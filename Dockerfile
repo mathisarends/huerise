@@ -5,7 +5,7 @@ WORKDIR /app
 RUN pip install uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --extra api
 
 
 FROM python:3.13-slim AS runtime
@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y libportaudio2 && rm -rf /var/lib/apt/li
 RUN pip install uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen
+RUN uv sync --frozen --extra api
 
 COPY huerise/ ./huerise/
 

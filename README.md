@@ -13,6 +13,21 @@ Sunrise alarm clock powered by Philips Hue. Gradually increases light brightness
 
 Python 3.13+ · FastAPI · SQLite (aiosqlite) · SQLModel · Alembic · Dishka (DI) · [hueify](https://pypi.org/project/hueify/) · uv
 
+## Optional Extras
+
+| Extra          | Installs          | When you need it                 |
+| -------------- | ----------------- | -------------------------------- |
+| `huerise[api]` | FastAPI + Uvicorn | Run the REST API server          |
+| `huerise[mcp]` | FastMCP           | Run the MCP server for AI agents |
+
+Install one or both:
+
+```bash
+uv sync --extra api          # REST API only
+uv sync --extra mcp          # MCP only
+uv sync --extra api --extra mcp  # both
+```
+
 ## Prerequisites
 
 - Docker & Docker Compose
@@ -57,24 +72,29 @@ Interactive docs are available at `http://localhost:8000/docs` (Swagger UI).
 
 Key endpoints:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/alarms` | List all alarms |
-| POST | `/alarms/one-time` | Create a one-time alarm |
-| POST | `/alarms/recurring` | Create a recurring alarm series |
-| POST | `/alarms/{id}/activate` | Activate an alarm |
-| POST | `/alarms/{id}/deactivate` | Deactivate an alarm |
-| POST | `/alarms/{id}/cancel` | Cancel a running alarm |
-| DELETE | `/alarms/{id}` | Delete an alarm |
-| DELETE | `/alarms/series/{id}` | Delete a recurring series |
+| Method | Path                      | Description                     |
+| ------ | ------------------------- | ------------------------------- |
+| GET    | `/alarms`                 | List all alarms                 |
+| POST   | `/alarms/one-time`        | Create a one-time alarm         |
+| POST   | `/alarms/recurring`       | Create a recurring alarm series |
+| POST   | `/alarms/{id}/activate`   | Activate an alarm               |
+| POST   | `/alarms/{id}/deactivate` | Deactivate an alarm             |
+| POST   | `/alarms/{id}/cancel`     | Cancel a running alarm          |
+| DELETE | `/alarms/{id}`            | Delete an alarm                 |
+| DELETE | `/alarms/series/{id}`     | Delete a recurring series       |
 
 ## Local Development
 
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.14+.
 
 ```bash
-uv sync
+# With REST API
+uv sync --extra api
 uv run python -m huerise.main
+
+# With MCP server (requires fastmcp)
+uv sync --extra mcp
+uv run python run_mcp.py
 ```
 
 Run tests:

@@ -1,12 +1,19 @@
+try:
+    from dishka.integrations.fastapi import setup_dishka
+    from fastapi import FastAPI
+except ImportError as e:
+    raise ImportError(
+        "API support requires 'fastapi' and 'uvicorn'. "
+        "Install with: pip install huerise[api]"
+    ) from e
+
 from dishka import make_async_container
-from dishka.integrations.fastapi import setup_dishka
-from fastapi import FastAPI
 
 from huerise.infrastructure import DatabaseSettings
 from huerise.infrastructure.di import AlarmProvider, DatabaseProvider, SchedulerProvider
 from huerise.lifespan import lifespan
 from huerise.presentation import router
-from huerise.presentation.exception_mappings import register_exception_handlers
+from huerise.presentation.api.exception_mappings import register_exception_handlers
 
 _settings = DatabaseSettings()
 _container = make_async_container(
