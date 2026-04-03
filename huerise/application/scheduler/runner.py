@@ -21,15 +21,15 @@ class AlarmRunner:
 
     async def run(self, alarm: Alarm) -> None:
         try:
-            alarm.trigger()  # SCHEDULED → SUNRISE
+            alarm.trigger()
             await self._repo.save(alarm)
             await self._run_sunrise(alarm)
 
-            alarm.ring()  # SUNRISE → RINGING
+            alarm.ring()
             await self._repo.save(alarm)
             await self._run_ringtone(alarm)
 
-            alarm.complete()  # RINGING → COMPLETED
+            alarm.complete()
             await self._repo.save(alarm)
         except Exception:
             logger.exception("Alarm %s failed during execution", alarm.id)

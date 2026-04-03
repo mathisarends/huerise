@@ -5,8 +5,8 @@ import pytest
 
 from huerise.domain import (
     Alarm,
-    AlarmAlreadyCancelled,
-    AlarmAlreadyInStatus,
+    AlarmAlreadyCancelledError,
+    AlarmAlreadyInStatusError,
     AlarmStatus,
     AlarmType,
     IntroConfig,
@@ -14,8 +14,6 @@ from huerise.domain import (
     Schedule,
     SunriseConfig,
     Weekday,
-    create_one_time,
-    create_recurring,
 )
 
 
@@ -39,7 +37,7 @@ def _ringtone() -> RingtoneConfig:
 def _one_time(**kwargs) -> Alarm:
     defaults = dict(label="Test", hour=8, minute=0)
     defaults.update(kwargs)
-    return create_one_time(
+    return Alarm.create_one_time(
         **defaults,
         intro_config=_intro(),
         sunrise_config=_sunrise(),
@@ -52,7 +50,7 @@ def _recurring(**kwargs) -> Alarm:
         label="Test", hour=8, minute=0, days={Weekday.MON}, series_id=uuid.uuid4()
     )
     defaults.update(kwargs)
-    return create_recurring(
+    return Alarm.create_recurring(
         **defaults,
         intro_config=_intro(),
         sunrise_config=_sunrise(),
@@ -206,13 +204,13 @@ class TestAlarmDeactivate:
     def test_deactivating_inactive_alarm_raises(self) -> None:
         alarm = _one_time()
         alarm.deactivate()
-        with pytest.raises(AlarmAlreadyInStatus, match="inactive"):
+        with pytest.raises(AlarmAlreadyInStatusError, match="inactive"):
             alarm.deactivate()
 
     def test_deactivating_cancelled_alarm_raises(self) -> None:
         alarm = _one_time()
         alarm.cancel()
-        with pytest.raises(AlarmAlreadyInStatus, match="cancelled"):
+        with pytest.raises(AlarmAlreadyInStatusError, match="cancelled"):
             alarm.deactivate()
 
 
@@ -234,13 +232,13 @@ class TestAlarmActivate:
 
     def test_activating_scheduled_alarm_raises(self) -> None:
         alarm = _one_time()
-        with pytest.raises(AlarmAlreadyInStatus, match="scheduled"):
+        with pytest.raises(AlarmAlreadyInStatusError, match="scheduled"):
             alarm.activate()
 
     def test_activating_cancelled_alarm_raises(self) -> None:
         alarm = _one_time()
         alarm.cancel()
-        with pytest.raises(AlarmAlreadyInStatus, match="cancelled"):
+        with pytest.raises(AlarmAlreadyInStatusError, match="cancelled"):
             alarm.activate()
 
 
@@ -258,13 +256,13 @@ class TestAlarmCancel:
     def test_inactive_alarm_cannot_be_cancelled(self) -> None:
         alarm = _one_time()
         alarm.deactivate()
-        with pytest.raises(AlarmAlreadyCancelled):
+        with pytest.raises(AlarmAlreadyCancelledError):
             alarm.cancel()
 
     def test_cancelling_already_cancelled_alarm_raises(self) -> None:
         alarm = _one_time()
         alarm.cancel()
-        with pytest.raises(AlarmAlreadyCancelled):
+        with pytest.raises(AlarmAlreadyCancelledError):
             alarm.cancel()
 
 

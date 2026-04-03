@@ -1,5 +1,6 @@
-import uuid
+import logging
 from dataclasses import dataclass
+from uuid import uuid4
 
 from huerise.domain import (
     Alarm,
@@ -9,6 +10,8 @@ from huerise.domain import (
     SunriseConfig,
     Weekday,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -29,7 +32,13 @@ class CreateRecurringAlarmCommandHandler:
         self._alarm_repository = alarm_repository
 
     async def execute(self, command: CreateRecurringAlarmCommand) -> Alarm:
-        series_id = uuid.uuid4()
+        logger.info(
+            "Creating recurring alarm '%s' at %02d:%02d",
+            command.label,
+            command.hour,
+            command.minute,
+        )
+        series_id = uuid4()
         alarm = Alarm.create_recurring(
             label=command.label,
             hour=command.hour,
@@ -46,5 +55,4 @@ class CreateRecurringAlarmCommandHandler:
                 volume=command.ringtone_volume,
             ),
         )
-        await self._alarm_repository.save(alarm)
-        return alarm
+        return await self._alarm_repository.save(alarm)

@@ -36,11 +36,12 @@ class SQLModelAlarmRepository(AlarmRepository):
         )
         return [self._to_domain(m) for m in result.scalars().all()]
 
-    async def save(self, alarm: Alarm) -> None:
+    async def save(self, alarm: Alarm) -> Alarm:
         model = self._to_model(alarm)
         merged = await self._session.merge(model)
         self._session.add(merged)
         await self._session.flush()
+        return alarm
 
     async def delete(self, alarm_id: uuid.UUID) -> None:
         model = await self._session.get(AlarmModel, alarm_id)
@@ -131,10 +132,11 @@ class BackgroundAlarmRepository(AlarmRepository):
         async with self._factory() as session:
             return await SQLModelAlarmRepository(session).get_scheduled()
 
-    async def save(self, alarm: Alarm) -> None:
+    async def save(self, alarm: Alarm) -> Alarm:
         async with self._factory() as session:
             await SQLModelAlarmRepository(session).save(alarm)
             await session.commit()
+            return alarm
 
     async def delete(self, alarm_id: uuid.UUID) -> None:
         async with self._factory() as session:

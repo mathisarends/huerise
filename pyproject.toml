@@ -30,6 +30,9 @@ mcp = [
     "fastmcp>=2.0.0",
 ]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
 [tool.hatch.build.targets.wheel]
 include = [
     "huerise/**/*.py",

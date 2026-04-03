@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from huerise.domain import (
@@ -7,6 +8,8 @@ from huerise.domain import (
     RingtoneConfig,
     SunriseConfig,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,12 @@ class CreateOneTimeAlarmCommandHandler:
         self._alarm_repository = alarm_repository
 
     async def execute(self, command: CreateOneTimeAlarmCommand) -> Alarm:
+        logger.info(
+            "Creating one-time alarm '%s' at %02d:%02d",
+            command.label,
+            command.hour,
+            command.minute,
+        )
         alarm = Alarm.create_one_time(
             label=command.label,
             hour=command.hour,
@@ -40,5 +49,4 @@ class CreateOneTimeAlarmCommandHandler:
                 volume=command.ringtone_volume,
             ),
         )
-        await self._alarm_repository.save(alarm)
-        return alarm
+        return await self._alarm_repository.save(alarm)
