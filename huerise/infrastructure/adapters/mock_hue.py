@@ -1,7 +1,7 @@
 from huerise.application.ports import Lights
 
 
-class MockHueLightsAdapter(Lights):
+class MockHueLights(Lights):
     async def activate_scene(self, room_name: str, scene_name: str) -> None:
         print(f"[MockHue] activate_scene({room_name!r}, {scene_name!r})")
 

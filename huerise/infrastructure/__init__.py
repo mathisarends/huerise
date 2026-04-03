@@ -1,3 +1,3 @@
-from .credentials import HueCredentials
+from .credentials import HueCredentials, DatabaseSettings
 
-__all__ = ["HueCredentials"]
+__all__ = ["HueCredentials", "DatabaseSettings"]

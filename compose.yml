@@ -38,5 +38,17 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  adminer:
+    image: adminer
+    container_name: daylight-alarm-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - sqlite_data:/data
+    environment:
+      - ADMINER_DEFAULT_DRIVER=sqlite
+      - ADMINER_DEFAULT_DB=/data/daylight.db
+
 volumes:
   sqlite_data:

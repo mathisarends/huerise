@@ -2,7 +2,7 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
-from huerise.infrastructure.credentials import DatabaseSettings
+from huerise.infrastructure import DatabaseSettings
 from huerise.infrastructure.di import AlarmProvider, DatabaseProvider, SchedulerProvider
 from huerise.lifespan import lifespan
 from huerise.presentation import router

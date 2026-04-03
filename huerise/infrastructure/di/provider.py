@@ -17,7 +17,7 @@ from huerise.application.commands import (
 from huerise.application.queries import ListAlarmsQueryHandler
 
 from huerise.domain import AlarmRepository
-from huerise.infrastructure.adapters.mock_hue import MockHueLightsAdapter
+from huerise.infrastructure.adapters.mock_hue import MockHueLights
 from huerise.infrastructure.adapters.pyaudio import SoundDeviceAudioPlayer
 from huerise.infrastructure.persistence import (
     BackgroundAlarmRepository,
@@ -103,7 +103,7 @@ class SchedulerProvider(Provider):
 
     @provide
     def get_lights(self) -> Lights:
-        return MockHueLightsAdapter()
+        return MockHueLights()
 
     @provide
     def get_audio(self) -> AudioPlayer:

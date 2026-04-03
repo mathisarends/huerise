@@ -1,5 +1,5 @@
-from .mock_hue import MockHueLightsAdapter
+from .mock_hue import MockHueLights
 
 __all__ = [
-    "MockHueLightsAdapter",
+    "MockHueLights",
 ]
