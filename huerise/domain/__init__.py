@@ -1,6 +1,5 @@
 from .alarm import Alarm
-from .exceptions import AlarmAlreadyCancelled, AlarmAlreadyInStatus
-from .factory import create_one_time, create_recurring
+from .exceptions import AlarmAlreadyCancelled, AlarmAlreadyInStatus, AlarmNotFound
 from .views import (
     AlarmStatus,
     AlarmType,
@@ -14,6 +13,7 @@ from .repository import AlarmRepository
 
 __all__ = [
     "Alarm",
+    "AlarmNotFound",
     "AlarmAlreadyCancelled",
     "AlarmAlreadyInStatus",
     "AlarmStatus",
@@ -23,7 +23,5 @@ __all__ = [
     "Schedule",
     "SunriseConfig",
     "Weekday",
-    "create_one_time",
-    "create_recurring",
     "AlarmRepository",
 ]

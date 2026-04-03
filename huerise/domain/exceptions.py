@@ -2,6 +2,11 @@ import uuid
 from huerise.domain.views import AlarmStatus
 
 
+class AlarmNotFound(Exception):
+    def __init__(self, alarm_id: uuid.UUID) -> None:
+        super().__init__(f"Alarm {alarm_id} not found")
+
+
 class AlarmAlreadyCancelled(Exception):
     def __init__(self, alarm_id: uuid.UUID) -> None:
         super().__init__(f"Alarm {alarm_id} is already cancelled")

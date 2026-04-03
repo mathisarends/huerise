@@ -10,6 +10,11 @@ class CreateOneTimeAlarmBody(BaseModel):
     label: str
     hour: int = Field(ge=0, le=23)
     minute: int = Field(ge=0, le=59)
+    room_name: str
+    intro_audio_file: str = "wake-up-bowls.mp3"
+    ringtone_audio_file: str = "get-up-aurora.mp3"
+    ringtone_volume: int = Field(default=80, ge=0, le=100)
+    sunrise_duration_minutes: int = Field(default=7, ge=1)
 
 
 class CreateRecurringAlarmBody(BaseModel):
@@ -17,6 +22,11 @@ class CreateRecurringAlarmBody(BaseModel):
     hour: int = Field(ge=0, le=23)
     minute: int = Field(ge=0, le=59)
     days: list[Weekday] = Field(min_length=1)
+    room_name: str
+    intro_audio_file: str = "wake-up-bowls.mp3"
+    ringtone_audio_file: str = "get-up-aurora.mp3"
+    ringtone_volume: int = Field(default=80, ge=0, le=100)
+    sunrise_duration_minutes: int = Field(default=7, ge=1)
 
 
 class ScheduleOut(BaseModel):

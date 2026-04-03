@@ -501,6 +501,7 @@ dependencies = [
     { name = "aiosqlite" },
     { name = "alembic" },
     { name = "dishka" },
+    { name = "fastapi" },
     { name = "hueify" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -508,9 +509,6 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
-api = [
-    { name = "fastapi" },
-]
 dev = [
     { name = "pre-commit" },
     { name = "pytest" },
@@ -526,6 +524,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.22.1" },
     { name = "alembic", specifier = ">=1.18.4" },
     { name = "dishka", specifier = ">=1.9.1" },
+    { name = "fastapi", specifier = ">=0.124.0" },
     { name = "hueify", specifier = ">=0.5.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydantic-settings", specifier = ">=2.13.1" },
@@ -533,7 +532,6 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-api = [{ name = "fastapi", specifier = ">=0.124.0" }]
 dev = [
     { name = "pre-commit", specifier = ">=4.5.0" },
     { name = "pytest", specifier = ">=9.0.2" },
