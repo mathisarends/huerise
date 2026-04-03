@@ -1,4 +1,3 @@
-# Dockerfile
 FROM python:3.13-slim AS builder
 
 WORKDIR /app
@@ -14,9 +13,26 @@ FROM python:3.13-slim AS runtime
 WORKDIR /app
 
 COPY --from=builder /app/.venv .venv
-COPY src/ ./src/
+COPY huerise/ ./huerise/
 
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "-m", "src.main"]
+CMD ["python", "-m", "uvicorn", "huerise.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+FROM python:3.13-slim AS dev
+
+WORKDIR /app
+
+RUN pip install uv
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
+
+COPY huerise/ ./huerise/
+
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "-m", "uvicorn", "huerise.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

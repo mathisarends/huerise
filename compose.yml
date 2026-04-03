@@ -1,14 +1,42 @@
 services:
-  daylight-alarm:
+  migrate:
     build:
       context: .
       dockerfile: Dockerfile
-      target: runtime
-    container_name: daylight-alarm
-    restart: unless-stopped
+      target: dev
+    container_name: daylight-alarm-migrate
     env_file:
       - .env
     volumes:
       - sqlite_data:/app/data
+      - ./huerise:/app/huerise
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
     environment:
-      - DATABASE_URL=sqlite:////app/data/daylight.db
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/daylight.db
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
+  daylight-alarm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: daylight-alarm
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite_data:/app/data
+      - ./huerise:/app/huerise
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/daylight.db
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  sqlite_data:

@@ -34,7 +34,8 @@ router = APIRouter(prefix="/alarms", tags=["Alarms"], route_class=DishkaRoute)
 async def list_alarms(
     handler: FromDishka[ListAlarmsQueryHandler],
 ) -> list[AlarmOut]:
-    alarms = await handler.execute(ListAlarmsQuery())
+    query = ListAlarmsQuery()
+    alarms = await handler.execute(query)
     return [to_alarm_out(a) for a in alarms]
 
 
@@ -48,18 +49,17 @@ async def create_one_time_alarm(
     body: CreateOneTimeAlarmBody,
     handler: FromDishka[CreateOneTimeAlarmCommandHandler],
 ) -> AlarmOut:
-    alarm = await handler.execute(
-        CreateOneTimeAlarmCommand(
-            label=body.label,
-            hour=body.hour,
-            minute=body.minute,
-            room_name=body.room_name,
-            intro_audio_file=body.intro_audio_file,
-            ringtone_audio_file=body.ringtone_audio_file,
-            ringtone_volume=body.ringtone_volume,
-            sunrise_duration_minutes=body.sunrise_duration_minutes,
-        )
+    command = CreateOneTimeAlarmCommand(
+        label=body.label,
+        hour=body.hour,
+        minute=body.minute,
+        room_name=body.room_name,
+        intro_audio_file=body.intro_audio_file,
+        ringtone_audio_file=body.ringtone_audio_file,
+        ringtone_volume=body.ringtone_volume,
+        sunrise_duration_minutes=body.sunrise_duration_minutes,
     )
+    alarm = await handler.execute(command)
     return to_alarm_out(alarm)
 
 
@@ -73,19 +73,18 @@ async def create_recurring_alarm(
     body: CreateRecurringAlarmBody,
     handler: FromDishka[CreateRecurringAlarmCommandHandler],
 ) -> AlarmOut:
-    alarm = await handler.execute(
-        CreateRecurringAlarmCommand(
-            label=body.label,
-            hour=body.hour,
-            minute=body.minute,
-            days=frozenset(body.days),
-            room_name=body.room_name,
-            intro_audio_file=body.intro_audio_file,
-            ringtone_audio_file=body.ringtone_audio_file,
-            ringtone_volume=body.ringtone_volume,
-            sunrise_duration_minutes=body.sunrise_duration_minutes,
-        )
+    command = CreateRecurringAlarmCommand(
+        label=body.label,
+        hour=body.hour,
+        minute=body.minute,
+        days=frozenset(body.days),
+        room_name=body.room_name,
+        intro_audio_file=body.intro_audio_file,
+        ringtone_audio_file=body.ringtone_audio_file,
+        ringtone_volume=body.ringtone_volume,
+        sunrise_duration_minutes=body.sunrise_duration_minutes,
     )
+    alarm = await handler.execute(command)
     return to_alarm_out(alarm)
 
 
@@ -96,7 +95,8 @@ async def activate_alarm(
     alarm_id: UUID,
     handler: FromDishka[ActivateAlarmCommandHandler],
 ) -> AlarmOut:
-    alarm = await handler.execute(ActivateAlarmCommand(alarm_id=alarm_id))
+    command = ActivateAlarmCommand(alarm_id=alarm_id)
+    alarm = await handler.execute(command)
     return to_alarm_out(alarm)
 
 
@@ -107,7 +107,8 @@ async def deactivate_alarm(
     alarm_id: UUID,
     handler: FromDishka[DeactivateAlarmCommandHandler],
 ) -> AlarmOut:
-    alarm = await handler.execute(DeactivateAlarmCommand(alarm_id=alarm_id))
+    command = DeactivateAlarmCommand(alarm_id=alarm_id)
+    alarm = await handler.execute(command)
     return to_alarm_out(alarm)
 
 
@@ -116,7 +117,8 @@ async def cancel_alarm(
     alarm_id: UUID,
     handler: FromDishka[CancelAlarmCommandHandler],
 ) -> AlarmOut:
-    alarm = await handler.execute(CancelAlarmCommand(alarm_id=alarm_id))
+    command = CancelAlarmCommand(alarm_id=alarm_id)
+    alarm = await handler.execute(command)
     return to_alarm_out(alarm)
 
 
@@ -130,7 +132,8 @@ async def delete_series(
     series_id: UUID,
     handler: FromDishka[DeleteSeriesCommandHandler],
 ) -> None:
-    await handler.execute(DeleteSeriesCommand(series_id=series_id))
+    command = DeleteSeriesCommand(series_id=series_id)
+    await handler.execute(command)
 
 
 @router.delete(
@@ -140,4 +143,5 @@ async def delete_alarm(
     alarm_id: UUID,
     handler: FromDishka[DeleteAlarmCommandHandler],
 ) -> None:
-    await handler.execute(DeleteAlarmCommand(alarm_id=alarm_id))
+    command = DeleteAlarmCommand(alarm_id=alarm_id)
+    await handler.execute(command)

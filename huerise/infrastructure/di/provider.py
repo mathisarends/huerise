@@ -3,7 +3,7 @@ from collections.abc import AsyncIterator
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from huerise.application import (
+from huerise.application.commands import (
     ActivateAlarmCommandHandler,
     CancelAlarmCommandHandler,
     CreateOneTimeAlarmCommandHandler,
@@ -11,8 +11,9 @@ from huerise.application import (
     DeactivateAlarmCommandHandler,
     DeleteAlarmCommandHandler,
     DeleteSeriesCommandHandler,
-    ListAlarmsQueryHandler,
 )
+from huerise.application.queries import ListAlarmsQueryHandler
+
 from huerise.domain import AlarmRepository
 from huerise.infrastructure.persistence import SQLModelAlarmRepository
 

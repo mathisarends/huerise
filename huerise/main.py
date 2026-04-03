@@ -1,8 +1,18 @@
+from dishka import make_async_container
+from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
-from huerise.presentation.exception_mappings import register_exception_handlers
+from huerise.infrastructure.credentials import DatabaseSettings
+from huerise.infrastructure.di import AlarmProvider, DatabaseProvider
 from huerise.lifespan import lifespan
 from huerise.presentation import router
+from huerise.presentation.exception_mappings import register_exception_handlers
+
+_settings = DatabaseSettings()
+_container = make_async_container(
+    DatabaseProvider(database_url=_settings.async_url),
+    AlarmProvider(),
+)
 
 app = FastAPI(
     title="Huerise Alarm API",
@@ -11,8 +21,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+setup_dishka(_container, app=app)
 app.include_router(router)
-
 register_exception_handlers(app)
 
 if __name__ == "__main__":
