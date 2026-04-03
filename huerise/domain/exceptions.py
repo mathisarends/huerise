@@ -20,3 +20,8 @@ class AlarmAlreadyCancelledError(HueriseError):
 class AlarmAlreadyInStatusError(HueriseError):
     def __init__(self, alarm_id: uuid.UUID, status: AlarmStatus) -> None:
         super().__init__(f"Alarm {alarm_id} is already {status}")
+
+
+class AlarmNotRunningError(HueriseError):
+    def __init__(self, alarm_id: uuid.UUID) -> None:
+        super().__init__(f"Alarm {alarm_id} is not currently running")

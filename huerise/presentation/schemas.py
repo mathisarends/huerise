@@ -13,8 +13,6 @@ class CreateOneTimeAlarmBody(BaseModel):
     room_name: str
     intro_audio_file: str = "wake-up-bowls.mp3"
     ringtone_audio_file: str = "get-up-aurora.mp3"
-    ringtone_volume: int = Field(default=80, ge=0, le=100)
-    sunrise_duration_minutes: int = Field(default=7, ge=1)
 
 
 class CreateRecurringAlarmBody(BaseModel):
@@ -25,8 +23,6 @@ class CreateRecurringAlarmBody(BaseModel):
     room_name: str
     intro_audio_file: str = "wake-up-bowls.mp3"
     ringtone_audio_file: str = "get-up-aurora.mp3"
-    ringtone_volume: int = Field(default=80, ge=0, le=100)
-    sunrise_duration_minutes: int = Field(default=7, ge=1)
 
 
 class ScheduleOut(BaseModel):
@@ -43,3 +39,11 @@ class AlarmOut(BaseModel):
     alarm_type: AlarmType
     series_id: UUID | None = None
     created_at: datetime
+
+
+class SnoozeAlarmBody(BaseModel):
+    minutes: int = Field(default=10, ge=1, le=60)
+
+
+class SetVolumeBody(BaseModel):
+    volume: int = Field(ge=0, le=100)

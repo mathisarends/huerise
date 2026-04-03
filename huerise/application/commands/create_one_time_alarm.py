@@ -1,13 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from huerise.domain import (
-    Alarm,
-    AlarmRepository,
-    IntroConfig,
-    RingtoneConfig,
-    SunriseConfig,
-)
+from huerise.domain import Alarm, AlarmRepository
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +14,6 @@ class CreateOneTimeAlarmCommand:
     room_name: str
     intro_audio_file: str = "wake-up-bowls.mp3"
     ringtone_audio_file: str = "get-up-aurora.mp3"
-    ringtone_volume: int = 80
-    sunrise_duration_minutes: int = 7
 
 
 class CreateOneTimeAlarmCommandHandler:
@@ -39,14 +31,8 @@ class CreateOneTimeAlarmCommandHandler:
             label=command.label,
             hour=command.hour,
             minute=command.minute,
-            intro_config=IntroConfig(audio_file=command.intro_audio_file),
-            sunrise_config=SunriseConfig(
-                room_name=command.room_name,
-                duration_minutes=command.sunrise_duration_minutes,
-            ),
-            ringtone_config=RingtoneConfig(
-                audio_file=command.ringtone_audio_file,
-                volume=command.ringtone_volume,
-            ),
+            room_name=command.room_name,
+            intro_audio_file=command.intro_audio_file,
+            ringtone_audio_file=command.ringtone_audio_file,
         )
         return await self._alarm_repository.save(alarm)

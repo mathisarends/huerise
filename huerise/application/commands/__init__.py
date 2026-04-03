@@ -11,6 +11,8 @@ from .create_recurring_alarm import (
 from .deactivate_alarm import DeactivateAlarmCommand, DeactivateAlarmCommandHandler
 from .delete_alarm import DeleteAlarmCommand, DeleteAlarmCommandHandler
 from .delete_series import DeleteSeriesCommand, DeleteSeriesCommandHandler
+from .set_volume import SetVolumeCommand, SetVolumeCommandHandler
+from .snooze_alarm import SnoozeAlarmCommand, SnoozeAlarmCommandHandler
 
 __all__ = [
     "ActivateAlarmCommand",
@@ -27,4 +29,8 @@ __all__ = [
     "DeleteAlarmCommandHandler",
     "DeleteSeriesCommand",
     "DeleteSeriesCommandHandler",
+    "SetVolumeCommand",
+    "SetVolumeCommandHandler",
+    "SnoozeAlarmCommand",
+    "SnoozeAlarmCommandHandler",
 ]

@@ -1,9 +1,10 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from huerise.domain.exceptions import (
     AlarmAlreadyCancelledError,
     AlarmAlreadyInStatusError,
+    AlarmNotRunningError,
 )
 from huerise.domain.views import (
     AlarmStatus,
@@ -86,7 +87,17 @@ class Alarm:
     def _can_cancel(self) -> bool:
         return self.status in {AlarmStatus.SCHEDULED, *_RUNNING_STATUSES}
 
-    # --- Factory methods ---
+    def snooze(self, minutes: int = 10) -> None:
+        if not self.is_running:
+            raise AlarmNotRunningError(self.id)
+
+        wake_time = datetime.now(timezone.utc) + timedelta(minutes=minutes)
+        self.schedule = Schedule(
+            hour=wake_time.hour,
+            minute=wake_time.minute,
+            recurrence=self.schedule.recurrence,
+        )
+        self.status = AlarmStatus.SCHEDULED
 
     @classmethod
     def create_one_time(
@@ -94,9 +105,9 @@ class Alarm:
         label: str,
         hour: int,
         minute: int,
-        intro_config: IntroConfig,
-        sunrise_config: SunriseConfig,
-        ringtone_config: RingtoneConfig,
+        room_name: str,
+        intro_audio_file: str = "wake-up-bowls.mp3",
+        ringtone_audio_file: str = "get-up-aurora.mp3",
     ) -> "Alarm":
         return cls(
             label=label,
@@ -104,9 +115,9 @@ class Alarm:
             status=AlarmStatus.SCHEDULED,
             alarm_type=AlarmType.ONE_TIME,
             series_id=None,
-            intro_config=intro_config,
-            sunrise_config=sunrise_config,
-            ringtone_config=ringtone_config,
+            intro_config=IntroConfig(audio_file=intro_audio_file),
+            sunrise_config=SunriseConfig(room_name=room_name),
+            ringtone_config=RingtoneConfig(audio_file=ringtone_audio_file),
         )
 
     @classmethod
@@ -117,9 +128,9 @@ class Alarm:
         minute: int,
         days: set["Weekday"],
         series_id: uuid.UUID,
-        intro_config: IntroConfig,
-        sunrise_config: SunriseConfig,
-        ringtone_config: RingtoneConfig,
+        room_name: str,
+        intro_audio_file: str = "wake-up-bowls.mp3",
+        ringtone_audio_file: str = "get-up-aurora.mp3",
     ) -> "Alarm":
         return cls(
             label=label,
@@ -127,7 +138,7 @@ class Alarm:
             status=AlarmStatus.SCHEDULED,
             alarm_type=AlarmType.RECURRING,
             series_id=series_id,
-            intro_config=intro_config,
-            sunrise_config=sunrise_config,
-            ringtone_config=ringtone_config,
+            intro_config=IntroConfig(audio_file=intro_audio_file),
+            sunrise_config=SunriseConfig(room_name=room_name),
+            ringtone_config=RingtoneConfig(audio_file=ringtone_audio_file),
         )

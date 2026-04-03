@@ -40,6 +40,6 @@ def make_repo(
     repo.get = AsyncMock(return_value=get_return)
     repo.get_all = AsyncMock(return_value=get_all_return or [])
     repo.get_scheduled = AsyncMock(return_value=get_scheduled_return or [])
-    repo.save = AsyncMock()
+    repo.save = AsyncMock(side_effect=lambda a: a)
     repo.delete = AsyncMock()
     return repo

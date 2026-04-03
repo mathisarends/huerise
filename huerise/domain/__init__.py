@@ -3,6 +3,7 @@ from .exceptions import (
     AlarmAlreadyCancelledError,
     AlarmAlreadyInStatusError,
     AlarmNotFoundError,
+    AlarmNotRunningError,
 )
 from .views import (
     AlarmStatus,
@@ -20,6 +21,7 @@ __all__ = [
     "AlarmNotFoundError",
     "AlarmAlreadyCancelledError",
     "AlarmAlreadyInStatusError",
+    "AlarmNotRunningError",
     "AlarmStatus",
     "AlarmType",
     "IntroConfig",

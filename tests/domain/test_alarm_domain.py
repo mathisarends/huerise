@@ -7,6 +7,7 @@ from huerise.domain import (
     Alarm,
     AlarmAlreadyCancelledError,
     AlarmAlreadyInStatusError,
+    AlarmNotRunningError,
     AlarmStatus,
     AlarmType,
     IntroConfig,
@@ -22,40 +23,32 @@ from huerise.domain import (
 # ---------------------------------------------------------------------------
 
 
-def _intro() -> IntroConfig:
-    return IntroConfig(audio_file="intro.mp3")
-
-
-def _sunrise() -> SunriseConfig:
-    return SunriseConfig(room_name="Bedroom")
-
-
-def _ringtone() -> RingtoneConfig:
-    return RingtoneConfig(audio_file="alarm.mp3")
-
-
 def _one_time(**kwargs) -> Alarm:
-    defaults = dict(label="Test", hour=8, minute=0)
-    defaults.update(kwargs)
-    return Alarm.create_one_time(
-        **defaults,
-        intro_config=_intro(),
-        sunrise_config=_sunrise(),
-        ringtone_config=_ringtone(),
+    defaults = dict(
+        label="Test",
+        hour=8,
+        minute=0,
+        room_name="Bedroom",
+        intro_audio_file="intro.mp3",
+        ringtone_audio_file="alarm.mp3",
     )
+    defaults.update(kwargs)
+    return Alarm.create_one_time(**defaults)
 
 
 def _recurring(**kwargs) -> Alarm:
     defaults = dict(
-        label="Test", hour=8, minute=0, days={Weekday.MON}, series_id=uuid.uuid4()
+        label="Test",
+        hour=8,
+        minute=0,
+        days={Weekday.MON},
+        series_id=uuid.uuid4(),
+        room_name="Bedroom",
+        intro_audio_file="intro.mp3",
+        ringtone_audio_file="alarm.mp3",
     )
     defaults.update(kwargs)
-    return Alarm.create_recurring(
-        **defaults,
-        intro_config=_intro(),
-        sunrise_config=_sunrise(),
-        ringtone_config=_ringtone(),
-    )
+    return Alarm.create_recurring(**defaults)
 
 
 # ---------------------------------------------------------------------------
@@ -305,6 +298,52 @@ class TestPhaseTransitions:
         alarm = _one_time()
         with pytest.raises(ValueError):
             alarm.complete()
+
+
+# ---------------------------------------------------------------------------
+# Alarm.snooze
+# ---------------------------------------------------------------------------
+
+
+class TestAlarmSnooze:
+    def test_snooze_from_ringing_sets_status_to_scheduled(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        alarm.snooze(minutes=10)
+        assert alarm.status == AlarmStatus.SCHEDULED
+
+    def test_snooze_from_sunrise_sets_status_to_scheduled(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.snooze(minutes=5)
+        assert alarm.status == AlarmStatus.SCHEDULED
+
+    def test_snooze_updates_schedule(self) -> None:
+        alarm = _one_time(hour=7, minute=0)
+        alarm.trigger()
+        alarm.ring()
+        alarm.snooze(minutes=10)
+        assert alarm.schedule.hour != 7 or alarm.schedule.minute != 0
+
+    def test_snooze_from_scheduled_raises(self) -> None:
+        alarm = _one_time()
+        with pytest.raises(AlarmNotRunningError):
+            alarm.snooze()
+
+    def test_snooze_from_inactive_raises(self) -> None:
+        alarm = _one_time()
+        alarm.deactivate()
+        with pytest.raises(AlarmNotRunningError):
+            alarm.snooze()
+
+    def test_snooze_from_completed_raises(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        alarm.complete()
+        with pytest.raises(AlarmNotRunningError):
+            alarm.snooze()
 
 
 # ---------------------------------------------------------------------------

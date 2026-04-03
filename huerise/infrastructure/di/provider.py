@@ -13,6 +13,8 @@ from huerise.application.commands import (
     DeactivateAlarmCommandHandler,
     DeleteAlarmCommandHandler,
     DeleteSeriesCommandHandler,
+    SetVolumeCommandHandler,
+    SnoozeAlarmCommandHandler,
 )
 from huerise.application.queries import ListAlarmsQueryHandler
 
@@ -96,6 +98,16 @@ class AlarmProvider(Provider):
         self, repo: AlarmRepository
     ) -> DeleteSeriesCommandHandler:
         return DeleteSeriesCommandHandler(repo)
+
+    @provide
+    def get_snooze_handler(
+        self, repo: AlarmRepository, audio: AudioPlayer
+    ) -> SnoozeAlarmCommandHandler:
+        return SnoozeAlarmCommandHandler(alarm_repository=repo, audio=audio)
+
+    @provide
+    def get_set_volume_handler(self, audio: AudioPlayer) -> SetVolumeCommandHandler:
+        return SetVolumeCommandHandler(audio=audio)
 
 
 class SchedulerProvider(Provider):

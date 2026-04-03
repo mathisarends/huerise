@@ -18,6 +18,10 @@ from huerise.application.commands import (
     DeleteAlarmCommandHandler,
     DeleteSeriesCommand,
     DeleteSeriesCommandHandler,
+    SetVolumeCommand,
+    SetVolumeCommandHandler,
+    SnoozeAlarmCommand,
+    SnoozeAlarmCommandHandler,
 )
 from huerise.application.queries import ListAlarmsQuery, ListAlarmsQueryHandler
 from huerise.presentation.mapper import to_alarm_out
@@ -25,6 +29,8 @@ from huerise.presentation.schemas import (
     AlarmOut,
     CreateOneTimeAlarmBody,
     CreateRecurringAlarmBody,
+    SetVolumeBody,
+    SnoozeAlarmBody,
 )
 
 router = APIRouter(prefix="/alarms", tags=["Alarms"], route_class=DishkaRoute)
@@ -56,8 +62,6 @@ async def create_one_time_alarm(
         room_name=body.room_name,
         intro_audio_file=body.intro_audio_file,
         ringtone_audio_file=body.ringtone_audio_file,
-        ringtone_volume=body.ringtone_volume,
-        sunrise_duration_minutes=body.sunrise_duration_minutes,
     )
     alarm = await handler.execute(command)
     return to_alarm_out(alarm)
@@ -81,8 +85,6 @@ async def create_recurring_alarm(
         room_name=body.room_name,
         intro_audio_file=body.intro_audio_file,
         ringtone_audio_file=body.ringtone_audio_file,
-        ringtone_volume=body.ringtone_volume,
-        sunrise_duration_minutes=body.sunrise_duration_minutes,
     )
     alarm = await handler.execute(command)
     return to_alarm_out(alarm)
@@ -120,6 +122,26 @@ async def cancel_alarm(
     command = CancelAlarmCommand(alarm_id=alarm_id)
     alarm = await handler.execute(command)
     return to_alarm_out(alarm)
+
+
+@router.post("/{alarm_id}/snooze", response_model=AlarmOut, operation_id="snoozeAlarm")
+async def snooze_alarm(
+    alarm_id: UUID,
+    body: SnoozeAlarmBody,
+    handler: FromDishka[SnoozeAlarmCommandHandler],
+) -> AlarmOut:
+    command = SnoozeAlarmCommand(alarm_id=alarm_id, minutes=body.minutes)
+    alarm = await handler.execute(command)
+    return to_alarm_out(alarm)
+
+
+@router.post("/volume", status_code=204, response_model=None, operation_id="setVolume")
+async def set_volume(
+    body: SetVolumeBody,
+    handler: FromDishka[SetVolumeCommandHandler],
+) -> None:
+    command = SetVolumeCommand(volume=body.volume)
+    await handler.execute(command)
 
 
 @router.delete(

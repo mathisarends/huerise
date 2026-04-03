@@ -1,5 +1,4 @@
 import uuid
-from unittest.mock import AsyncMock
 
 import pytest
 
@@ -14,9 +13,7 @@ from tests.application.conftest import make_alarm, make_repo
 class TestActivateAlarmCommandHandler:
     async def test_returns_the_alarm(self) -> None:
         alarm = make_alarm(status=AlarmStatus.INACTIVE)
-        repo = make_repo(get_return=alarm)
-        repo.save = AsyncMock(return_value=alarm)
-        handler = ActivateAlarmCommandHandler(repo)
+        handler = ActivateAlarmCommandHandler(make_repo(get_return=alarm))
 
         result = await handler.execute(ActivateAlarmCommand(alarm_id=alarm.id))
 

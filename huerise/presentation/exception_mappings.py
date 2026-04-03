@@ -5,12 +5,15 @@ from huerise.domain.exceptions import (
     AlarmAlreadyCancelledError,
     AlarmAlreadyInStatusError,
     AlarmNotFoundError,
+    AlarmNotRunningError,
 )
 
 _HANDLERS: list[tuple[type[Exception], int, str]] = [
     (AlarmNotFoundError, 404, "Alarm not found"),
     (AlarmAlreadyCancelledError, 409, "Alarm is already cancelled"),
     (AlarmAlreadyInStatusError, 409, "Alarm status conflict"),
+    (AlarmNotRunningError, 409, "Alarm is not currently running"),
+    (ValueError, 400, "Invalid operation"),
 ]
 
 
