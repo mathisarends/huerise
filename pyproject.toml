@@ -5,16 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi>=0.124.0",
-    "hueify>=0.2.0",
-    "hypercorn>=0.18.0",
-    "pygame-ce>=2.5.6",
-    "python-dotenv>=1.2.1",
-    "soco>=0.30.12",
+    "hueify>=0.5.0",
+    "dishka>=1.9.1",
+    "pydantic-settings>=2.13.1",
     "sqlmodel>=0.0.27",
+    "pydantic>=2.12.5",
 ]
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.5.0",
+]
+api = [
+    "fastapi>=0.124.0",
+]
+mcp = [
+    "fastmcp>=2.0.0",
 ]
