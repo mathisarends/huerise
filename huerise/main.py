@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from huerise.presentation.api.exception_mappings import register_exception_handlers
-from huerise.presentation.api.lifespan import lifespan
-from huerise.presentation.api.router import alarms_router, series_router
+from huerise.presentation.exception_mappings import register_exception_handlers
+from huerise.lifespan import lifespan
+from huerise.presentation import router
 
 app = FastAPI(
     title="Huerise Alarm API",
@@ -11,8 +11,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(alarms_router)
-app.include_router(series_router)
+app.include_router(router)
 
 register_exception_handlers(app)
 

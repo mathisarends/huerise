@@ -1,3 +1,3 @@
-from .credentials import Credentials
+from .credentials import HueCredentials
 
-__all__ = ["Credentials"]
+__all__ = ["HueCredentials"]

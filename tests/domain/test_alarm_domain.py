@@ -3,9 +3,61 @@ from datetime import timezone
 
 import pytest
 
-from huerise.domain.alarm import Alarm
-from huerise.domain.exceptions import AlarmAlreadyCancelled, AlarmAlreadyInStatus
-from huerise.domain.views import AlarmStatus, AlarmType, Schedule, Weekday
+from huerise.domain import (
+    Alarm,
+    AlarmAlreadyCancelled,
+    AlarmAlreadyInStatus,
+    AlarmStatus,
+    AlarmType,
+    IntroConfig,
+    RingtoneConfig,
+    Schedule,
+    SunriseConfig,
+    Weekday,
+    create_one_time,
+    create_recurring,
+)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _intro() -> IntroConfig:
+    return IntroConfig(audio_file="intro.mp3")
+
+
+def _sunrise() -> SunriseConfig:
+    return SunriseConfig(room_name="Bedroom")
+
+
+def _ringtone() -> RingtoneConfig:
+    return RingtoneConfig(audio_file="alarm.mp3")
+
+
+def _one_time(**kwargs) -> Alarm:
+    defaults = dict(label="Test", hour=8, minute=0)
+    defaults.update(kwargs)
+    return create_one_time(
+        **defaults,
+        intro_config=_intro(),
+        sunrise_config=_sunrise(),
+        ringtone_config=_ringtone(),
+    )
+
+
+def _recurring(**kwargs) -> Alarm:
+    defaults = dict(
+        label="Test", hour=8, minute=0, days={Weekday.MON}, series_id=uuid.uuid4()
+    )
+    defaults.update(kwargs)
+    return create_recurring(
+        **defaults,
+        intro_config=_intro(),
+        sunrise_config=_sunrise(),
+        ringtone_config=_ringtone(),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -65,87 +117,78 @@ class TestScheduleIsRecurring:
 
 class TestCreateOneTime:
     def test_creates_alarm_with_correct_label(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        alarm = _one_time(label="Morning")
         assert alarm.label == "Morning"
 
     def test_creates_alarm_with_correct_schedule(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=30)
+        alarm = _one_time(hour=7, minute=30)
         assert alarm.schedule.hour == 7
         assert alarm.schedule.minute == 30
 
-    def test_creates_alarm_with_active_status(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
-        assert alarm.status == AlarmStatus.ACTIVE
+    def test_creates_alarm_with_scheduled_status(self) -> None:
+        alarm = _one_time()
+        assert alarm.status == AlarmStatus.SCHEDULED
 
     def test_creates_alarm_with_one_time_type(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        alarm = _one_time()
         assert alarm.alarm_type == AlarmType.ONE_TIME
 
     def test_creates_alarm_with_no_series_id(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        alarm = _one_time()
         assert alarm.series_id is None
 
     def test_creates_alarm_with_uuid_id(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        alarm = _one_time()
         assert isinstance(alarm.id, uuid.UUID)
 
     def test_each_call_produces_unique_id(self) -> None:
-        a1 = Alarm.create_one_time(label="Morning", hour=7, minute=0)
-        a2 = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        a1 = _one_time()
+        a2 = _one_time()
         assert a1.id != a2.id
 
     def test_created_at_is_utc_aware(self) -> None:
-        alarm = Alarm.create_one_time(label="Morning", hour=7, minute=0)
+        alarm = _one_time()
         assert alarm.created_at.tzinfo is not None
         assert alarm.created_at.tzinfo == timezone.utc
+
+    def test_stores_intro_config(self) -> None:
+        alarm = _one_time()
+        assert alarm.intro_config.audio_file == "intro.mp3"
+
+    def test_stores_sunrise_config(self) -> None:
+        alarm = _one_time()
+        assert alarm.sunrise_config.room_name == "Bedroom"
+
+    def test_stores_ringtone_config(self) -> None:
+        alarm = _one_time()
+        assert alarm.ringtone_config.audio_file == "alarm.mp3"
 
 
 class TestCreateRecurring:
     def test_creates_alarm_with_correct_label(self) -> None:
-        series = uuid.uuid4()
-        alarm = Alarm.create_recurring(
-            label="Weekdays",
-            hour=6,
-            minute=30,
-            days={Weekday.MON, Weekday.FRI},
-            series_id=series,
-        )
+        alarm = _recurring(label="Weekdays")
         assert alarm.label == "Weekdays"
 
     def test_creates_alarm_with_recurring_type(self) -> None:
-        series = uuid.uuid4()
-        alarm = Alarm.create_recurring(
-            label="Weekdays", hour=6, minute=30, days={Weekday.MON}, series_id=series
-        )
+        alarm = _recurring()
         assert alarm.alarm_type == AlarmType.RECURRING
 
-    def test_creates_alarm_with_active_status(self) -> None:
-        series = uuid.uuid4()
-        alarm = Alarm.create_recurring(
-            label="Weekdays", hour=6, minute=30, days={Weekday.MON}, series_id=series
-        )
-        assert alarm.status == AlarmStatus.ACTIVE
+    def test_creates_alarm_with_scheduled_status(self) -> None:
+        alarm = _recurring()
+        assert alarm.status == AlarmStatus.SCHEDULED
 
     def test_stores_series_id(self) -> None:
         series = uuid.uuid4()
-        alarm = Alarm.create_recurring(
-            label="Weekdays", hour=6, minute=30, days={Weekday.MON}, series_id=series
-        )
+        alarm = _recurring(series_id=series)
         assert alarm.series_id == series
 
     def test_stores_days_as_frozenset_in_schedule(self) -> None:
-        series = uuid.uuid4()
         days = {Weekday.MON, Weekday.WED, Weekday.FRI}
-        alarm = Alarm.create_recurring(
-            label="MWF", hour=7, minute=0, days=days, series_id=series
-        )
+        alarm = _recurring(days=days)
         assert alarm.schedule.recurrence == frozenset(days)
 
     def test_schedule_is_recurring(self) -> None:
-        series = uuid.uuid4()
-        alarm = Alarm.create_recurring(
-            label="Daily", hour=7, minute=0, days={Weekday.MON}, series_id=series
-        )
+        alarm = _recurring()
         assert alarm.schedule.is_recurring() is True
 
 
@@ -155,24 +198,21 @@ class TestCreateRecurring:
 
 
 class TestAlarmDeactivate:
-    def _active_alarm(self) -> Alarm:
-        return Alarm.create_one_time(label="Test", hour=8, minute=0)
-
-    def test_active_alarm_becomes_inactive(self) -> None:
-        alarm = self._active_alarm()
+    def test_scheduled_alarm_becomes_inactive(self) -> None:
+        alarm = _one_time()
         alarm.deactivate()
         assert alarm.status == AlarmStatus.INACTIVE
 
     def test_deactivating_inactive_alarm_raises(self) -> None:
-        alarm = self._active_alarm()
+        alarm = _one_time()
         alarm.deactivate()
         with pytest.raises(AlarmAlreadyInStatus, match="inactive"):
             alarm.deactivate()
 
     def test_deactivating_cancelled_alarm_raises(self) -> None:
-        alarm = self._active_alarm()
+        alarm = _one_time()
         alarm.cancel()
-        with pytest.raises(AlarmAlreadyCancelled):
+        with pytest.raises(AlarmAlreadyInStatus, match="cancelled"):
             alarm.deactivate()
 
 
@@ -183,24 +223,24 @@ class TestAlarmDeactivate:
 
 class TestAlarmActivate:
     def _inactive_alarm(self) -> Alarm:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
+        alarm = _one_time()
         alarm.deactivate()
         return alarm
 
-    def test_inactive_alarm_becomes_active(self) -> None:
+    def test_inactive_alarm_becomes_scheduled(self) -> None:
         alarm = self._inactive_alarm()
         alarm.activate()
-        assert alarm.status == AlarmStatus.ACTIVE
+        assert alarm.status == AlarmStatus.SCHEDULED
 
-    def test_activating_active_alarm_raises(self) -> None:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
-        with pytest.raises(AlarmAlreadyInStatus, match="active"):
+    def test_activating_scheduled_alarm_raises(self) -> None:
+        alarm = _one_time()
+        with pytest.raises(AlarmAlreadyInStatus, match="scheduled"):
             alarm.activate()
 
     def test_activating_cancelled_alarm_raises(self) -> None:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
+        alarm = _one_time()
         alarm.cancel()
-        with pytest.raises(AlarmAlreadyCancelled):
+        with pytest.raises(AlarmAlreadyInStatus, match="cancelled"):
             alarm.activate()
 
 
@@ -210,19 +250,151 @@ class TestAlarmActivate:
 
 
 class TestAlarmCancel:
-    def test_active_alarm_becomes_cancelled(self) -> None:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
+    def test_scheduled_alarm_becomes_cancelled(self) -> None:
+        alarm = _one_time()
         alarm.cancel()
         assert alarm.status == AlarmStatus.CANCELLED
 
-    def test_inactive_alarm_becomes_cancelled(self) -> None:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
+    def test_inactive_alarm_cannot_be_cancelled(self) -> None:
+        alarm = _one_time()
         alarm.deactivate()
-        alarm.cancel()
-        assert alarm.status == AlarmStatus.CANCELLED
+        with pytest.raises(AlarmAlreadyCancelled):
+            alarm.cancel()
 
     def test_cancelling_already_cancelled_alarm_raises(self) -> None:
-        alarm = Alarm.create_one_time(label="Test", hour=8, minute=0)
+        alarm = _one_time()
         alarm.cancel()
         with pytest.raises(AlarmAlreadyCancelled):
             alarm.cancel()
+
+
+# ---------------------------------------------------------------------------
+# Phase transitions
+# ---------------------------------------------------------------------------
+
+
+class TestPhaseTransitions:
+    def test_trigger_sets_sunrise(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        assert alarm.status == AlarmStatus.SUNRISE
+
+    def test_sunrise_to_ringing(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        assert alarm.status == AlarmStatus.RINGING
+
+    def test_ringing_to_completed(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        alarm.complete()
+        assert alarm.status == AlarmStatus.COMPLETED
+
+    def test_trigger_from_wrong_status_raises(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        with pytest.raises(ValueError):
+            alarm.trigger()
+
+    def test_ring_from_wrong_status_raises(self) -> None:
+        alarm = _one_time()
+        with pytest.raises(ValueError):
+            alarm.ring()
+
+    def test_complete_from_wrong_status_raises(self) -> None:
+        alarm = _one_time()
+        with pytest.raises(ValueError):
+            alarm.complete()
+
+
+# ---------------------------------------------------------------------------
+# Derived state
+# ---------------------------------------------------------------------------
+
+
+class TestDerivedState:
+    def test_is_running_false_when_scheduled(self) -> None:
+        alarm = _one_time()
+        assert alarm.is_running is False
+
+    def test_is_running_true_when_sunrise(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        assert alarm.is_running is True
+
+    def test_is_running_true_when_ringing(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        assert alarm.is_running is True
+
+    def test_is_finished_false_when_scheduled(self) -> None:
+        alarm = _one_time()
+        assert alarm.is_finished is False
+
+    def test_is_finished_true_when_completed(self) -> None:
+        alarm = _one_time()
+        alarm.trigger()
+        alarm.ring()
+        alarm.complete()
+        assert alarm.is_finished is True
+
+    def test_is_finished_true_when_cancelled(self) -> None:
+        alarm = _one_time()
+        alarm.cancel()
+        assert alarm.is_finished is True
+
+
+# ---------------------------------------------------------------------------
+# IntroConfig validation
+# ---------------------------------------------------------------------------
+
+
+class TestIntroConfig:
+    def test_valid_config(self) -> None:
+        cfg = IntroConfig(audio_file="intro.mp3")
+        assert cfg.audio_file == "intro.mp3"
+
+
+# ---------------------------------------------------------------------------
+# SunriseConfig validation
+# ---------------------------------------------------------------------------
+
+
+class TestSunriseConfig:
+    def test_valid_config(self) -> None:
+        cfg = SunriseConfig(room_name="Bedroom")
+        assert cfg.room_name == "Bedroom"
+
+    def test_step_interval_calculation(self) -> None:
+        cfg = SunriseConfig(room_name="Bedroom", duration_minutes=7, steps=70)
+        assert cfg.step_interval_seconds == pytest.approx(6.0)
+
+    def test_invalid_brightness_range_raises(self) -> None:
+        with pytest.raises(ValueError, match="brightness"):
+            SunriseConfig(room_name="Bedroom", brightness_start=50, brightness_end=30)
+
+    def test_steps_zero_raises(self) -> None:
+        with pytest.raises(ValueError, match="steps"):
+            SunriseConfig(room_name="Bedroom", steps=0)
+
+
+# ---------------------------------------------------------------------------
+# RingtoneConfig validation
+# ---------------------------------------------------------------------------
+
+
+class TestRingtoneConfig:
+    def test_valid_config(self) -> None:
+        cfg = RingtoneConfig(audio_file="alarm.mp3", volume=80)
+        assert cfg.volume == 80
+
+    def test_volume_above_100_raises(self) -> None:
+        with pytest.raises(ValueError, match="volume"):
+            RingtoneConfig(audio_file="alarm.mp3", volume=101)
+
+    def test_volume_below_0_raises(self) -> None:
+        with pytest.raises(ValueError, match="volume"):
+            RingtoneConfig(audio_file="alarm.mp3", volume=-1)
