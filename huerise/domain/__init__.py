@@ -1,5 +1,9 @@
 from .alarm import Alarm
-from .exceptions import AlarmAlreadyCancelled, AlarmAlreadyInStatus, AlarmNotFound
+from .exceptions import (
+    AlarmAlreadyCancelledError,
+    AlarmAlreadyInStatusError,
+    AlarmNotFoundError,
+)
 from .views import (
     AlarmStatus,
     AlarmType,
@@ -13,9 +17,9 @@ from .repository import AlarmRepository
 
 __all__ = [
     "Alarm",
-    "AlarmNotFound",
-    "AlarmAlreadyCancelled",
-    "AlarmAlreadyInStatus",
+    "AlarmNotFoundError",
+    "AlarmAlreadyCancelledError",
+    "AlarmAlreadyInStatusError",
     "AlarmStatus",
     "AlarmType",
     "IntroConfig",

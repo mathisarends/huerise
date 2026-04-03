@@ -3,7 +3,7 @@ from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
 from huerise.infrastructure.credentials import DatabaseSettings
-from huerise.infrastructure.di import AlarmProvider, DatabaseProvider
+from huerise.infrastructure.di import AlarmProvider, DatabaseProvider, SchedulerProvider
 from huerise.lifespan import lifespan
 from huerise.presentation import router
 from huerise.presentation.exception_mappings import register_exception_handlers
@@ -12,6 +12,7 @@ _settings = DatabaseSettings()
 _container = make_async_container(
     DatabaseProvider(database_url=_settings.async_url),
     AlarmProvider(),
+    SchedulerProvider(),
 )
 
 app = FastAPI(

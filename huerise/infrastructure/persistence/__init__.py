@@ -1,5 +1,6 @@
-from .repository import SQLModelAlarmRepository
+from .repository import BackgroundAlarmRepository, SQLModelAlarmRepository
 
 __all__ = [
+    "BackgroundAlarmRepository",
     "SQLModelAlarmRepository",
 ]

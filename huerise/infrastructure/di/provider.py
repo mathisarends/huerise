@@ -3,6 +3,8 @@ from collections.abc import AsyncIterator
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from huerise.application.ports import AudioPlayer, Lights
+from huerise.application.scheduler import AlarmRunner, AlarmScheduler
 from huerise.application.commands import (
     ActivateAlarmCommandHandler,
     CancelAlarmCommandHandler,
@@ -15,7 +17,12 @@ from huerise.application.commands import (
 from huerise.application.queries import ListAlarmsQueryHandler
 
 from huerise.domain import AlarmRepository
-from huerise.infrastructure.persistence import SQLModelAlarmRepository
+from huerise.infrastructure.adapters.mock_hue import MockHueLightsAdapter
+from huerise.infrastructure.adapters.pyaudio import SoundDeviceAudioPlayer
+from huerise.infrastructure.persistence import (
+    BackgroundAlarmRepository,
+    SQLModelAlarmRepository,
+)
 
 
 class DatabaseProvider(Provider):
@@ -23,6 +30,10 @@ class DatabaseProvider(Provider):
         super().__init__()
         engine = create_async_engine(database_url, echo=False)
         self._factory = async_sessionmaker(engine, expire_on_commit=False)
+
+    @provide(scope=Scope.APP)
+    def get_session_factory(self) -> async_sessionmaker[AsyncSession]:
+        return self._factory
 
     @provide(scope=Scope.REQUEST)
     async def get_session(self) -> AsyncIterator[AsyncSession]:
@@ -85,3 +96,38 @@ class AlarmProvider(Provider):
         self, repo: AlarmRepository
     ) -> DeleteSeriesCommandHandler:
         return DeleteSeriesCommandHandler(repo)
+
+
+class SchedulerProvider(Provider):
+    scope = Scope.APP
+
+    @provide
+    def get_lights(self) -> Lights:
+        return MockHueLightsAdapter()
+
+    @provide
+    def get_audio(self) -> AudioPlayer:
+        return SoundDeviceAudioPlayer()
+
+    @provide
+    def get_background_repo(
+        self, factory: async_sessionmaker[AsyncSession]
+    ) -> BackgroundAlarmRepository:
+        return BackgroundAlarmRepository(factory)
+
+    @provide
+    def get_alarm_runner(
+        self,
+        lights: Lights,
+        audio: AudioPlayer,
+        repo: BackgroundAlarmRepository,
+    ) -> AlarmRunner:
+        return AlarmRunner(lights=lights, audio=audio, repo=repo)
+
+    @provide
+    def get_alarm_scheduler(
+        self,
+        repo: BackgroundAlarmRepository,
+        runner: AlarmRunner,
+    ) -> AlarmScheduler:
+        return AlarmScheduler(repo=repo, runner=runner)

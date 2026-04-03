@@ -1,6 +1,7 @@
-from .provider import AlarmProvider, DatabaseProvider
+from .provider import AlarmProvider, DatabaseProvider, SchedulerProvider
 
 __all__ = [
     "AlarmProvider",
     "DatabaseProvider",
+    "SchedulerProvider",
 ]

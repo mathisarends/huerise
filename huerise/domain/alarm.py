@@ -1,7 +1,10 @@
 import uuid
 from datetime import datetime, timezone
 
-from huerise.domain.exceptions import AlarmAlreadyCancelled, AlarmAlreadyInStatus
+from huerise.domain.exceptions import (
+    AlarmAlreadyCancelledError,
+    AlarmAlreadyInStatusError,
+)
 from huerise.domain.views import (
     AlarmStatus,
     AlarmType,
@@ -67,17 +70,17 @@ class Alarm:
 
     def activate(self) -> None:
         if self.status != AlarmStatus.INACTIVE:
-            raise AlarmAlreadyInStatus(self.id, self.status)
+            raise AlarmAlreadyInStatusError(self.id, self.status)
         self.status = AlarmStatus.SCHEDULED
 
     def deactivate(self) -> None:
         if self.status != AlarmStatus.SCHEDULED:
-            raise AlarmAlreadyInStatus(self.id, self.status)
+            raise AlarmAlreadyInStatusError(self.id, self.status)
         self.status = AlarmStatus.INACTIVE
 
     def cancel(self) -> None:
         if not self._can_cancel():
-            raise AlarmAlreadyCancelled(self.id)
+            raise AlarmAlreadyCancelledError(self.id)
         self.status = AlarmStatus.CANCELLED
 
     def _can_cancel(self) -> bool:

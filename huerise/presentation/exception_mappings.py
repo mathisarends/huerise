@@ -2,27 +2,28 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from huerise.domain.exceptions import (
-    AlarmAlreadyCancelled,
-    AlarmAlreadyInStatus,
-    AlarmNotFound,
+    AlarmAlreadyCancelledError,
+    AlarmAlreadyInStatusError,
+    AlarmNotFoundError,
 )
+
+_HANDLERS: list[tuple[type[Exception], int, str]] = [
+    (AlarmNotFoundError, 404, "Alarm not found"),
+    (AlarmAlreadyCancelledError, 409, "Alarm is already cancelled"),
+    (AlarmAlreadyInStatusError, 409, "Alarm status conflict"),
+]
+
+
+def _make_handler(status_code: int, default_detail: str):
+    async def handler(request: Request, exc: Exception) -> JSONResponse:
+        return JSONResponse(
+            status_code=status_code,
+            content={"detail": str(exc) or default_detail},
+        )
+
+    return handler
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    @app.exception_handler(AlarmNotFound)
-    async def alarm_not_found_handler(
-        request: Request, exc: AlarmNotFound
-    ) -> JSONResponse:
-        return JSONResponse(status_code=404, content={"detail": str(exc)})
-
-    @app.exception_handler(AlarmAlreadyCancelled)
-    async def alarm_already_cancelled_handler(
-        request: Request, exc: AlarmAlreadyCancelled
-    ) -> JSONResponse:
-        return JSONResponse(status_code=409, content={"detail": str(exc)})
-
-    @app.exception_handler(AlarmAlreadyInStatus)
-    async def alarm_already_in_status_handler(
-        request: Request, exc: AlarmAlreadyInStatus
-    ) -> JSONResponse:
-        return JSONResponse(status_code=409, content={"detail": str(exc)})
+    for exc_class, status_code, detail in _HANDLERS:
+        app.add_exception_handler(exc_class, _make_handler(status_code, detail))

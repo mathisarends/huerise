@@ -12,6 +12,8 @@ FROM python:3.13-slim AS runtime
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y libportaudio2 && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/.venv .venv
 COPY huerise/ ./huerise/
 
@@ -24,6 +26,8 @@ CMD ["python", "-m", "uvicorn", "huerise.main:app", "--host", "0.0.0.0", "--port
 FROM python:3.13-slim AS dev
 
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y libportaudio2 && rm -rf /var/lib/apt/lists/*
 
 RUN pip install uv
 

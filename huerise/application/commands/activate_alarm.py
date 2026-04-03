@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 
-from huerise.domain import Alarm, AlarmNotFound, AlarmRepository
+from huerise.domain import Alarm, AlarmNotFoundError, AlarmRepository
 
 
 @dataclass(frozen=True)
@@ -16,7 +16,7 @@ class ActivateAlarmCommandHandler:
     async def execute(self, command: ActivateAlarmCommand) -> Alarm:
         alarm = await self._alarm_repository.get(command.alarm_id)
         if alarm is None:
-            raise AlarmNotFound(command.alarm_id)
+            raise AlarmNotFoundError(command.alarm_id)
         alarm.activate()
         await self._alarm_repository.save(alarm)
         return alarm

@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 
-from huerise.domain import AlarmNotFound, AlarmRepository
+from huerise.domain import AlarmNotFoundError, AlarmRepository
 
 
 @dataclass(frozen=True)
@@ -16,5 +16,5 @@ class DeleteAlarmCommandHandler:
     async def execute(self, command: DeleteAlarmCommand) -> None:
         alarm = await self._alarm_repository.get(command.alarm_id)
         if alarm is None:
-            raise AlarmNotFound(command.alarm_id)
+            raise AlarmNotFoundError(command.alarm_id)
         await self._alarm_repository.delete(command.alarm_id)

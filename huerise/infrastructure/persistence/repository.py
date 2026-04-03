@@ -2,8 +2,8 @@ import json
 import uuid
 from collections.abc import Sequence
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from huerise.domain import Alarm, AlarmRepository
 from huerise.domain.views import (
@@ -27,8 +27,14 @@ class SQLModelAlarmRepository(AlarmRepository):
         return self._to_domain(model) if model is not None else None
 
     async def get_all(self) -> Sequence[Alarm]:
-        result = await self._session.exec(select(AlarmModel))
-        return [self._to_domain(m) for m in result.all()]
+        result = await self._session.execute(select(AlarmModel))
+        return [self._to_domain(m) for m in result.scalars().all()]
+
+    async def get_scheduled(self) -> Sequence[Alarm]:
+        result = await self._session.execute(
+            select(AlarmModel).where(AlarmModel.status == AlarmStatus.SCHEDULED.value)
+        )
+        return [self._to_domain(m) for m in result.scalars().all()]
 
     async def save(self, alarm: Alarm) -> None:
         model = self._to_model(alarm)
@@ -105,3 +111,32 @@ class SQLModelAlarmRepository(AlarmRepository):
                 volume=m.ringtone_volume,
             ),
         )
+
+
+class BackgroundAlarmRepository(AlarmRepository):
+    """Session-per-operation repository for use in long-running background tasks."""
+
+    def __init__(self, factory: async_sessionmaker[AsyncSession]) -> None:
+        self._factory = factory
+
+    async def get(self, alarm_id: uuid.UUID) -> Alarm | None:
+        async with self._factory() as session:
+            return await SQLModelAlarmRepository(session).get(alarm_id)
+
+    async def get_all(self) -> Sequence[Alarm]:
+        async with self._factory() as session:
+            return await SQLModelAlarmRepository(session).get_all()
+
+    async def get_scheduled(self) -> Sequence[Alarm]:
+        async with self._factory() as session:
+            return await SQLModelAlarmRepository(session).get_scheduled()
+
+    async def save(self, alarm: Alarm) -> None:
+        async with self._factory() as session:
+            await SQLModelAlarmRepository(session).save(alarm)
+            await session.commit()
+
+    async def delete(self, alarm_id: uuid.UUID) -> None:
+        async with self._factory() as session:
+            await SQLModelAlarmRepository(session).delete(alarm_id)
+            await session.commit()

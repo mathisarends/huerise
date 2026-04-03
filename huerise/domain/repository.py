@@ -13,6 +13,9 @@ class AlarmRepository(ABC):
     async def get_all(self) -> Sequence[Alarm]: ...
 
     @abstractmethod
+    async def get_scheduled(self) -> Sequence[Alarm]: ...
+
+    @abstractmethod
     async def save(self, alarm: Alarm) -> None: ...
 
     @abstractmethod
