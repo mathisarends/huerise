@@ -1,0 +1,14 @@
+services:
+  daylight-alarm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: daylight-alarm
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - sqlite_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:////app/data/daylight.db
