@@ -2,10 +2,9 @@ import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
-from typing import Protocol
 from uuid import UUID
 
-from huerise.features.lighting.application import (
+from huerise.features.lighting.domain import (
     HueClient,
     HueClientFactory,
     HueCredentialsSource,
@@ -13,16 +12,12 @@ from huerise.features.lighting.application import (
     SceneNotFoundError,
     room_for_scene,
 )
-from huerise.platform.configuration import DaylightAlarmConfig, HueriseConfig
+from huerise.platform.configuration import ConfigurationSource, DaylightAlarmConfig
 
 logger = logging.getLogger(__name__)
 START_BRIGHTNESS = 1.0
 
 type Sleep = Callable[[float], Awaitable[None]]
-
-
-class ConfigurationSource(Protocol):
-    def load(self) -> HueriseConfig: ...
 
 
 class AlarmAlreadyRunningError(Exception):

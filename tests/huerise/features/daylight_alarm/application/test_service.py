@@ -8,7 +8,7 @@ from huerise.features.daylight_alarm.application import (
     AlarmAlreadyRunningError,
     DaylightAlarm,
 )
-from huerise.features.lighting.application import (
+from huerise.features.lighting.domain import (
     HueUnavailableError,
     Room,
     Scene,

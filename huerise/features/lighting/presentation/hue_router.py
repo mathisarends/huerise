@@ -9,9 +9,9 @@ from huerise.features.lighting.presentation.errors import (
     select_bridge_errors,
 )
 from huerise.features.lighting.presentation.mappers import (
-    to_bridge_response,
+    to_bridges_response,
     to_onboarding_status_response,
-    to_room_response,
+    to_rooms_response,
 )
 from huerise.features.lighting.presentation.schemas import (
     BridgeResponse,
@@ -35,10 +35,10 @@ hue_router = ExceptionRouter(
     errors=discover_bridges_errors,
 )
 async def discover_bridges(
-    service: FromDishka[HueOnboarding],
+    onboarding: FromDishka[HueOnboarding],
 ) -> list[BridgeResponse]:
-    bridges = await service.discover()
-    return [to_bridge_response(bridge) for bridge in bridges]
+    bridges = await onboarding.discover()
+    return to_bridges_response(bridges)
 
 
 @hue_router.get(
@@ -48,9 +48,9 @@ async def discover_bridges(
     errors=bridge_status_errors,
 )
 async def bridge_status(
-    service: FromDishka[HueOnboarding],
+    onboarding: FromDishka[HueOnboarding],
 ) -> OnboardingStatusResponse:
-    status = service.status()
+    status = onboarding.status()
     return to_onboarding_status_response(status)
 
 
@@ -62,9 +62,9 @@ async def bridge_status(
 )
 async def select_bridge(
     body: BridgeSelectionRequest,
-    service: FromDishka[HueOnboarding],
+    onboarding: FromDishka[HueOnboarding],
 ) -> OnboardingStatusResponse:
-    status = await service.select(body.bridge_id)
+    status = await onboarding.select(body.bridge_id)
     return to_onboarding_status_response(status)
 
 
@@ -75,9 +75,9 @@ async def select_bridge(
     errors=register_bridge_errors,
 )
 async def register_bridge(
-    service: FromDishka[HueOnboarding],
+    onboarding: FromDishka[HueOnboarding],
 ) -> OnboardingStatusResponse:
-    status = await service.register()
+    status = await onboarding.register()
     return to_onboarding_status_response(status)
 
 
@@ -88,6 +88,7 @@ async def register_bridge(
     errors=scene_errors,
 )
 async def rooms(
-    service: FromDishka[SceneService],
+    scenes: FromDishka[SceneService],
 ) -> list[RoomResponse]:
-    return [to_room_response(room) for room in await service.list_rooms()]
+    rooms = await scenes.list_rooms()
+    return to_rooms_response(rooms)

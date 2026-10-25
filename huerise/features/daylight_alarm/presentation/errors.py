@@ -4,10 +4,7 @@ from huerise.features.daylight_alarm.application import (
     AlarmAlreadyRunningError,
     SceneDoesNotBelongToRoomError,
 )
-from huerise.features.lighting.application import (
-    HueUnavailableError,
-    SceneNotFoundError,
-)
+from huerise.features.lighting.domain import HueUnavailableError, SceneNotFoundError
 from huerise.platform.api.errors import error
 from huerise.platform.configuration import ConfigurationError
 

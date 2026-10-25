@@ -19,7 +19,7 @@ doctor_router = ExceptionRouter(
     errors=doctor_errors,
 )
 async def doctor(
-    service: FromDishka[Doctor],
+    doctor: FromDishka[Doctor],
 ) -> DoctorResponse:
-    report = await service.check()
+    report = await doctor.check()
     return to_doctor_response(report)

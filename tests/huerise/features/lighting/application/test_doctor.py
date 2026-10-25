@@ -2,8 +2,8 @@ from uuid import UUID
 
 import pytest
 
-from huerise.features.lighting.application import (
-    Doctor,
+from huerise.features.lighting.application import Doctor
+from huerise.features.lighting.domain import (
     HueUnavailableError,
     Room,
     Scene,

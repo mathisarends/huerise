@@ -1,6 +1,6 @@
 from fastapi import status
 
-from huerise.features.lighting.application import (
+from huerise.features.lighting.domain import (
     BridgeNotFoundError,
     BridgeNotSelectedError,
     HueUnavailableError,

@@ -2,17 +2,17 @@ from pathlib import Path
 
 import pytest
 
-from huerise.features.lighting.application import (
+from huerise.features.lighting.application import HueOnboarding
+from huerise.features.lighting.domain import (
     BridgeNotFoundError,
     BridgeNotSelectedError,
     HueBridge,
-    HueOnboarding,
     HueUnavailableError,
     LinkButtonTimeoutError,
     OnboardingReadOnlyError,
     OnboardingState,
 )
-from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.configuration.yaml import YamlConfiguration
 from huerise.platform.settings import HueEnvironment
 from tests.huerise.features.lighting.fakes import FakeOnboardingGateway
 

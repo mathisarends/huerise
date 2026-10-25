@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.configuration.yaml import YamlConfiguration
 from huerise.platform.provider import PlatformProvider
 from huerise.platform.settings import AppSettings, HueEnvironment
 

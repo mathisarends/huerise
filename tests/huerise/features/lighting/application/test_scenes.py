@@ -2,12 +2,8 @@ from uuid import UUID
 
 import pytest
 
-from huerise.features.lighting.application import (
-    HueUnavailableError,
-    Room,
-    Scene,
-    SceneService,
-)
+from huerise.features.lighting.application import SceneService
+from huerise.features.lighting.domain import HueUnavailableError, Room, Scene
 from tests.huerise.features.lighting.fakes import (
     FakeHueClient,
     FakeHueClientFactory,

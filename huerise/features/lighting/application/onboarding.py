@@ -1,67 +1,24 @@
 import asyncio
-from dataclasses import dataclass
-from enum import StrEnum
-from typing import Protocol
 
-from huerise.features.lighting.application.models import HueUnavailableError
-from huerise.platform.configuration import HueConfig, YamlConfiguration
+from huerise.features.lighting.domain import (
+    BridgeNotFoundError,
+    BridgeNotSelectedError,
+    DiscoveredBridge,
+    HueUnavailableError,
+    LinkButtonTimeoutError,
+    OnboardingGateway,
+    OnboardingReadOnlyError,
+    OnboardingState,
+    OnboardingStatus,
+)
+from huerise.platform.configuration import ConfigurationStore, HueConfig
 from huerise.platform.settings import HueEnvironment
-
-
-class OnboardingState(StrEnum):
-    NOT_SELECTED = "not_selected"
-    LINK_BUTTON_REQUIRED = "link_button_required"
-    READY = "ready"
-
-
-class OnboardingReadOnlyError(Exception):
-    pass
-
-
-class BridgeNotFoundError(Exception):
-    def __init__(self, bridge_id: str) -> None:
-        super().__init__(f"Hue Bridge not found: {bridge_id}")
-
-
-class BridgeNotSelectedError(Exception):
-    pass
-
-
-class LinkButtonTimeoutError(Exception):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
-class HueBridge:
-    id: str
-    ip_address: str
-
-
-@dataclass(frozen=True, slots=True)
-class DiscoveredBridge:
-    id: str
-    ip_address: str
-    selected: bool
-
-
-@dataclass(frozen=True, slots=True)
-class OnboardingStatus:
-    state: OnboardingState
-    bridge_id: str | None
-    ip_address: str | None
-    read_only: bool
-
-
-class OnboardingGateway(Protocol):
-    async def discover(self) -> tuple[HueBridge, ...]: ...
-
-    async def register(self, bridge_ip: str) -> str: ...
 
 
 class HueOnboarding:
     def __init__(
         self,
-        configuration: YamlConfiguration,
+        configuration: ConfigurationStore,
         environment: HueEnvironment,
         gateway: OnboardingGateway,
     ) -> None:

@@ -1,18 +1,17 @@
 from dishka import Provider, Scope, provide
 
-from huerise.features.lighting.application import (
-    Doctor,
+from huerise.features.lighting.application import Doctor, HueOnboarding, SceneService
+from huerise.features.lighting.domain import (
     HueClientFactory,
-    HueOnboarding,
+    HueCredentialsSource,
     OnboardingGateway,
-    SceneService,
 )
 from huerise.features.lighting.infrastructure.hue import (
     HueCredentialsProvider,
     HueifyClientFactory,
     HueifyOnboarding,
 )
-from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.configuration import ConfigurationSource, ConfigurationStore
 from huerise.platform.settings import HueEnvironment
 
 
@@ -26,9 +25,9 @@ class LightingProvider(Provider):
     @provide
     def credentials(
         self,
-        configuration: YamlConfiguration,
+        configuration: ConfigurationStore,
         environment: HueEnvironment,
-    ) -> HueCredentialsProvider:
+    ) -> HueCredentialsSource:
         return HueCredentialsProvider(configuration, environment)
 
     @provide
@@ -38,7 +37,7 @@ class LightingProvider(Provider):
     @provide
     def onboarding(
         self,
-        configuration: YamlConfiguration,
+        configuration: ConfigurationStore,
         environment: HueEnvironment,
         gateway: OnboardingGateway,
     ) -> HueOnboarding:
@@ -47,8 +46,8 @@ class LightingProvider(Provider):
     @provide
     def doctor(
         self,
-        configuration: YamlConfiguration,
-        credentials: HueCredentialsProvider,
+        configuration: ConfigurationSource,
+        credentials: HueCredentialsSource,
         clients: HueClientFactory,
     ) -> Doctor:
         return Doctor(configuration, credentials, clients)
@@ -56,7 +55,7 @@ class LightingProvider(Provider):
     @provide
     def scenes(
         self,
-        credentials: HueCredentialsProvider,
+        credentials: HueCredentialsSource,
         clients: HueClientFactory,
     ) -> SceneService:
         return SceneService(credentials, clients)

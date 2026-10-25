@@ -6,9 +6,9 @@ from huerise.features.daylight_alarm.application import (
     DaylightAlarm,
     DaylightAlarmConfiguration,
 )
-from huerise.features.lighting.application import HueClientFactory, SceneService
-from huerise.features.lighting.infrastructure import HueCredentialsProvider
-from huerise.platform.configuration import YamlConfiguration
+from huerise.features.lighting.application import SceneService
+from huerise.features.lighting.domain import HueClientFactory, HueCredentialsSource
+from huerise.platform.configuration import ConfigurationSource, ConfigurationStore
 
 
 class DaylightAlarmProvider(Provider):
@@ -17,8 +17,8 @@ class DaylightAlarmProvider(Provider):
     @provide
     async def daylight_alarm(
         self,
-        configuration: YamlConfiguration,
-        credentials: HueCredentialsProvider,
+        configuration: ConfigurationSource,
+        credentials: HueCredentialsSource,
         clients: HueClientFactory,
     ) -> AsyncIterator[DaylightAlarm]:
         alarm = DaylightAlarm(configuration, credentials, clients)
@@ -30,7 +30,7 @@ class DaylightAlarmProvider(Provider):
     @provide
     def configuration(
         self,
-        configuration: YamlConfiguration,
+        configuration: ConfigurationStore,
         scenes: SceneService,
     ) -> DaylightAlarmConfiguration:
         return DaylightAlarmConfiguration(configuration, scenes)

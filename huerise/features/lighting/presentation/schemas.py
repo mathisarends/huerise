@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from huerise.features.lighting.application import OnboardingState
+from huerise.features.lighting.domain import OnboardingState
 
 
 class DoctorCheckResponse(BaseModel):

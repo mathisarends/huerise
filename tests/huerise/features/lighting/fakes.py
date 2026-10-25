@@ -1,15 +1,18 @@
 from dataclasses import dataclass, field
 from uuid import UUID
 
-from huerise.features.lighting.application import (
-    HueBridge,
+from huerise.features.lighting.domain.models import (
+    HueClient,
+    HueClientFactory,
     HueCredentials,
+    HueCredentialsSource,
     Room,
 )
+from huerise.features.lighting.domain.onboarding import HueBridge, OnboardingGateway
 
 
 @dataclass
-class FakeHueClient:
+class FakeHueClient(HueClient):
     rooms: list[Room] = field(default_factory=list)
     list_rooms_error: Exception | None = None
     activate_scene_error: Exception | None = None
@@ -40,7 +43,7 @@ class FakeHueClient:
 
 
 @dataclass
-class FakeHueClientFactory:
+class FakeHueClientFactory(HueClientFactory):
     client: FakeHueClient
     error: Exception | None = None
     credentials: list[HueCredentials] = field(default_factory=list)
@@ -53,7 +56,7 @@ class FakeHueClientFactory:
 
 
 @dataclass
-class FakeHueCredentialsSource:
+class FakeHueCredentialsSource(HueCredentialsSource):
     credentials: HueCredentials = field(
         default_factory=lambda: HueCredentials("192.0.2.10", "secret")
     )
@@ -66,7 +69,7 @@ class FakeHueCredentialsSource:
 
 
 @dataclass
-class FakeOnboardingGateway:
+class FakeOnboardingGateway(OnboardingGateway):
     bridges: tuple[HueBridge, ...] = ()
     app_key: str = "registered-hue-key-123"
     discovery_error: Exception | None = None

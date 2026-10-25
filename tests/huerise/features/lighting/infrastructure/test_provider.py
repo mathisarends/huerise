@@ -1,8 +1,8 @@
-from huerise.features.lighting.infrastructure import (
+from huerise.features.lighting.infrastructure.hue import (
     HueifyClientFactory,
     HueifyOnboarding,
-    LightingProvider,
 )
+from huerise.features.lighting.infrastructure.provider import LightingProvider
 
 
 def test_provider_uses_hueify_adapters() -> None:

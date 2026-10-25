@@ -11,14 +11,14 @@ from pydantic import SecretStr
 
 from huerise import __version__
 from huerise.app import create_app
-from huerise.features.lighting.application import (
+from huerise.features.lighting.domain import (
     HueBridge,
     HueClientFactory,
     OnboardingGateway,
     Room,
     Scene,
 )
-from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.configuration.yaml import YamlConfiguration
 from huerise.platform.settings import AppSettings, HueEnvironment
 from tests.huerise.features.lighting.fakes import (
     FakeHueClient,

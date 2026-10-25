@@ -4,24 +4,26 @@ from uuid import UUID
 from hueify import Hueify
 from hueify.onboarding import discover_bridges, register_app_key
 
-from huerise.features.lighting.application.models import (
+from huerise.features.lighting.domain.models import (
     HueClient,
+    HueClientFactory,
     HueCredentials,
+    HueCredentialsSource,
     HueUnavailableError,
     Room,
     Scene,
 )
-from huerise.features.lighting.application.onboarding import (
+from huerise.features.lighting.domain.onboarding import (
     HueBridge,
     OnboardingGateway,
 )
-from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.configuration import ConfigurationStore
 from huerise.platform.settings import HueEnvironment
 
 
-class HueCredentialsProvider:
+class HueCredentialsProvider(HueCredentialsSource):
     def __init__(
-        self, configuration: YamlConfiguration, environment: HueEnvironment
+        self, configuration: ConfigurationStore, environment: HueEnvironment
     ) -> None:
         self._configuration = configuration
         self._environment = environment
@@ -41,12 +43,12 @@ class HueCredentialsProvider:
         return HueCredentials(bridge_ip=str(hue.bridge_ip), app_key=hue.app_key)
 
 
-class HueifyClientFactory:
+class HueifyClientFactory(HueClientFactory):
     def create(self, credentials: HueCredentials) -> HueClient:
         return HueifyClient(Hueify(credentials.bridge_ip, credentials.app_key))
 
 
-class HueifyClient:
+class HueifyClient(HueClient):
     def __init__(self, client: Hueify) -> None:
         self._client = client
 

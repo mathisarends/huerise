@@ -9,6 +9,9 @@ from huerise.features.daylight_alarm.presentation.errors import (
     configuration_errors,
     start_alarm_errors,
 )
+from huerise.features.daylight_alarm.presentation.mappers import (
+    to_configuration_response,
+)
 from huerise.features.daylight_alarm.presentation.schemas import (
     AlarmStatusResponse,
     DaylightAlarmConfigurationRequest,
@@ -33,7 +36,8 @@ router = ExceptionRouter(
 async def get_configuration(
     configuration: FromDishka[DaylightAlarmConfiguration],
 ) -> DaylightAlarmConfigurationResponse:
-    return configuration.get()
+    alarm_configuration = configuration.get()
+    return to_configuration_response(alarm_configuration)
 
 
 @router.put(
@@ -47,7 +51,7 @@ async def set_configuration(
     configuration: FromDishka[DaylightAlarmConfiguration],
 ) -> DaylightAlarmConfigurationResponse:
     after_alarm = body.after_alarm
-    return await configuration.save(
+    alarm_configuration = await configuration.save(
         room_id=body.room_id,
         scene_id=body.scene_id,
         duration_seconds=body.duration_seconds,
@@ -57,6 +61,7 @@ async def set_configuration(
             after_alarm.delay_seconds if after_alarm is not None else None
         ),
     )
+    return to_configuration_response(alarm_configuration)
 
 
 @router.post(

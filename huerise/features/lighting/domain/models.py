@@ -1,5 +1,5 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Protocol
 from uuid import UUID
 
 
@@ -33,21 +33,27 @@ class Room:
     scenes: tuple[Scene, ...]
 
 
-class HueClient(Protocol):
+class HueClient(ABC):
+    @abstractmethod
     async def list_rooms(self) -> list[Room]: ...
 
+    @abstractmethod
     async def activate_scene(self, scene_id: UUID, *, brightness: float) -> None: ...
 
+    @abstractmethod
     async def set_brightness(self, room_id: UUID, brightness: float) -> None: ...
 
+    @abstractmethod
     async def close(self) -> None: ...
 
 
-class HueClientFactory(Protocol):
+class HueClientFactory(ABC):
+    @abstractmethod
     def create(self, credentials: HueCredentials) -> HueClient: ...
 
 
-class HueCredentialsSource(Protocol):
+class HueCredentialsSource(ABC):
+    @abstractmethod
     def get(self) -> HueCredentials: ...
 
 

@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from huerise.features.lighting.application.models import (
+from huerise.features.lighting.domain.models import (
     HueClientFactory,
     HueCredentialsSource,
     HueUnavailableError,

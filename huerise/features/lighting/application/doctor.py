@@ -1,19 +1,15 @@
 from contextlib import suppress
 from dataclasses import dataclass
-from typing import Literal, Protocol
+from typing import Literal
 
-from huerise.features.lighting.application.models import (
+from huerise.features.lighting.domain.models import (
     HueClientFactory,
     HueCredentialsSource,
     HueUnavailableError,
     SceneNotFoundError,
     room_for_scene,
 )
-from huerise.platform.configuration import HueriseConfig
-
-
-class ConfigurationSource(Protocol):
-    def load(self) -> HueriseConfig: ...
+from huerise.platform.configuration import ConfigurationSource
 
 
 @dataclass(frozen=True, slots=True)

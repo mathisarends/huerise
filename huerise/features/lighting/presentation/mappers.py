@@ -1,9 +1,5 @@
-from huerise.features.lighting.application import (
-    DiscoveredBridge,
-    DoctorReport,
-    OnboardingStatus,
-    Room,
-)
+from huerise.features.lighting.application import DoctorReport
+from huerise.features.lighting.domain import DiscoveredBridge, OnboardingStatus, Room
 from huerise.features.lighting.presentation.schemas import (
     BridgeResponse,
     DoctorCheckResponse,
@@ -43,6 +39,14 @@ def to_bridge_response(bridge: DiscoveredBridge) -> BridgeResponse:
     )
 
 
+def to_bridges_response(bridges: Sequence[DiscoveredBridge]) -> list[BridgeResponse]:
+    return [to_bridge_response(bridge) for bridge in bridges]
+
+
+def to_rooms_response(rooms: Sequence[Room]) -> list[RoomResponse]:
+    return [to_room_response(room) for room in rooms]
+
+
 def to_onboarding_status_response(
     onboarding: OnboardingStatus,
 ) -> OnboardingStatusResponse:
@@ -52,3 +56,6 @@ def to_onboarding_status_response(
         ip_address=onboarding.ip_address,
         read_only=onboarding.read_only,
     )
+
+
+from collections.abc import Sequence

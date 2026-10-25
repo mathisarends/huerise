@@ -1,16 +1,12 @@
 from uuid import UUID
 
-from huerise.features.lighting.application import (
-    Room,
-    Scene,
-    SceneService,
-    room_for_scene,
-)
+from huerise.features.lighting.application import SceneService
+from huerise.features.lighting.domain import Room, Scene, room_for_scene
 from huerise.platform.configuration import (
     AfterAlarmConfig,
+    ConfigurationStore,
     DaylightAlarmConfig,
     NamedResourceConfig,
-    YamlConfiguration,
 )
 
 
@@ -24,7 +20,7 @@ class SceneDoesNotBelongToRoomError(Exception):
 class DaylightAlarmConfiguration:
     def __init__(
         self,
-        configuration: YamlConfiguration,
+        configuration: ConfigurationStore,
         scenes: SceneService,
     ) -> None:
         self._configuration = configuration

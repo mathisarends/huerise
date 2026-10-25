@@ -6,15 +6,16 @@ from uuid import UUID
 import pytest
 from pydantic import SecretStr
 
-from huerise.features.lighting.application import HueCredentials, HueUnavailableError
-from huerise.features.lighting.infrastructure import (
+from huerise.features.lighting.domain import HueCredentials, HueUnavailableError
+from huerise.features.lighting.infrastructure import hue as hue_module
+from huerise.features.lighting.infrastructure.hue import (
     HueCredentialsProvider,
     HueifyClient,
     HueifyClientFactory,
     HueifyOnboarding,
 )
-from huerise.features.lighting.infrastructure import hue as hue_module
-from huerise.platform.configuration import HueConfig, YamlConfiguration
+from huerise.platform.configuration import HueConfig
+from huerise.platform.configuration.yaml import YamlConfiguration
 from huerise.platform.settings import HueEnvironment
 
 SCENE_ID = UUID(int=1)
