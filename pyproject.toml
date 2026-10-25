@@ -28,7 +28,7 @@ dev = [
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "--cov=huerise --cov-report=term-missing"
+addopts = "--import-mode=importlib --cov=huerise --cov-report=term-missing"
 
 [tool.coverage.run]
 source = ["huerise"]
