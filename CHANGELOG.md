@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Group health routers under `presentation/routers` with explicit re-exports.
+- Upgrade Hueify to 0.9.0 and adapt its typed registration result.
+- Stop an alarm implicitly when another control changes the alarm room, including
+  scene and entertainment takeovers. Cancel delayed follow-up scenes, filter own
+  command acknowledgements, and verify state after event-stream reconnects.
 - Move Doctor diagnostics into a dedicated health feature while preserving the
   `/doctor` API and CLI contracts.
 - Add public `/health` liveness and `/readiness` probes, bounded readiness checks

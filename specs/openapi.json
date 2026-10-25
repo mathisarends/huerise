@@ -665,11 +665,25 @@
             }
           },
           "409": {
-            "description": "A daylight alarm is already running.",
+            "description": "Possible problems: Alarm already running, Lights controlled elsewhere",
             "content": {
               "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AlarmAlreadyRunningProblem"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AlarmAlreadyRunningProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LightingOverriddenProblem"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "code",
+                    "mapping": {
+                      "alarm_already_running": "#/components/schemas/AlarmAlreadyRunningProblem",
+                      "lighting_overridden": "#/components/schemas/LightingOverriddenProblem"
+                    }
+                  }
                 }
               }
             }
@@ -1842,6 +1856,66 @@
             "type": "string",
             "enum": [
               "scene_room_mismatch"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "LightingOverriddenProblem": {
+        "type": "object",
+        "title": "LightingOverriddenProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/lighting_overridden"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Lights controlled elsewhere"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "lighting_overridden"
             ]
           },
           "detail": {

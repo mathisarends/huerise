@@ -4,6 +4,7 @@ from huerise.features.daylight_alarm.application import (
     AlarmAlreadyRunningError,
     SceneDoesNotBelongToRoomError,
 )
+from huerise.features.lighting.domain import LightingOverrideError
 from huerise.features.lighting.presentation.errors import (
     HUE_UNAVAILABLE,
     SCENE_NOT_FOUND,
@@ -28,16 +29,26 @@ SCENE_ROOM_MISMATCH = Error(
     description="The selected scene does not belong to the selected room.",
 )
 
+LIGHTING_OVERRIDDEN = Error(
+    LightingOverrideError,
+    status=409,
+    code="lighting_overridden",
+    title="Lights controlled elsewhere",
+    detail="Another control changed the alarm lights.",
+)
+
 alarm_errors = ErrorRegistry.merge(
     lighting_errors,
     ErrorRegistry(
-        name="daylight_alarm", errors=[ALARM_ALREADY_RUNNING, SCENE_ROOM_MISMATCH]
+        name="daylight_alarm",
+        errors=[ALARM_ALREADY_RUNNING, SCENE_ROOM_MISMATCH, LIGHTING_OVERRIDDEN],
     ),
     name="daylight_alarm",
 )
 
 start_alarm_errors = [
     ALARM_ALREADY_RUNNING,
+    LIGHTING_OVERRIDDEN,
     SCENE_NOT_FOUND,
     CONFIGURATION_INVALID,
     HUE_UNAVAILABLE,

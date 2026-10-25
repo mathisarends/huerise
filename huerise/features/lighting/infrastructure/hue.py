@@ -17,6 +17,7 @@ from huerise.features.lighting.domain.onboarding import (
     HueBridge,
     OnboardingGateway,
 )
+from huerise.features.lighting.infrastructure.control import RoomControlMonitor
 from huerise.platform.configuration import ConfigurationStore
 from huerise.platform.settings import HueEnvironment
 
@@ -51,6 +52,15 @@ class HueifyClientFactory(HueClientFactory):
 class HueifyClient(HueClient):
     def __init__(self, client: Hueify) -> None:
         self._client = client
+        self._monitor: RoomControlMonitor | None = None
+
+    async def watch_room(self, room_id: UUID) -> None:
+        self._monitor = RoomControlMonitor(self._client)
+        await self._monitor.start(room_id)
+
+    async def wait_for_override(self) -> None:
+        assert self._monitor is not None
+        await self._monitor.wait_for_override()
 
     async def list_rooms(self) -> list[Room]:
         rooms = (await self._client.rooms.list()).data
@@ -71,12 +81,24 @@ class HueifyClient(HueClient):
         ]
 
     async def activate_scene(self, scene_id: UUID, *, brightness: float) -> None:
+        if self._monitor is not None:
+            await self._monitor.wait_ready()
+        monitored = self._monitor is not None and self._monitor.expect_scene(
+            scene_id, brightness
+        )
         await self._client.scenes.activate(scene_id, brightness=brightness)
+        if monitored and self._monitor is not None:
+            await self._monitor.finish_scene(scene_id)
 
     async def set_brightness(self, room_id: UUID, brightness: float) -> None:
+        if self._monitor is not None:
+            await self._monitor.wait_ready()
+            self._monitor.expect_brightness(room_id, brightness)
         await self._client.rooms.set_brightness(room_id, brightness)
 
     async def close(self) -> None:
+        if self._monitor is not None:
+            self._monitor.close()
         await self._client.close()
 
 

@@ -40,6 +40,7 @@ func TestProblemResponsesReachCLI(t *testing.T) {
 	}{
 		{code: "authentication_required", title: "Authentication required", status: 401, exitCode: 3, hint: "HUERISE_API_KEY", args: []string{"doctor"}},
 		{code: "alarm_already_running", title: "Alarm already running", status: 409, exitCode: 1, args: []string{"start"}},
+		{code: "lighting_overridden", title: "Lights controlled elsewhere", status: 409, exitCode: 1, args: []string{"start"}},
 		{code: "configuration_invalid", title: "Invalid configuration", status: 422, exitCode: 2, hint: "Field required", args: []string{"start"}, extra: map[string]any{
 			"issues": []map[string]string{{"location": "daylight_alarm.scene", "message": "Field required", "type": "missing"}},
 		}},

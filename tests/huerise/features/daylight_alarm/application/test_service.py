@@ -35,13 +35,18 @@ DEFAULT_ROOMS = [Room(ROOM_ID, "Bedroom", (Scene(SCENE_ID, "Sunrise", 30),))]
 
 
 def make_alarm(
-    client: FakeHueClient, *, duration: int = 2, sleep=asyncio.sleep
+    client: FakeHueClient,
+    *,
+    duration: int = 2,
+    sleep=asyncio.sleep,
+    after_alarm: AfterAlarmConfig | None = None,
 ) -> DaylightAlarm:
     config = HueriseConfig(
         daylight_alarm=DaylightAlarmConfig(
             room=NamedResourceConfig(id=ROOM_ID, name="Bedroom"),
             scene=NamedResourceConfig(id=SCENE_ID, name="Sunrise"),
             duration_seconds=duration,
+            after_alarm=after_alarm,
         )
     )
     return DaylightAlarm(
@@ -293,3 +298,127 @@ async def test_logs_runtime_and_cleanup_failures(
     assert "Daylight alarm failed during execution" in caplog.text
     assert "Could not close Hue client" in caplog.text
     assert client.closed is True
+
+
+@pytest.mark.parametrize("stream_error", [None, HueUnavailableError("stream offline")])
+async def test_external_control_stops_the_pending_fade(
+    stream_error: Exception | None,
+) -> None:
+    waiting = asyncio.Event()
+
+    async def blocked_sleep(_: float) -> None:
+        waiting.set()
+        await asyncio.Event().wait()
+
+    client = FakeHueClient(DEFAULT_ROOMS, stream_error=stream_error)
+    alarm = make_alarm(client, sleep=blocked_sleep)
+    await alarm.start()
+    await waiting.wait()
+    commands = list(client.commands)
+    client.overridden.set()
+    assert alarm._task is not None
+    await asyncio.wait_for(alarm._task, 1)
+
+    assert client.commands == commands
+    assert client.closed
+    assert not client.monitoring
+    assert not alarm.is_running
+
+
+async def test_override_immediately_before_a_step_prevents_the_write() -> None:
+    client = FakeHueClient(DEFAULT_ROOMS)
+
+    async def manual_control(_: float) -> None:
+        client.overridden.set()
+
+    alarm = make_alarm(client, sleep=manual_control)
+    await alarm.start()
+    assert alarm._task is not None
+    await alarm._task
+
+    assert client.commands == [("activate", SCENE_ID, 1)]
+    assert client.closed
+    assert not alarm.is_running
+
+
+async def test_external_control_cancels_the_after_alarm_scene() -> None:
+    waiting = asyncio.Event()
+
+    async def controlled_sleep(delay: float) -> None:
+        if delay == 60:
+            waiting.set()
+            await asyncio.Event().wait()
+        await asyncio.sleep(0)
+
+    after_alarm = AfterAlarmConfig(
+        room=NamedResourceConfig(id=ROOM_ID, name="Bedroom"),
+        scene=NamedResourceConfig(id=SCENE_ID, name="Sunrise"),
+        delay_seconds=60,
+    )
+    client = FakeHueClient(DEFAULT_ROOMS)
+    alarm = make_alarm(client, sleep=controlled_sleep, after_alarm=after_alarm)
+    await alarm.start()
+    await waiting.wait()
+    commands = list(client.commands)
+    client.overridden.set()
+    assert alarm._task is not None
+    await alarm._task
+
+    assert client.commands == commands
+    assert client.commands[-1] == ("brightness", ROOM_ID, 30)
+    assert client.closed
+    assert not alarm.is_running
+
+
+async def test_monitoring_must_connect_before_the_first_light_command() -> None:
+    client = FakeHueClient(DEFAULT_ROOMS, watch_error=TimeoutError("SSE unavailable"))
+    alarm = make_alarm(client)
+
+    with pytest.raises(HueUnavailableError, match="communicate"):
+        await alarm.start()
+
+    assert client.commands == []
+    assert client.closed
+    assert not client.monitoring
+
+
+async def test_cancelling_start_closes_the_pending_event_stream() -> None:
+    waiting = asyncio.Event()
+
+    class ConnectingClient(FakeHueClient):
+        async def watch_room(self, room_id: UUID) -> None:
+            waiting.set()
+            await asyncio.Event().wait()
+
+    client = ConnectingClient(DEFAULT_ROOMS)
+    alarm = make_alarm(client)
+    start = asyncio.create_task(alarm.start())
+    await waiting.wait()
+    start.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await start
+
+    assert client.commands == []
+    assert client.closed
+    assert not alarm.is_running
+
+
+async def test_alarm_can_restart_after_external_control_stopped_it() -> None:
+    waiting = asyncio.Event()
+
+    async def blocked_sleep(_: float) -> None:
+        waiting.set()
+        await asyncio.Event().wait()
+
+    client = FakeHueClient(DEFAULT_ROOMS)
+    alarm = make_alarm(client, sleep=blocked_sleep)
+    await alarm.start()
+    await waiting.wait()
+    client.overridden.set()
+    assert alarm._task is not None
+    await alarm._task
+
+    await alarm.start()
+    assert alarm.is_running
+    await alarm.stop()

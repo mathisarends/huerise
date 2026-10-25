@@ -175,7 +175,11 @@ def test_errors_are_documented_on_their_routes(client: TestClient) -> None:
     ]
 
     assert responses["404"]["description"] == ("The selected Hue scene does not exist.")
-    assert responses["409"]["description"] == ("A daylight alarm is already running.")
+    conflict = responses["409"]["content"]["application/problem+json"]["schema"]
+    assert conflict["discriminator"]["mapping"] == {
+        "alarm_already_running": "#/components/schemas/AlarmAlreadyRunningProblem",
+        "lighting_overridden": "#/components/schemas/LightingOverriddenProblem",
+    }
     schema = responses["422"]["content"]["application/problem+json"]["schema"]
     assert schema["discriminator"]["mapping"] == {
         "configuration_invalid": "#/components/schemas/ConfigurationInvalidProblem",
@@ -454,6 +458,24 @@ def test_rejects_a_second_alarm_with_the_documented_error(client: TestClient) ->
         "code": "alarm_already_running",
         "detail": "Daylight alarm is already running",
     }
+
+
+def test_reports_a_control_takeover_during_start(tmp_path: Path) -> None:
+    class OverriddenClient(FakeHueClient):
+        async def watch_room(self, room_id: UUID) -> None:
+            await super().watch_room(room_id)
+            self.overridden.set()
+
+    hue_client = OverriddenClient(
+        [Room(ROOM_ID, "Bedroom", (Scene(SCENE_ID, "Sunrise", 80),))]
+    )
+    with _client(tmp_path, hue_client) as client:
+        response = client.post("/daylight-alarm/start", headers=AUTH)
+
+    assert response.status_code == 409
+    assert response.json()["code"] == "lighting_overridden"
+    assert hue_client.commands == []
+    assert hue_client.closed
 
 
 def test_request_validation_matches_documented_error(client: TestClient) -> None:

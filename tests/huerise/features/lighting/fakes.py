@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass, field
 from uuid import UUID
 
@@ -6,6 +7,7 @@ from huerise.features.lighting.domain.models import (
     HueClientFactory,
     HueCredentials,
     HueCredentialsSource,
+    LightingOverrideError,
     Room,
 )
 from huerise.features.lighting.domain.onboarding import HueBridge, OnboardingGateway
@@ -20,6 +22,25 @@ class FakeHueClient(HueClient):
     close_error: Exception | None = None
     commands: list[tuple[str, UUID, float]] = field(default_factory=list)
     closed: bool = False
+    watch_error: Exception | None = None
+    stream_error: Exception | None = None
+    monitoring: bool = False
+    overridden: asyncio.Event = field(default_factory=asyncio.Event)
+
+    async def watch_room(self, room_id: UUID) -> None:
+        if self.watch_error is not None:
+            raise self.watch_error
+        self.overridden.clear()
+        self.monitoring = True
+
+    async def wait_for_override(self) -> None:
+        await self.overridden.wait()
+        if self.stream_error is not None:
+            raise self.stream_error
+
+    def ensure_control(self) -> None:
+        if self.overridden.is_set():
+            raise LightingOverrideError
 
     async def list_rooms(self) -> list[Room]:
         if self.list_rooms_error is not None:
@@ -27,17 +48,20 @@ class FakeHueClient(HueClient):
         return self.rooms
 
     async def activate_scene(self, scene_id: UUID, *, brightness: float) -> None:
+        self.ensure_control()
         if self.activate_scene_error is not None:
             raise self.activate_scene_error
         self.commands.append(("activate", scene_id, brightness))
 
     async def set_brightness(self, room_id: UUID, brightness: float) -> None:
+        self.ensure_control()
         if self.set_brightness_error is not None:
             raise self.set_brightness_error
         self.commands.append(("brightness", room_id, brightness))
 
     async def close(self) -> None:
         self.closed = True
+        self.monitoring = False
         if self.close_error is not None:
             raise self.close_error
 

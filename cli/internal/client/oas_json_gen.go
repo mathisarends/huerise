@@ -3880,6 +3880,402 @@ func (s *HueUnavailableProblemType) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *LightingOverriddenProblem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *LightingOverriddenProblem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("type")
+		s.Type.Encode(e)
+	}
+	{
+		e.FieldStart("title")
+		s.Title.Encode(e)
+	}
+	{
+		e.FieldStart("status")
+		s.Status.Encode(e)
+	}
+	{
+		e.FieldStart("code")
+		s.Code.Encode(e)
+	}
+	{
+		if s.Detail.Set {
+			e.FieldStart("detail")
+			s.Detail.Encode(e)
+		}
+	}
+	{
+		if s.Instance.Set {
+			e.FieldStart("instance")
+			s.Instance.Encode(e)
+		}
+	}
+	for k, elem := range s.AdditionalProps {
+		e.FieldStart(k)
+
+		if len(elem) != 0 {
+			e.Raw(elem)
+		}
+	}
+}
+
+var jsonFieldsNameOfLightingOverriddenProblem = [6]string{
+	0: "type",
+	1: "title",
+	2: "status",
+	3: "code",
+	4: "detail",
+	5: "instance",
+}
+
+// Decode decodes LightingOverriddenProblem from json.
+func (s *LightingOverriddenProblem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblem to nil")
+	}
+	var requiredBitSet [1]uint8
+	s.AdditionalProps = map[string]jx.Raw{}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "type":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Type.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "status":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"status\"")
+			}
+		case "code":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "detail":
+			if err := func() error {
+				s.Detail.Reset()
+				if err := s.Detail.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"detail\"")
+			}
+		case "instance":
+			if err := func() error {
+				s.Instance.Reset()
+				if err := s.Instance.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"instance\"")
+			}
+		default:
+			var elem jx.Raw
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				elem = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrapf(err, "decode field %q", k)
+			}
+			s.AdditionalProps[string(k)] = elem
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode LightingOverriddenProblem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfLightingOverriddenProblem) {
+					name = jsonFieldsNameOfLightingOverriddenProblem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *LightingOverriddenProblem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s LightingOverriddenProblemAdditional) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields implements json.Marshaler.
+func (s LightingOverriddenProblemAdditional) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
+
+		if len(elem) != 0 {
+			e.Raw(elem)
+		}
+	}
+}
+
+// Decode decodes LightingOverriddenProblemAdditional from json.
+func (s *LightingOverriddenProblemAdditional) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblemAdditional to nil")
+	}
+	m := s.init()
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		var elem jx.Raw
+		if err := func() error {
+			v, err := d.RawAppend(nil)
+			elem = jx.Raw(v)
+			if err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
+		}
+		m[string(k)] = elem
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode LightingOverriddenProblemAdditional")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s LightingOverriddenProblemAdditional) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblemAdditional) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes LightingOverriddenProblemCode as json.
+func (s LightingOverriddenProblemCode) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes LightingOverriddenProblemCode from json.
+func (s *LightingOverriddenProblemCode) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblemCode to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch LightingOverriddenProblemCode(v) {
+	case LightingOverriddenProblemCodeLightingOverridden:
+		*s = LightingOverriddenProblemCodeLightingOverridden
+	default:
+		*s = LightingOverriddenProblemCode(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s LightingOverriddenProblemCode) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblemCode) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes LightingOverriddenProblemStatus as json.
+func (s LightingOverriddenProblemStatus) Encode(e *jx.Encoder) {
+	e.Int(int(s))
+}
+
+// Decode decodes LightingOverriddenProblemStatus from json.
+func (s *LightingOverriddenProblemStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblemStatus to nil")
+	}
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	*s = LightingOverriddenProblemStatus(v)
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s LightingOverriddenProblemStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblemStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes LightingOverriddenProblemTitle as json.
+func (s LightingOverriddenProblemTitle) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes LightingOverriddenProblemTitle from json.
+func (s *LightingOverriddenProblemTitle) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblemTitle to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch LightingOverriddenProblemTitle(v) {
+	case LightingOverriddenProblemTitleLightsControlledElsewhere:
+		*s = LightingOverriddenProblemTitleLightsControlledElsewhere
+	default:
+		*s = LightingOverriddenProblemTitle(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s LightingOverriddenProblemTitle) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblemTitle) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes LightingOverriddenProblemType as json.
+func (s LightingOverriddenProblemType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes LightingOverriddenProblemType from json.
+func (s *LightingOverriddenProblemType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LightingOverriddenProblemType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch LightingOverriddenProblemType(v) {
+	case LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden:
+		*s = LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden
+	default:
+		*s = LightingOverriddenProblemType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s LightingOverriddenProblemType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LightingOverriddenProblemType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *LinkButtonTimeoutProblem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -8162,6 +8558,162 @@ func (s SetDaylightAlarmConfigurationUnprocessableEntity) MarshalJSON() ([]byte,
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *SetDaylightAlarmConfigurationUnprocessableEntity) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes StartDaylightAlarmConflict as json.
+func (s StartDaylightAlarmConflict) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+func (s StartDaylightAlarmConflict) encodeFields(e *jx.Encoder) {
+	switch s.Type {
+	case AlarmAlreadyRunningProblemStartDaylightAlarmConflict:
+		e.FieldStart("code")
+		e.Str("alarm_already_running")
+		{
+			s := s.AlarmAlreadyRunningProblem
+			{
+				e.FieldStart("type")
+				s.Type.Encode(e)
+			}
+			{
+				e.FieldStart("title")
+				s.Title.Encode(e)
+			}
+			{
+				e.FieldStart("status")
+				s.Status.Encode(e)
+			}
+			{
+				if s.Detail.Set {
+					e.FieldStart("detail")
+					s.Detail.Encode(e)
+				}
+			}
+			{
+				if s.Instance.Set {
+					e.FieldStart("instance")
+					s.Instance.Encode(e)
+				}
+			}
+			for k, elem := range s.AdditionalProps {
+				e.FieldStart(k)
+
+				if len(elem) != 0 {
+					e.Raw(elem)
+				}
+			}
+		}
+	case LightingOverriddenProblemStartDaylightAlarmConflict:
+		e.FieldStart("code")
+		e.Str("lighting_overridden")
+		{
+			s := s.LightingOverriddenProblem
+			{
+				e.FieldStart("type")
+				s.Type.Encode(e)
+			}
+			{
+				e.FieldStart("title")
+				s.Title.Encode(e)
+			}
+			{
+				e.FieldStart("status")
+				s.Status.Encode(e)
+			}
+			{
+				if s.Detail.Set {
+					e.FieldStart("detail")
+					s.Detail.Encode(e)
+				}
+			}
+			{
+				if s.Instance.Set {
+					e.FieldStart("instance")
+					s.Instance.Encode(e)
+				}
+			}
+			for k, elem := range s.AdditionalProps {
+				e.FieldStart(k)
+
+				if len(elem) != 0 {
+					e.Raw(elem)
+				}
+			}
+		}
+	}
+}
+
+// Decode decodes StartDaylightAlarmConflict from json.
+func (s *StartDaylightAlarmConflict) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode StartDaylightAlarmConflict to nil")
+	}
+	// Sum type discriminator.
+	if typ := d.Next(); typ != jx.Object {
+		return errors.Errorf("unexpected json type %q", typ)
+	}
+
+	var found bool
+	if err := d.Capture(func(d *jx.Decoder) error {
+		return d.ObjBytes(func(d *jx.Decoder, key []byte) error {
+			if found {
+				return d.Skip()
+			}
+			switch string(key) {
+			case "code":
+				typ, err := d.Str()
+				if err != nil {
+					return err
+				}
+				switch typ {
+				case "alarm_already_running":
+					s.Type = AlarmAlreadyRunningProblemStartDaylightAlarmConflict
+					found = true
+				case "lighting_overridden":
+					s.Type = LightingOverriddenProblemStartDaylightAlarmConflict
+					found = true
+				default:
+					return errors.Errorf("unknown type %s", typ)
+				}
+				return nil
+			}
+			return d.Skip()
+		})
+	}); err != nil {
+		return errors.Wrap(err, "capture")
+	}
+	if !found {
+		return errors.New("unable to detect sum type variant")
+	}
+	switch s.Type {
+	case AlarmAlreadyRunningProblemStartDaylightAlarmConflict:
+		if err := s.AlarmAlreadyRunningProblem.Decode(d); err != nil {
+			return err
+		}
+	case LightingOverriddenProblemStartDaylightAlarmConflict:
+		if err := s.LightingOverriddenProblem.Decode(d); err != nil {
+			return err
+		}
+	default:
+		return errors.Errorf("inferred invalid type: %s", s.Type)
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s StartDaylightAlarmConflict) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *StartDaylightAlarmConflict) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

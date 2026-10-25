@@ -26,12 +26,14 @@ Starting an alarm runs one linear brightness ramp:
 
 1. The YAML file is read fresh, so the latest configuration always applies.
 2. The room owning `scene_id` is resolved from the Bridge.
-3. The scene is activated at 1% brightness, setting its colors at their
+3. The Hue event stream is connected before changing the lights, so external
+   control can be observed throughout the alarm.
+4. The scene is activated at 1% brightness, setting its colors at their
    dimmest.
-4. A background task then steps the room's brightness once per second, moving
+5. A background task then steps the room's brightness once per second, moving
    linearly from 1% to the brightness stored in the scene across
    `duration_seconds`.
-5. When the ramp completes the lights simply stay where they are. Huerise sends
+6. When the ramp completes the lights simply stay where they are. Huerise sends
    no final command and never switches anything off.
 
 Because the configuration is read at start time, a running alarm keeps the
@@ -39,9 +41,25 @@ snapshot it began with; editing the YAML mid-run affects only the next one.
 Exactly one alarm can be active at a time, and `stop` cancels the ramp in place
 — the lights hold their current brightness rather than jumping back.
 
-`GET /doctor` runs the same preconditions ahead of time: the YAML parses and
-validates, Hue credentials exist, the Bridge answers and accepts them, and the
-configured scene still exists.
+Using a remote, app, or automation to change the alarm room implicitly stops
+the alarm. Changes to power, brightness, color, scene, or an entertainment source
+take priority; Huerise cancels both the remaining ramp and any delayed
+after-alarm scene without sending a reset command. Other rooms are ignored.
+
+The monitor recognizes acknowledgements of its own commands, including delayed
+and quantized brightness updates. Hue events do not reliably identify who sent
+a command, so an external command that leaves the same state as an expected
+acknowledgement cannot always be distinguished. Dynamic scene effects can also
+produce independent state changes.
+
+During stream reconnection, further writes wait for the room's state to be
+verified again. A changed state stops the alarm. If monitoring cannot be restored
+within five seconds, the alarm ends instead of sending unobserved commands.
+Starting also fails before the first light command if the stream cannot connect.
+
+`GET /doctor` checks the configuration and REST prerequisites ahead of time:
+the YAML parses and validates, Hue credentials exist, the Bridge answers and
+accepts them, and the configured scene still exists.
 
 ## Installation
 

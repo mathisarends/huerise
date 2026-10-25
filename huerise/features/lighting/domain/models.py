@@ -7,6 +7,10 @@ class HueUnavailableError(Exception):
     pass
 
 
+class LightingOverrideError(Exception):
+    pass
+
+
 class SceneNotFoundError(Exception):
     def __init__(self, scene_id: UUID) -> None:
         super().__init__(f"Hue scene not found: {scene_id}")
@@ -36,6 +40,12 @@ class Room:
 class HueClient(ABC):
     @abstractmethod
     async def list_rooms(self) -> list[Room]: ...
+
+    @abstractmethod
+    async def watch_room(self, room_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def wait_for_override(self) -> None: ...
 
     @abstractmethod
     async def activate_scene(self, scene_id: UUID, *, brightness: float) -> None: ...

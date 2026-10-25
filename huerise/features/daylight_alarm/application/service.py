@@ -9,6 +9,7 @@ from huerise.features.lighting.domain import (
     HueClientFactory,
     HueCredentialsSource,
     HueUnavailableError,
+    LightingOverrideError,
     SceneNotFoundError,
     room_for_scene,
 )
@@ -91,14 +92,18 @@ class DaylightAlarm:
                             "The configured after-alarm Hue scene has no brightness"
                         )
                     after_alarm_brightness = after_alarm_scene.brightness
+                await client.watch_room(room.id)
                 await client.activate_scene(
                     config.scene.id, brightness=START_BRIGHTNESS
                 )
-            except Exception as error:
+            except BaseException as error:
                 await self._close(client)
-                if isinstance(error, HueUnavailableError):
+                if isinstance(
+                    error,
+                    (HueUnavailableError, SceneNotFoundError, LightingOverrideError),
+                ):
                     raise
-                if isinstance(error, SceneNotFoundError):
+                if not isinstance(error, Exception):
                     raise
                 raise HueUnavailableError(
                     "Could not communicate with Hue Bridge"
@@ -130,30 +135,61 @@ class DaylightAlarm:
         after_alarm_brightness: float | None,
         config: DaylightAlarmConfig,
     ) -> None:
-        elapsed = 0.0
+        fade = asyncio.create_task(
+            self._fade(
+                client, room_id, target_brightness, after_alarm_brightness, config
+            )
+        )
+        overridden = asyncio.create_task(client.wait_for_override())
         try:
-            while elapsed < config.duration_seconds:
-                delay = min(self._step_interval, config.duration_seconds - elapsed)
-                await self._sleep(delay)
-                elapsed += delay
-                progress = elapsed / config.duration_seconds
-                brightness = (
-                    START_BRIGHTNESS + (target_brightness - START_BRIGHTNESS) * progress
+            finished, _ = await asyncio.wait(
+                (fade, overridden), return_when=asyncio.FIRST_COMPLETED
+            )
+            if overridden in finished:
+                overridden.result()
+                logger.info(
+                    "Daylight alarm stopped after another control changed the lights"
                 )
-                await client.set_brightness(room_id, brightness)
-            if config.after_alarm is not None:
-                assert after_alarm_brightness is not None
-                await self._sleep(config.after_alarm.delay_seconds)
-                await client.activate_scene(
-                    config.after_alarm.scene.id,
-                    brightness=after_alarm_brightness,
-                )
+            else:
+                fade.result()
+        except LightingOverrideError:
+            logger.info(
+                "Daylight alarm stopped after another control changed the lights"
+            )
         except asyncio.CancelledError:
             raise
         except Exception:
             logger.exception("Daylight alarm failed during execution")
         finally:
+            fade.cancel()
+            overridden.cancel()
+            await asyncio.gather(fade, overridden, return_exceptions=True)
             await self._close(client)
+
+    async def _fade(
+        self,
+        client: HueClient,
+        room_id: UUID,
+        target_brightness: float,
+        after_alarm_brightness: float | None,
+        config: DaylightAlarmConfig,
+    ) -> None:
+        elapsed = 0.0
+        while elapsed < config.duration_seconds:
+            delay = min(self._step_interval, config.duration_seconds - elapsed)
+            await self._sleep(delay)
+            elapsed += delay
+            progress = elapsed / config.duration_seconds
+            brightness = (
+                START_BRIGHTNESS + (target_brightness - START_BRIGHTNESS) * progress
+            )
+            await client.set_brightness(room_id, brightness)
+        if config.after_alarm is not None:
+            assert after_alarm_brightness is not None
+            await self._sleep(config.after_alarm.delay_seconds)
+            await client.activate_scene(
+                config.after_alarm.scene.id, brightness=after_alarm_brightness
+            )
 
     def _finished(self, task: asyncio.Task[None]) -> None:
         if self._task is task:

@@ -61,6 +61,13 @@ shutdown. The alarm provider owns its task's lifetime and stops a resolved alarm
 before the container closes. Tests add features with explicit provider overrides
 through `create_app(*extra_features)`.
 
+The alarm also owns a concurrent override watcher. The Hue adapter maps Hueify's
+event stream into that port, correlates its own commands with light updates, and
+watches only the alarm room's resources and entertainment areas. Reconnection
+blocks writes until fresh snapshots match the last commanded state. External
+control or a failed monitoring recovery cancels the fade and its pending
+after-alarm scene; both tasks are drained before the client is closed.
+
 ## HTTP contracts
 
 Every route declares a stable operation ID, success response, and relevant

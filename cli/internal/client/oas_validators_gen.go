@@ -861,6 +861,98 @@ func (s HueUnavailableProblemType) Validate() error {
 	}
 }
 
+func (s *LightingOverriddenProblem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Type.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "type",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Title.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "title",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Status.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "status",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Code.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "code",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s LightingOverriddenProblemCode) Validate() error {
+	switch s {
+	case "lighting_overridden":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s LightingOverriddenProblemStatus) Validate() error {
+	switch s {
+	case 409:
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s LightingOverriddenProblemTitle) Validate() error {
+	switch s {
+	case "Lights controlled elsewhere":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s LightingOverriddenProblemType) Validate() error {
+	switch s {
+	case "urn:huerise:problem/lighting_overridden":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *LinkButtonTimeoutProblem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1729,6 +1821,23 @@ func (s SetDaylightAlarmConfigurationUnprocessableEntity) Validate() error {
 		return nil
 	case RequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity:
 		if err := s.RequestValidationProblem.Validate(); err != nil {
+			return err
+		}
+		return nil
+	default:
+		return errors.Errorf("invalid type %q", s.Type)
+	}
+}
+
+func (s StartDaylightAlarmConflict) Validate() error {
+	switch s.Type {
+	case AlarmAlreadyRunningProblemStartDaylightAlarmConflict:
+		if err := s.AlarmAlreadyRunningProblem.Validate(); err != nil {
+			return err
+		}
+		return nil
+	case LightingOverriddenProblemStartDaylightAlarmConflict:
+		if err := s.LightingOverriddenProblem.Validate(); err != nil {
 			return err
 		}
 		return nil

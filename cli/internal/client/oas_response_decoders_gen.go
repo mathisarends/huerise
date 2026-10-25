@@ -1942,7 +1942,7 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response AlarmAlreadyRunningProblem
+			var response StartDaylightAlarmConflict
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

@@ -189,8 +189,6 @@ func (s *AlarmAlreadyRunningProblem) SetAdditionalProps(val AlarmAlreadyRunningP
 	s.AdditionalProps = val
 }
 
-func (*AlarmAlreadyRunningProblem) startDaylightAlarmRes() {}
-
 type AlarmAlreadyRunningProblemAdditional map[string]jx.Raw
 
 func (s *AlarmAlreadyRunningProblemAdditional) init() AlarmAlreadyRunningProblemAdditional {
@@ -1813,6 +1811,214 @@ func (s *HueUnavailableProblemType) UnmarshalText(data []byte) error {
 	switch HueUnavailableProblemType(data) {
 	case HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable:
 		*s = HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/LightingOverriddenProblem
+type LightingOverriddenProblem struct {
+	Type            LightingOverriddenProblemType   `json:"type"`
+	Title           LightingOverriddenProblemTitle  `json:"title"`
+	Status          LightingOverriddenProblemStatus `json:"status"`
+	Code            LightingOverriddenProblemCode   `json:"code"`
+	Detail          OptNilString                    `json:"detail"`
+	Instance        OptNilString                    `json:"instance"`
+	AdditionalProps LightingOverriddenProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *LightingOverriddenProblem) GetType() LightingOverriddenProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *LightingOverriddenProblem) GetTitle() LightingOverriddenProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *LightingOverriddenProblem) GetStatus() LightingOverriddenProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *LightingOverriddenProblem) GetCode() LightingOverriddenProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *LightingOverriddenProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *LightingOverriddenProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *LightingOverriddenProblem) GetAdditionalProps() LightingOverriddenProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *LightingOverriddenProblem) SetType(val LightingOverriddenProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *LightingOverriddenProblem) SetTitle(val LightingOverriddenProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *LightingOverriddenProblem) SetStatus(val LightingOverriddenProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *LightingOverriddenProblem) SetCode(val LightingOverriddenProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *LightingOverriddenProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *LightingOverriddenProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *LightingOverriddenProblem) SetAdditionalProps(val LightingOverriddenProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type LightingOverriddenProblemAdditional map[string]jx.Raw
+
+func (s *LightingOverriddenProblemAdditional) init() LightingOverriddenProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type LightingOverriddenProblemCode string
+
+const (
+	LightingOverriddenProblemCodeLightingOverridden LightingOverriddenProblemCode = "lighting_overridden"
+)
+
+// AllValues returns all LightingOverriddenProblemCode values.
+func (LightingOverriddenProblemCode) AllValues() []LightingOverriddenProblemCode {
+	return []LightingOverriddenProblemCode{
+		LightingOverriddenProblemCodeLightingOverridden,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LightingOverriddenProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case LightingOverriddenProblemCodeLightingOverridden:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LightingOverriddenProblemCode) UnmarshalText(data []byte) error {
+	switch LightingOverriddenProblemCode(data) {
+	case LightingOverriddenProblemCodeLightingOverridden:
+		*s = LightingOverriddenProblemCodeLightingOverridden
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type LightingOverriddenProblemStatus int
+
+const (
+	LightingOverriddenProblemStatus409 LightingOverriddenProblemStatus = 409
+)
+
+// AllValues returns all LightingOverriddenProblemStatus values.
+func (LightingOverriddenProblemStatus) AllValues() []LightingOverriddenProblemStatus {
+	return []LightingOverriddenProblemStatus{
+		LightingOverriddenProblemStatus409,
+	}
+}
+
+type LightingOverriddenProblemTitle string
+
+const (
+	LightingOverriddenProblemTitleLightsControlledElsewhere LightingOverriddenProblemTitle = "Lights controlled elsewhere"
+)
+
+// AllValues returns all LightingOverriddenProblemTitle values.
+func (LightingOverriddenProblemTitle) AllValues() []LightingOverriddenProblemTitle {
+	return []LightingOverriddenProblemTitle{
+		LightingOverriddenProblemTitleLightsControlledElsewhere,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LightingOverriddenProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case LightingOverriddenProblemTitleLightsControlledElsewhere:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LightingOverriddenProblemTitle) UnmarshalText(data []byte) error {
+	switch LightingOverriddenProblemTitle(data) {
+	case LightingOverriddenProblemTitleLightsControlledElsewhere:
+		*s = LightingOverriddenProblemTitleLightsControlledElsewhere
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type LightingOverriddenProblemType string
+
+const (
+	LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden LightingOverriddenProblemType = "urn:huerise:problem/lighting_overridden"
+)
+
+// AllValues returns all LightingOverriddenProblemType values.
+func (LightingOverriddenProblemType) AllValues() []LightingOverriddenProblemType {
+	return []LightingOverriddenProblemType{
+		LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LightingOverriddenProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LightingOverriddenProblemType) UnmarshalText(data []byte) error {
+	switch LightingOverriddenProblemType(data) {
+	case LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden:
+		*s = LightingOverriddenProblemTypeUrnHueriseProblemLightingOverridden
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -4271,6 +4477,76 @@ func NewRequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity
 }
 
 func (*SetDaylightAlarmConfigurationUnprocessableEntity) setDaylightAlarmConfigurationRes() {}
+
+// StartDaylightAlarmConflict represents sum type.
+type StartDaylightAlarmConflict struct {
+	Type                       StartDaylightAlarmConflictType // switch on this field
+	AlarmAlreadyRunningProblem AlarmAlreadyRunningProblem
+	LightingOverriddenProblem  LightingOverriddenProblem
+}
+
+// StartDaylightAlarmConflictType is oneOf type of StartDaylightAlarmConflict.
+type StartDaylightAlarmConflictType string
+
+// Possible values for StartDaylightAlarmConflictType.
+const (
+	AlarmAlreadyRunningProblemStartDaylightAlarmConflict StartDaylightAlarmConflictType = "alarm_already_running"
+	LightingOverriddenProblemStartDaylightAlarmConflict  StartDaylightAlarmConflictType = "lighting_overridden"
+)
+
+// IsAlarmAlreadyRunningProblem reports whether StartDaylightAlarmConflict is AlarmAlreadyRunningProblem.
+func (s StartDaylightAlarmConflict) IsAlarmAlreadyRunningProblem() bool {
+	return s.Type == AlarmAlreadyRunningProblemStartDaylightAlarmConflict
+}
+
+// IsLightingOverriddenProblem reports whether StartDaylightAlarmConflict is LightingOverriddenProblem.
+func (s StartDaylightAlarmConflict) IsLightingOverriddenProblem() bool {
+	return s.Type == LightingOverriddenProblemStartDaylightAlarmConflict
+}
+
+// SetAlarmAlreadyRunningProblem sets StartDaylightAlarmConflict to AlarmAlreadyRunningProblem.
+func (s *StartDaylightAlarmConflict) SetAlarmAlreadyRunningProblem(v AlarmAlreadyRunningProblem) {
+	s.Type = AlarmAlreadyRunningProblemStartDaylightAlarmConflict
+	s.AlarmAlreadyRunningProblem = v
+}
+
+// GetAlarmAlreadyRunningProblem returns AlarmAlreadyRunningProblem and true boolean if StartDaylightAlarmConflict is AlarmAlreadyRunningProblem.
+func (s StartDaylightAlarmConflict) GetAlarmAlreadyRunningProblem() (v AlarmAlreadyRunningProblem, ok bool) {
+	if !s.IsAlarmAlreadyRunningProblem() {
+		return v, false
+	}
+	return s.AlarmAlreadyRunningProblem, true
+}
+
+// NewAlarmAlreadyRunningProblemStartDaylightAlarmConflict returns new StartDaylightAlarmConflict from AlarmAlreadyRunningProblem.
+func NewAlarmAlreadyRunningProblemStartDaylightAlarmConflict(v AlarmAlreadyRunningProblem) StartDaylightAlarmConflict {
+	var s StartDaylightAlarmConflict
+	s.SetAlarmAlreadyRunningProblem(v)
+	return s
+}
+
+// SetLightingOverriddenProblem sets StartDaylightAlarmConflict to LightingOverriddenProblem.
+func (s *StartDaylightAlarmConflict) SetLightingOverriddenProblem(v LightingOverriddenProblem) {
+	s.Type = LightingOverriddenProblemStartDaylightAlarmConflict
+	s.LightingOverriddenProblem = v
+}
+
+// GetLightingOverriddenProblem returns LightingOverriddenProblem and true boolean if StartDaylightAlarmConflict is LightingOverriddenProblem.
+func (s StartDaylightAlarmConflict) GetLightingOverriddenProblem() (v LightingOverriddenProblem, ok bool) {
+	if !s.IsLightingOverriddenProblem() {
+		return v, false
+	}
+	return s.LightingOverriddenProblem, true
+}
+
+// NewLightingOverriddenProblemStartDaylightAlarmConflict returns new StartDaylightAlarmConflict from LightingOverriddenProblem.
+func NewLightingOverriddenProblemStartDaylightAlarmConflict(v LightingOverriddenProblem) StartDaylightAlarmConflict {
+	var s StartDaylightAlarmConflict
+	s.SetLightingOverriddenProblem(v)
+	return s
+}
+
+func (*StartDaylightAlarmConflict) startDaylightAlarmRes() {}
 
 // StartDaylightAlarmUnprocessableEntity represents sum type.
 type StartDaylightAlarmUnprocessableEntity struct {
