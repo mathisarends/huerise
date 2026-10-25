@@ -1,8 +1,9 @@
+import asyncio
 from uuid import UUID
 
 import pytest
 
-from huerise.features.health.application import Doctor
+from huerise.features.health.application import Doctor, Readiness, ServiceNotReadyError
 from huerise.features.lighting.domain import (
     HueUnavailableError,
     Room,
@@ -90,3 +91,39 @@ async def test_reports_client_initialization_failures() -> None:
         await doctor.check()
 
     assert client.closed is False
+
+
+class WaitingHueClient(FakeHueClient):
+    def __init__(self) -> None:
+        super().__init__()
+        self.started = asyncio.Event()
+
+    async def list_rooms(self) -> list[Room]:
+        self.started.set()
+        await asyncio.Event().wait()
+        return []
+
+
+async def test_readiness_timeout_closes_the_hue_client() -> None:
+    client = WaitingHueClient()
+    readiness = Readiness(make_doctor(client), timeout_seconds=0.01)
+
+    with pytest.raises(ServiceNotReadyError) as failure:
+        await readiness.check()
+
+    assert isinstance(failure.value.__cause__, TimeoutError)
+    assert client.closed
+    assert client.commands == []
+
+
+async def test_readiness_cancellation_closes_the_hue_client() -> None:
+    client = WaitingHueClient()
+    readiness = Readiness(make_doctor(client))
+    task = asyncio.create_task(readiness.check())
+    await client.started.wait()
+
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert client.closed

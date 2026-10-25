@@ -141,7 +141,8 @@ storage.
 
 ## API
 
-Send the configured key as `X-API-Key` on every route.
+Send the configured key as `X-API-Key` on application and diagnostic routes.
+The `/health` and `/readiness` probes are public and return only a minimal status.
 
 API failures use RFC 9457 `application/problem+json`, including `type`, `title`,
 `status`, a stable `code`, and optional `detail`. YAML failures add sanitized
@@ -151,6 +152,8 @@ CLI should be upgraded together from `0.1.x`; see [the changelog](CHANGELOG.md).
 
 | Method | Route | Purpose |
 | --- | --- | --- |
+| `GET` | `/health` | Liveness: answer without reading YAML or contacting Hue |
+| `GET` | `/readiness` | Readiness: verify configuration and Hue prerequisites; return `503` if unavailable |
 | `GET` | `/doctor` | Validate YAML, credentials, Bridge access, and configured scene |
 | `POST` | `/daylight-alarm/start` | Start immediately, optionally overriding this run's duration |
 | `POST` | `/daylight-alarm/stop` | Stop it without changing the current light state |
@@ -165,6 +168,15 @@ CLI should be upgraded together from `0.1.x`; see [the changelog](CHANGELOG.md).
 The onboarding states are `not_selected`, `link_button_required`, and `ready`.
 Registration waits up to 60 seconds for the physical link button. Environment
 credentials report `ready` with `read_only: true`.
+
+Both probes return `200` with `{"status":"ok"}` when successful. Readiness uses
+the Doctor checks with a five-second deadline. Missing prerequisites or a timeout
+return `503` with `code: "not_ready"` and `Retry-After: 5`; `/doctor` retains the
+detailed protected diagnostics. These checks never change the lights.
+
+The container's healthcheck uses `/health`, so a temporary Hue outage does not
+mark the API process itself as unhealthy. Orchestrators can use `/readiness`
+separately to decide whether the application is ready to run alarms.
 
 Example:
 

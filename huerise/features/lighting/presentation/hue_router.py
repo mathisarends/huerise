@@ -1,4 +1,5 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
+from fastapi import Depends
 from fastapi_canon import CanonRouter
 
 from huerise.features.lighting.application import HueOnboarding, SceneService
@@ -21,6 +22,7 @@ from huerise.features.lighting.presentation.schemas import (
     OnboardingStatusResponse,
     RoomResponse,
 )
+from huerise.platform.api.authentication import require_api_key
 from huerise.platform.api.errors import AUTHENTICATION_REQUIRED
 
 hue_router = CanonRouter(
@@ -29,6 +31,7 @@ hue_router = CanonRouter(
     route_class=DishkaRoute,
     error_registry=lighting_errors,
     raises=[AUTHENTICATION_REQUIRED],
+    dependencies=[Depends(require_api_key)],
 )
 
 

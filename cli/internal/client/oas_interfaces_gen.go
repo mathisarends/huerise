@@ -13,6 +13,10 @@ type GetHueBridgeRes interface {
 	getHueBridgeRes()
 }
 
+type GetReadinessRes interface {
+	getReadinessRes()
+}
+
 type ListHueBridgesRes interface {
 	listHueBridgesRes()
 }

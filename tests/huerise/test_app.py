@@ -149,6 +149,8 @@ def test_operation_ids_are_explicit_and_stable(client: TestClient) -> None:
 
     assert operations == {
         "doctor",
+        "getHealth",
+        "getReadiness",
         "getHueBridge",
         "getDaylightAlarmConfiguration",
         "listHueBridges",
@@ -185,20 +187,113 @@ def test_errors_are_documented_on_their_routes(client: TestClient) -> None:
 
 
 @pytest.mark.parametrize("headers", [{}, {"X-API-Key": "wrong"}])
+@pytest.mark.parametrize(
+    ("method", "path"),
+    [
+        ("GET", "/doctor"),
+        ("GET", "/hue/rooms"),
+        ("GET", "/hue/bridges"),
+        ("GET", "/hue/bridge"),
+        ("PUT", "/hue/bridge"),
+        ("POST", "/hue/bridge/register"),
+        ("GET", "/daylight-alarm/configuration"),
+        ("PUT", "/daylight-alarm/configuration"),
+        ("POST", "/daylight-alarm/start"),
+        ("POST", "/daylight-alarm/stop"),
+    ],
+)
 def test_protected_routes_require_api_key(
-    client: TestClient, headers: dict[str, str]
+    client: TestClient, headers: dict[str, str], method: str, path: str
 ) -> None:
-    assert client.post("/daylight-alarm/start", headers=headers).status_code == 401
-    assert client.get("/doctor", headers=headers).status_code == 401
-    assert client.get("/hue/rooms", headers=headers).status_code == 401
-    assert (
-        client.get("/daylight-alarm/configuration", headers=headers).status_code == 401
-    )
-    assert client.get("/hue/bridge", headers=headers).status_code == 401
-    response = client.get("/doctor", headers=headers)
+    response = client.request(method, path, headers=headers)
+
+    assert response.status_code == 401
     assert response.headers["content-type"] == "application/problem+json"
     assert response.headers["www-authenticate"] == 'ApiKey realm="huerise"'
     assert response.json()["code"] == "authentication_required"
+
+
+def test_liveness_is_public_and_independent_of_configuration_and_hue(
+    client: TestClient, tmp_path: Path, hue_client: FakeHueClient
+) -> None:
+    (tmp_path / "huerise.yml").write_text("invalid: [", encoding="utf-8")
+    hue_client.list_rooms_error = OSError("offline")
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+    assert not hue_client.closed
+    assert hue_client.commands == []
+
+
+def test_readiness_is_public_and_checks_dependencies_without_changing_lights(
+    client: TestClient, hue_client: FakeHueClient
+) -> None:
+    response = client.get("/readiness")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+    assert hue_client.closed
+    assert hue_client.commands == []
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "configuration_missing",
+        "configuration_invalid",
+        "credentials_missing",
+        "bridge_unavailable",
+        "scene_missing",
+    ],
+)
+def test_readiness_reports_unavailable_dependencies_as_503(
+    client: TestClient, tmp_path: Path, hue_client: FakeHueClient, failure: str
+) -> None:
+    path = tmp_path / "huerise.yml"
+    match failure:
+        case "configuration_missing":
+            path.unlink()
+        case "configuration_invalid":
+            path.write_text("invalid: [", encoding="utf-8")
+        case "credentials_missing":
+            contents = path.read_text(encoding="utf-8")
+            path.write_text(
+                contents[contents.index("daylight_alarm:") :], encoding="utf-8"
+            )
+        case "bridge_unavailable":
+            hue_client.list_rooms_error = OSError("private upstream response")
+        case "scene_missing":
+            hue_client.rooms = []
+
+    response = client.get("/readiness")
+
+    assert response.status_code == 503
+    assert response.headers["retry-after"] == "5"
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.json() == {
+        "type": "urn:huerise:problem/not_ready",
+        "title": "Service not ready",
+        "status": 503,
+        "code": "not_ready",
+        "detail": "The application is not ready to run daylight alarms.",
+    }
+    assert hue_client.commands == []
+    assert client.get("/health").status_code == 200
+
+
+def test_probes_have_public_openapi_security(client: TestClient) -> None:
+    assert isinstance(client.app, FastAPI)
+    paths = client.app.openapi()["paths"]
+
+    assert "security" not in paths["/health"]["get"]
+    assert "security" not in paths["/readiness"]["get"]
+    assert paths["/doctor"]["get"]["security"] == [{"APIKeyHeader": []}]
+    retry_header = paths["/readiness"]["get"]["responses"]["503"]["headers"][
+        "Retry-After"
+    ]
+    assert retry_header["schema"] == {"type": "integer", "minimum": 0}
 
 
 def test_exposes_doctor_rooms_and_configuration(client: TestClient) -> None:

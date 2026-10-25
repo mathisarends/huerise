@@ -9,7 +9,7 @@
     "/doctor": {
       "get": {
         "tags": [
-          "doctor"
+          "health"
         ],
         "summary": "Doctor",
         "operationId": "doctor",
@@ -70,6 +70,67 @@
             "APIKeyHeader": []
           }
         ]
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readiness": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readiness",
+        "operationId": "getReadiness",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service not ready",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the readiness probe should be retried.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0.0
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotReadyProblem"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/hue/bridges": {
@@ -914,6 +975,20 @@
         ],
         "title": "DoctorResponse"
       },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "ok",
+            "enum": [
+              "ok"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "HealthResponse"
+      },
       "NamedResourceResponse": {
         "properties": {
           "id": {
@@ -1347,6 +1422,66 @@
             "type": "string",
             "enum": [
               "hue_unavailable"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "NotReadyProblem": {
+        "type": "object",
+        "title": "NotReadyProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/not_ready"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Service not ready"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              503
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "not_ready"
             ]
           },
           "detail": {

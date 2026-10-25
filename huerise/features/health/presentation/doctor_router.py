@@ -1,17 +1,20 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
+from fastapi import Depends
 from fastapi_canon import CanonRouter
 
 from huerise.features.health.application import Doctor
 from huerise.features.health.presentation.errors import doctor_errors, health_errors
 from huerise.features.health.presentation.mappers import to_doctor_response
 from huerise.features.health.presentation.schemas import DoctorResponse
+from huerise.platform.api.authentication import require_api_key
 from huerise.platform.api.errors import AUTHENTICATION_REQUIRED
 
 doctor_router = CanonRouter(
-    tags=["doctor"],
+    tags=["health"],
     route_class=DishkaRoute,
     error_registry=health_errors,
     raises=[AUTHENTICATION_REQUIRED],
+    dependencies=[Depends(require_api_key)],
 )
 
 

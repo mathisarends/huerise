@@ -18,9 +18,9 @@ huerise/
     feature.py           Platform assembly and logging lifespan
   features/
     health/
-      application/       Doctor diagnostics
+      application/       Doctor diagnostics and bounded readiness checks
       infrastructure/    Dishka provider
-      presentation/      Diagnostic router, schemas, mappers, errors
+      presentation/      Probe and diagnostic routers, schemas, mappers, errors
       feature.py         Feature descriptor
     lighting/
       domain/            Hue values, errors, and abstract gateway contracts
@@ -64,9 +64,16 @@ through `create_app(*extra_features)`.
 ## HTTP contracts
 
 Every route declares a stable operation ID, success response, and relevant
-failures. A shared API router applies authentication. Each feature's
-`CanonRouter` declares its authentication problem alongside operation-specific
-errors; `Composition` merges the registries and installs their runtime handlers.
+failures. Protected `CanonRouter` instances apply the shared authentication
+dependency and declare its problem alongside operation-specific errors.
+`Composition` merges the registries and installs their runtime handlers.
+
+The health feature owns the protected `/doctor` diagnostics and the public
+`/health` and `/readiness` probes. Liveness touches no configuration or external
+dependency. Readiness runs the Doctor prerequisites under a five-second deadline
+and converts expected dependency failures into one generic `503` problem with a
+retry hint. Detailed failures stay available through `/doctor`. The container
+healthcheck uses liveness; readiness is a separate signal for orchestrators.
 
 Errors use RFC 9457 `application/problem+json` with a stable `code`. Configuration
 errors include sanitized `issues`; request validation uses Canon's `errors`

@@ -8,7 +8,9 @@ type OperationName = string
 const (
 	DoctorOperation                        OperationName = "Doctor"
 	GetDaylightAlarmConfigurationOperation OperationName = "GetDaylightAlarmConfiguration"
+	GetHealthOperation                     OperationName = "GetHealth"
 	GetHueBridgeOperation                  OperationName = "GetHueBridge"
+	GetReadinessOperation                  OperationName = "GetReadiness"
 	ListHueBridgesOperation                OperationName = "ListHueBridges"
 	ListRoomsOperation                     OperationName = "ListRooms"
 	RegisterHueBridgeOperation             OperationName = "RegisterHueBridge"

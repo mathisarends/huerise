@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Move Doctor diagnostics into a dedicated health feature while preserving the
+  `/doctor` API and CLI contracts.
+- Add public `/health` liveness and `/readiness` probes, bounded readiness checks
+  with generic `503` failures, and a container liveness healthcheck.
+
 ## 0.2.0 — 2026-10-25
 
 - Adopt Canon 0.7 feature composition, managed Dishka lifetimes, and declarative

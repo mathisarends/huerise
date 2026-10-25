@@ -32,12 +32,24 @@ type Invoker interface {
 	//
 	// GET /daylight-alarm/configuration
 	GetDaylightAlarmConfiguration(ctx context.Context) (GetDaylightAlarmConfigurationRes, error)
+	// GetHealth invokes getHealth operation.
+	//
+	// Health.
+	//
+	// GET /health
+	GetHealth(ctx context.Context) (*HealthResponse, error)
 	// GetHueBridge invokes getHueBridge operation.
 	//
 	// Bridge Status.
 	//
 	// GET /hue/bridge
 	GetHueBridge(ctx context.Context) (GetHueBridgeRes, error)
+	// GetReadiness invokes getReadiness operation.
+	//
+	// Readiness.
+	//
+	// GET /readiness
+	GetReadiness(ctx context.Context) (GetReadinessRes, error)
 	// ListHueBridges invokes listHueBridges operation.
 	//
 	// Discover Bridges.
@@ -263,6 +275,43 @@ func (c *Client) sendGetDaylightAlarmConfiguration(ctx context.Context) (res Get
 	return result, nil
 }
 
+// GetHealth invokes getHealth operation.
+//
+// Health.
+//
+// GET /health
+func (c *Client) GetHealth(ctx context.Context) (*HealthResponse, error) {
+	res, err := c.sendGetHealth(ctx)
+	return res, err
+}
+
+func (c *Client) sendGetHealth(ctx context.Context) (res *HealthResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/health"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGetHealthResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetHueBridge invokes getHueBridge operation.
 //
 // Bridge Status.
@@ -326,6 +375,43 @@ func (c *Client) sendGetHueBridge(ctx context.Context) (res GetHueBridgeRes, err
 	defer body.Close()
 
 	result, err := decodeGetHueBridgeResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetReadiness invokes getReadiness operation.
+//
+// Readiness.
+//
+// GET /readiness
+func (c *Client) GetReadiness(ctx context.Context) (GetReadinessRes, error) {
+	res, err := c.sendGetReadiness(ctx)
+	return res, err
+}
+
+func (c *Client) sendGetReadiness(ctx context.Context) (res GetReadinessRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/readiness"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGetReadinessResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

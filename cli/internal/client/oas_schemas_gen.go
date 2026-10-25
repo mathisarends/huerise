@@ -1552,6 +1552,57 @@ func (s *DoctorResponseStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+// Ref: #/components/schemas/HealthResponse
+type HealthResponse struct {
+	Status OptHealthResponseStatus `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *HealthResponse) GetStatus() OptHealthResponseStatus {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *HealthResponse) SetStatus(val OptHealthResponseStatus) {
+	s.Status = val
+}
+
+func (*HealthResponse) getReadinessRes() {}
+
+type HealthResponseStatus string
+
+const (
+	HealthResponseStatusOk HealthResponseStatus = "ok"
+)
+
+// AllValues returns all HealthResponseStatus values.
+func (HealthResponseStatus) AllValues() []HealthResponseStatus {
+	return []HealthResponseStatus{
+		HealthResponseStatusOk,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HealthResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case HealthResponseStatusOk:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HealthResponseStatus) UnmarshalText(data []byte) error {
+	switch HealthResponseStatus(data) {
+	case HealthResponseStatusOk:
+		*s = HealthResponseStatusOk
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // RFC 9457 Problem Details with a stable application code.
 // Ref: #/components/schemas/HueUnavailableProblem
 type HueUnavailableProblem struct {
@@ -2101,6 +2152,242 @@ func (o NilString) Or(d string) string {
 }
 
 // RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/NotReadyProblem
+type NotReadyProblem struct {
+	Type            NotReadyProblemType   `json:"type"`
+	Title           NotReadyProblemTitle  `json:"title"`
+	Status          NotReadyProblemStatus `json:"status"`
+	Code            NotReadyProblemCode   `json:"code"`
+	Detail          OptNilString          `json:"detail"`
+	Instance        OptNilString          `json:"instance"`
+	AdditionalProps NotReadyProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *NotReadyProblem) GetType() NotReadyProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *NotReadyProblem) GetTitle() NotReadyProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *NotReadyProblem) GetStatus() NotReadyProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *NotReadyProblem) GetCode() NotReadyProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *NotReadyProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *NotReadyProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *NotReadyProblem) GetAdditionalProps() NotReadyProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *NotReadyProblem) SetType(val NotReadyProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *NotReadyProblem) SetTitle(val NotReadyProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *NotReadyProblem) SetStatus(val NotReadyProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *NotReadyProblem) SetCode(val NotReadyProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *NotReadyProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *NotReadyProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *NotReadyProblem) SetAdditionalProps(val NotReadyProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type NotReadyProblemAdditional map[string]jx.Raw
+
+func (s *NotReadyProblemAdditional) init() NotReadyProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type NotReadyProblemCode string
+
+const (
+	NotReadyProblemCodeNotReady NotReadyProblemCode = "not_ready"
+)
+
+// AllValues returns all NotReadyProblemCode values.
+func (NotReadyProblemCode) AllValues() []NotReadyProblemCode {
+	return []NotReadyProblemCode{
+		NotReadyProblemCodeNotReady,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s NotReadyProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case NotReadyProblemCodeNotReady:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *NotReadyProblemCode) UnmarshalText(data []byte) error {
+	switch NotReadyProblemCode(data) {
+	case NotReadyProblemCodeNotReady:
+		*s = NotReadyProblemCodeNotReady
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// NotReadyProblemHeaders wraps NotReadyProblem with response headers.
+type NotReadyProblemHeaders struct {
+	RetryAfter OptInt
+	Response   NotReadyProblem
+}
+
+// GetRetryAfter returns the value of RetryAfter.
+func (s *NotReadyProblemHeaders) GetRetryAfter() OptInt {
+	return s.RetryAfter
+}
+
+// GetResponse returns the value of Response.
+func (s *NotReadyProblemHeaders) GetResponse() NotReadyProblem {
+	return s.Response
+}
+
+// SetRetryAfter sets the value of RetryAfter.
+func (s *NotReadyProblemHeaders) SetRetryAfter(val OptInt) {
+	s.RetryAfter = val
+}
+
+// SetResponse sets the value of Response.
+func (s *NotReadyProblemHeaders) SetResponse(val NotReadyProblem) {
+	s.Response = val
+}
+
+func (*NotReadyProblemHeaders) getReadinessRes() {}
+
+type NotReadyProblemStatus int
+
+const (
+	NotReadyProblemStatus503 NotReadyProblemStatus = 503
+)
+
+// AllValues returns all NotReadyProblemStatus values.
+func (NotReadyProblemStatus) AllValues() []NotReadyProblemStatus {
+	return []NotReadyProblemStatus{
+		NotReadyProblemStatus503,
+	}
+}
+
+type NotReadyProblemTitle string
+
+const (
+	NotReadyProblemTitleServiceNotReady NotReadyProblemTitle = "Service not ready"
+)
+
+// AllValues returns all NotReadyProblemTitle values.
+func (NotReadyProblemTitle) AllValues() []NotReadyProblemTitle {
+	return []NotReadyProblemTitle{
+		NotReadyProblemTitleServiceNotReady,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s NotReadyProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case NotReadyProblemTitleServiceNotReady:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *NotReadyProblemTitle) UnmarshalText(data []byte) error {
+	switch NotReadyProblemTitle(data) {
+	case NotReadyProblemTitleServiceNotReady:
+		*s = NotReadyProblemTitleServiceNotReady
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type NotReadyProblemType string
+
+const (
+	NotReadyProblemTypeUrnHueriseProblemNotReady NotReadyProblemType = "urn:huerise:problem/not_ready"
+)
+
+// AllValues returns all NotReadyProblemType values.
+func (NotReadyProblemType) AllValues() []NotReadyProblemType {
+	return []NotReadyProblemType{
+		NotReadyProblemTypeUrnHueriseProblemNotReady,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s NotReadyProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case NotReadyProblemTypeUrnHueriseProblemNotReady:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *NotReadyProblemType) UnmarshalText(data []byte) error {
+	switch NotReadyProblemType(data) {
+	case NotReadyProblemTypeUrnHueriseProblemNotReady:
+		*s = NotReadyProblemTypeUrnHueriseProblemNotReady
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
 // Ref: #/components/schemas/OnboardingReadOnlyProblem
 type OnboardingReadOnlyProblem struct {
 	Type            OnboardingReadOnlyProblemType   `json:"type"`
@@ -2451,6 +2738,98 @@ func (o OptAlarmStatusResponseStatus) Get() (v AlarmStatusResponseStatus, ok boo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptAlarmStatusResponseStatus) Or(d AlarmStatusResponseStatus) AlarmStatusResponseStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptHealthResponseStatus returns new OptHealthResponseStatus with value set to v.
+func NewOptHealthResponseStatus(v HealthResponseStatus) OptHealthResponseStatus {
+	return OptHealthResponseStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptHealthResponseStatus is optional HealthResponseStatus.
+type OptHealthResponseStatus struct {
+	Value HealthResponseStatus
+	Set   bool
+}
+
+// IsSet returns true if OptHealthResponseStatus was set.
+func (o OptHealthResponseStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptHealthResponseStatus) Reset() {
+	var v HealthResponseStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptHealthResponseStatus) SetTo(v HealthResponseStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptHealthResponseStatus) Get() (v HealthResponseStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptHealthResponseStatus) Or(d HealthResponseStatus) HealthResponseStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
 	if v, ok := o.Get(); ok {
 		return v
 	}

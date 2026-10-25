@@ -1,5 +1,5 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import status
+from fastapi import Depends, status
 from fastapi_canon import CanonResponse, CanonRouter
 
 from huerise.features.daylight_alarm.application import (
@@ -20,6 +20,7 @@ from huerise.features.daylight_alarm.presentation.schemas import (
     DaylightAlarmConfigurationResponse,
     StartRequest,
 )
+from huerise.platform.api.authentication import require_api_key
 from huerise.platform.api.errors import AUTHENTICATION_REQUIRED, CONFIGURATION_INVALID
 
 router = CanonRouter(
@@ -28,6 +29,7 @@ router = CanonRouter(
     route_class=DishkaRoute,
     error_registry=alarm_errors,
     raises=[AUTHENTICATION_REQUIRED],
+    dependencies=[Depends(require_api_key)],
 )
 
 

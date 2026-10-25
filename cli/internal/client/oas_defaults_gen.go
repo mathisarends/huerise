@@ -9,3 +9,11 @@ func (s *AlarmStatusResponse) setDefaults() {
 		s.Status.SetTo(val)
 	}
 }
+
+// setDefaults set default value of fields.
+func (s *HealthResponse) setDefaults() {
+	{
+		val := HealthResponseStatus("ok")
+		s.Status.SetTo(val)
+	}
+}
