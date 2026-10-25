@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from huerise.features.lighting.application import DoctorReport
 from huerise.features.lighting.domain import DiscoveredBridge, OnboardingStatus, Room
 from huerise.features.lighting.presentation.schemas import (
@@ -56,6 +58,3 @@ def to_onboarding_status_response(
         ip_address=onboarding.ip_address,
         read_only=onboarding.read_only,
     )
-
-
-from collections.abc import Sequence
