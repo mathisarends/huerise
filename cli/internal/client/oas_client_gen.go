@@ -79,7 +79,7 @@ type Invoker interface {
 	// Stop.
 	//
 	// POST /daylight-alarm/stop
-	StopDaylightAlarm(ctx context.Context) error
+	StopDaylightAlarm(ctx context.Context) (StopDaylightAlarmRes, error)
 }
 
 // Client implements OAS client.
@@ -767,12 +767,12 @@ func (c *Client) sendStartDaylightAlarm(ctx context.Context, request OptNilStart
 // Stop.
 //
 // POST /daylight-alarm/stop
-func (c *Client) StopDaylightAlarm(ctx context.Context) error {
-	_, err := c.sendStopDaylightAlarm(ctx)
-	return err
+func (c *Client) StopDaylightAlarm(ctx context.Context) (StopDaylightAlarmRes, error) {
+	res, err := c.sendStopDaylightAlarm(ctx)
+	return res, err
 }
 
-func (c *Client) sendStopDaylightAlarm(ctx context.Context) (res *StopDaylightAlarmNoContent, err error) {
+func (c *Client) sendStopDaylightAlarm(ctx context.Context) (res StopDaylightAlarmRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string

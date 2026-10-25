@@ -50,11 +50,8 @@ func (command startCommand) Run(runtime *Runtime) error {
 }
 
 func (stopCommand) Run(runtime *Runtime) error {
-	apiClient, err := runtime.client()
+	_, err := fetch[*client.StopDaylightAlarmNoContent](runtime, "stop", (*client.Client).StopDaylightAlarm)
 	if err != nil {
-		return err
-	}
-	if err := apiClient.StopDaylightAlarm(runtime.ctx); err != nil {
 		return err
 	}
 	return runtime.output(map[string]any{"stopped": true}, func() error {

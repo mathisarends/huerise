@@ -1,47 +1,65 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from fastapi_canon import CanonRouter, Composition, ErrorOptions, Feature
 
-from huerise.platform.api.errors import ExceptionRouter, error
+from huerise.platform.api.errors import CONFIGURATION_INVALID, api_errors
 from huerise.platform.configuration import ConfigurationError, ConfigurationIssue
 
 
-def test_preserves_configuration_issues_in_route_error_response() -> None:
-    router = ExceptionRouter()
+def test_preserves_configuration_issues_without_exposing_yaml_contents() -> None:
+    router = CanonRouter(error_registry=api_errors)
 
-    @router.get(
-        "/configuration",
-        errors={
-            ConfigurationError: error(
-                status.HTTP_422_UNPROCESSABLE_CONTENT,
-                "The configuration is invalid.",
-            )
-        },
-    )
+    @router.get("/configuration", raises=[CONFIGURATION_INVALID])
     async def configuration() -> None:
         raise ConfigurationError(
-            "Configuration is invalid",
+            "Invalid YAML: app_key: secret-bridge-key",
             [
                 ConfigurationIssue(
-                    location="daylight_alarm.scene_id",
+                    location="daylight_alarm.scene",
                     message="Field required",
                     type="missing",
                 )
             ],
         )
 
-    app = FastAPI()
-    app.include_router(router)
-
+    app = Composition(
+        Feature(name="configuration", routers=[router]),
+        errors=ErrorOptions(type_base="urn:huerise:problem"),
+    ).apply(FastAPI())
     response = TestClient(app).get("/configuration")
 
     assert response.status_code == 422
+    assert response.headers["content-type"] == "application/problem+json"
     assert response.json() == {
-        "detail": "Configuration is invalid",
+        "type": "urn:huerise:problem/configuration_invalid",
+        "title": "Invalid configuration",
+        "status": 422,
+        "code": "configuration_invalid",
+        "detail": "The YAML configuration is missing or invalid.",
         "issues": [
             {
-                "location": "daylight_alarm.scene_id",
+                "location": "daylight_alarm.scene",
                 "message": "Field required",
                 "type": "missing",
             }
         ],
     }
+
+
+def test_unexpected_errors_do_not_expose_exception_text() -> None:
+    router = CanonRouter(error_registry=api_errors)
+
+    @router.get("/failure")
+    async def failure() -> None:
+        raise RuntimeError("private upstream response")
+
+    app = Composition(
+        Feature(name="failure", routers=[router]),
+        errors=ErrorOptions(type_base="urn:huerise:problem"),
+    ).apply(FastAPI())
+    response = TestClient(app, raise_server_exceptions=False).get("/failure")
+
+    assert response.status_code == 500
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.json()["code"] == "internal_server_error"
+    assert "private" not in response.text

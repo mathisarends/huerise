@@ -16,7 +16,7 @@ func (doctorCommand) Run(runtime *Runtime) error {
 	return runtime.output(result, func() error {
 		rows := make([][]string, 0, len(result.Checks))
 		for _, check := range result.Checks {
-			rows = append(rows, []string{check.Status, strings.ReplaceAll(check.Name, "_", " ")})
+			rows = append(rows, []string{string(check.Status), strings.ReplaceAll(check.Name, "_", " ")})
 		}
 		if err := writeTable(runtime.stdout, nil, rows, emptyState{
 			Message: "No checks reported.",

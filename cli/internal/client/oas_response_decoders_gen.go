@@ -59,21 +59,21 @@ func decodeDoctorResponse(resp *http.Response) (res DoctorRes, _ error) {
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
+	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response DoctorNotFound
+			var response AuthenticationRequiredProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -90,6 +90,59 @@ func decodeDoctorResponse(resp *http.Response) (res DoctorRes, _ error) {
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response SceneNotFoundProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -101,14 +154,14 @@ func decodeDoctorResponse(resp *http.Response) (res DoctorRes, _ error) {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -145,14 +198,14 @@ func decodeDoctorResponse(resp *http.Response) (res DoctorRes, _ error) {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response DoctorServiceUnavailable
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -168,6 +221,15 @@ func decodeDoctorResponse(resp *http.Response) (res DoctorRes, _ error) {
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -214,21 +276,21 @@ func decodeGetDaylightAlarmConfigurationResponse(resp *http.Response) (res GetDa
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
+	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response GetDaylightAlarmConfigurationNotFound
+			var response AuthenticationRequiredProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -244,6 +306,15 @@ func decodeGetDaylightAlarmConfigurationResponse(resp *http.Response) (res GetDa
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -256,14 +327,14 @@ func decodeGetDaylightAlarmConfigurationResponse(resp *http.Response) (res GetDa
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response GetDaylightAlarmConfigurationUnprocessableEntity
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -280,40 +351,14 @@ func decodeGetDaylightAlarmConfigurationResponse(resp *http.Response) (res GetDa
 				}
 				return res, err
 			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 503:
-		// Code 503.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response GetDaylightAlarmConfigurationServiceUnavailable
+			// Validate response.
 			if err := func() error {
-				if err := response.Decode(d); err != nil {
+				if err := response.Validate(); err != nil {
 					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
 				}
 				return nil
 			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -369,6 +414,50 @@ func decodeGetHueBridgeResponse(resp *http.Response) (res GetHueBridgeRes, _ err
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	case 401:
+		// Code 401.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response AuthenticationRequiredProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 422:
 		// Code 422.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -376,14 +465,14 @@ func decodeGetHueBridgeResponse(resp *http.Response) (res GetHueBridgeRes, _ err
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -463,6 +552,50 @@ func decodeListHueBridgesResponse(resp *http.Response) (res ListHueBridgesRes, _
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	case 401:
+		// Code 401.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response AuthenticationRequiredProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 422:
 		// Code 422.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -470,14 +603,14 @@ func decodeListHueBridgesResponse(resp *http.Response) (res ListHueBridgesRes, _
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -514,14 +647,14 @@ func decodeListHueBridgesResponse(resp *http.Response) (res ListHueBridgesRes, _
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ErrorResponse
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -537,6 +670,15 @@ func decodeListHueBridgesResponse(resp *http.Response) (res ListHueBridgesRes, _
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -592,6 +734,50 @@ func decodeListRoomsResponse(resp *http.Response) (res ListRoomsRes, _ error) {
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	case 401:
+		// Code 401.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response AuthenticationRequiredProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 422:
 		// Code 422.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -599,14 +785,14 @@ func decodeListRoomsResponse(resp *http.Response) (res ListRoomsRes, _ error) {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -643,14 +829,14 @@ func decodeListRoomsResponse(resp *http.Response) (res ListRoomsRes, _ error) {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ErrorResponse
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -666,6 +852,15 @@ func decodeListRoomsResponse(resp *http.Response) (res ListRoomsRes, _ error) {
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -721,6 +916,50 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	case 401:
+		// Code 401.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response AuthenticationRequiredProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 409:
 		// Code 409.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -728,7 +967,7 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
@@ -752,6 +991,15 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -763,14 +1011,14 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response ConfigurationInvalidProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -807,14 +1055,14 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response RegisterHueBridgeServiceUnavailable
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -830,6 +1078,15 @@ func decodeRegisterHueBridgeResponse(resp *http.Response) (res RegisterHueBridge
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -885,21 +1142,21 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
+	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SelectHueBridgeNotFound
+			var response AuthenticationRequiredProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -915,6 +1172,59 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response BridgeNotFoundProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -927,14 +1237,14 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SelectHueBridgeConflict
+			var response OnboardingReadOnlyProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -951,6 +1261,15 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -962,14 +1281,14 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response SelectHueBridgeUnprocessableEntity
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1006,14 +1325,14 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SelectHueBridgeServiceUnavailable
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1029,6 +1348,15 @@ func decodeSelectHueBridgeResponse(resp *http.Response) (res SelectHueBridgeRes,
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -1075,21 +1403,21 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
+	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SetDaylightAlarmConfigurationNotFound
+			var response AuthenticationRequiredProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1106,6 +1434,59 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response SceneNotFoundProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -1117,7 +1498,7 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
@@ -1141,6 +1522,15 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -1152,14 +1542,14 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SetDaylightAlarmConfigurationServiceUnavailable
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1175,6 +1565,15 @@ func decodeSetDaylightAlarmConfigurationResponse(resp *http.Response) (res SetDa
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -1217,25 +1616,34 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
+	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response StartDaylightAlarmNotFound
+			var response AuthenticationRequiredProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1251,6 +1659,59 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response SceneNotFoundProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -1263,14 +1724,14 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response StartDaylightAlarmConflict
+			var response AlarmAlreadyRunningProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1287,6 +1748,15 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -1298,14 +1768,14 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ConfigurationErrorResponse
+			var response StartDaylightAlarmUnprocessableEntity
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1342,14 +1812,14 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 			return res, errors.Wrap(err, "parse media type")
 		}
 		switch {
-		case ct == "application/json":
+		case ct == "application/problem+json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return res, err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response StartDaylightAlarmServiceUnavailable
+			var response HueUnavailableProblem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1366,6 +1836,15 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -1374,11 +1853,55 @@ func decodeStartDaylightAlarmResponse(resp *http.Response) (res StartDaylightAla
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
-func decodeStopDaylightAlarmResponse(resp *http.Response) (res *StopDaylightAlarmNoContent, _ error) {
+func decodeStopDaylightAlarmResponse(resp *http.Response) (res StopDaylightAlarmRes, _ error) {
 	switch resp.StatusCode {
 	case 204:
 		// Code 204.
 		return &StopDaylightAlarmNoContent{}, nil
+	case 401:
+		// Code 401.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/problem+json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response AuthenticationRequiredProblem
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	}
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }

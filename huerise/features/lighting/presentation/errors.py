@@ -1,4 +1,4 @@
-from fastapi import status
+from fastapi_canon import Error, ErrorRegistry
 
 from huerise.features.lighting.domain import (
     BridgeNotFoundError,
@@ -8,84 +8,86 @@ from huerise.features.lighting.domain import (
     OnboardingReadOnlyError,
     SceneNotFoundError,
 )
-from huerise.platform.api.errors import error
-from huerise.platform.configuration import ConfigurationError
+from huerise.platform.api.errors import CONFIGURATION_INVALID, api_errors
 
-doctor_errors = {
-    SceneNotFoundError: error(
-        status.HTTP_404_NOT_FOUND,
-        "The configured Hue scene does not exist.",
-    ),
-    ConfigurationError: error(
-        status.HTTP_422_UNPROCESSABLE_CONTENT,
-        "The YAML configuration is missing or invalid.",
-    ),
-    HueUnavailableError: error(
-        status.HTTP_503_SERVICE_UNAVAILABLE,
-        "The Hue Bridge is not configured, reachable, or authenticated.",
-    ),
-}
+SCENE_NOT_FOUND = Error(
+    SceneNotFoundError,
+    status=404,
+    code="scene_not_found",
+    title="Scene not found",
+    detail=str,
+    description="The selected Hue scene does not exist.",
+)
+HUE_UNAVAILABLE = Error(
+    HueUnavailableError,
+    status=503,
+    code="hue_unavailable",
+    title="Hue Bridge unavailable",
+    detail=str,
+    description="The Hue Bridge is not configured, reachable, or authenticated.",
+)
+BRIDGE_NOT_FOUND = Error(
+    BridgeNotFoundError,
+    status=404,
+    code="bridge_not_found",
+    title="Bridge not found",
+    detail=str,
+    description="The selected Hue Bridge was not discovered.",
+)
+BRIDGE_NOT_SELECTED = Error(
+    BridgeNotSelectedError,
+    status=409,
+    code="bridge_not_selected",
+    title="Bridge not selected",
+    detail=str,
+    description="A Hue Bridge must be selected before registration.",
+)
+LINK_BUTTON_TIMEOUT = Error(
+    LinkButtonTimeoutError,
+    status=409,
+    code="link_button_timeout",
+    title="Link button timeout",
+    detail=str,
+    description="The Hue Bridge link button was not pressed in time.",
+)
+ONBOARDING_READ_ONLY = Error(
+    OnboardingReadOnlyError,
+    status=409,
+    code="onboarding_read_only",
+    title="Onboarding is read-only",
+    detail=str,
+    description="Environment overrides make Hue onboarding read-only.",
+)
 
-discover_bridges_errors = {
-    ConfigurationError: error(
-        status.HTTP_422_UNPROCESSABLE_CONTENT,
-        "The stored Hue configuration is invalid.",
+lighting_errors = ErrorRegistry.merge(
+    api_errors,
+    ErrorRegistry(
+        name="lighting",
+        errors=[
+            SCENE_NOT_FOUND,
+            HUE_UNAVAILABLE,
+            BRIDGE_NOT_FOUND,
+            BRIDGE_NOT_SELECTED,
+            LINK_BUTTON_TIMEOUT,
+            ONBOARDING_READ_ONLY,
+        ],
     ),
-    HueUnavailableError: error(
-        status.HTTP_503_SERVICE_UNAVAILABLE,
-        "Hue Bridge discovery is unavailable.",
-    ),
-}
+    name="lighting",
+)
 
-bridge_status_errors = {
-    ConfigurationError: error(
-        status.HTTP_422_UNPROCESSABLE_CONTENT,
-        "The stored Hue configuration is invalid.",
-    ),
-}
-
-select_bridge_errors = {
-    BridgeNotFoundError: error(
-        status.HTTP_404_NOT_FOUND,
-        "The selected Hue Bridge was not discovered.",
-    ),
-    OnboardingReadOnlyError: error(
-        status.HTTP_409_CONFLICT,
-        "Environment overrides make Hue onboarding read-only.",
-    ),
-    **discover_bridges_errors,
-}
-
-register_bridge_errors = {
-    BridgeNotSelectedError: error(
-        status.HTTP_409_CONFLICT,
-        "A Hue Bridge must be selected before registration.",
-    ),
-    LinkButtonTimeoutError: error(
-        status.HTTP_409_CONFLICT,
-        "The Hue Bridge link button was not pressed in time.",
-    ),
-    OnboardingReadOnlyError: error(
-        status.HTTP_409_CONFLICT,
-        "Environment overrides make Hue onboarding read-only.",
-    ),
-    ConfigurationError: error(
-        status.HTTP_422_UNPROCESSABLE_CONTENT,
-        "The stored Hue configuration is invalid.",
-    ),
-    HueUnavailableError: error(
-        status.HTTP_503_SERVICE_UNAVAILABLE,
-        "Hue Bridge registration is unavailable.",
-    ),
-}
-
-scene_errors = {
-    ConfigurationError: error(
-        status.HTTP_422_UNPROCESSABLE_CONTENT,
-        "The YAML configuration is invalid.",
-    ),
-    HueUnavailableError: error(
-        status.HTTP_503_SERVICE_UNAVAILABLE,
-        "The Hue Bridge is not configured, reachable, or authenticated.",
-    ),
-}
+doctor_errors = [SCENE_NOT_FOUND, CONFIGURATION_INVALID, HUE_UNAVAILABLE]
+scene_errors = [CONFIGURATION_INVALID, HUE_UNAVAILABLE]
+discover_bridges_errors = [CONFIGURATION_INVALID, HUE_UNAVAILABLE]
+bridge_status_errors = [CONFIGURATION_INVALID]
+select_bridge_errors = [
+    BRIDGE_NOT_FOUND,
+    ONBOARDING_READ_ONLY,
+    *discover_bridges_errors,
+]
+register_bridge_errors = [
+    BRIDGE_NOT_SELECTED,
+    LINK_BUTTON_TIMEOUT,
+    ONBOARDING_READ_ONLY,
+    CONFIGURATION_INVALID,
+    HUE_UNAVAILABLE,
+]

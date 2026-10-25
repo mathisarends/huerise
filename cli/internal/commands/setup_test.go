@@ -28,17 +28,19 @@ func TestDoctorJSON(t *testing.T) {
 func TestDoctorReportsConfigurationIssues(t *testing.T) {
 	t.Parallel()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
-		writer.Header().Set("Content-Type", "application/json")
+		writer.Header().Set("Content-Type", "application/problem+json")
 		writer.WriteHeader(http.StatusUnprocessableEntity)
 		_, _ = writer.Write([]byte(`{
-			"detail":"The YAML configuration is invalid.",
+			"type":"urn:huerise:problem/configuration_invalid",
+            "title":"Invalid configuration", "status":422, "code":"configuration_invalid",
+            "detail":"The YAML configuration is missing or invalid.",
 			"issues":[{"location":"daylight_alarm.duration_seconds","message":"must be positive","type":"value_error"}]
 		}`))
 	}))
 	defer server.Close()
 
 	stdout, stderr, exitCode := runTestCLI(t, server.URL, "doctor", "--json", "--compact")
-	if exitCode != 2 || !strings.Contains(stderr, `"code": "configuration"`) || !strings.Contains(stderr, "must be positive") {
+	if exitCode != 2 || !strings.Contains(stderr, `"code": "configuration_invalid"`) || !strings.Contains(stderr, "must be positive") {
 		t.Fatalf("exit = %d, stdout = %s, stderr = %s", exitCode, stdout, stderr)
 	}
 }
@@ -46,9 +48,9 @@ func TestDoctorReportsConfigurationIssues(t *testing.T) {
 func TestDoctorReportsUnavailableBridge(t *testing.T) {
 	t.Parallel()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
-		writer.Header().Set("Content-Type", "application/json")
+		writer.Header().Set("Content-Type", "application/problem+json")
 		writer.WriteHeader(http.StatusServiceUnavailable)
-		_, _ = writer.Write([]byte(`{"detail":"The Hue Bridge is unreachable."}`))
+		_, _ = writer.Write([]byte(`{"type":"urn:huerise:problem/hue_unavailable","title":"Hue Bridge unavailable","status":503,"code":"hue_unavailable","detail":"The Hue Bridge is unreachable."}`))
 	}))
 	defer server.Close()
 

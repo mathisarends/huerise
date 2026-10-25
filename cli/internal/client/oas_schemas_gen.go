@@ -4,6 +4,7 @@ package client
 
 import (
 	"github.com/go-faster/errors"
+	"github.com/go-faster/jx"
 	"github.com/google/uuid"
 )
 
@@ -106,14 +107,224 @@ func (s *AfterAlarmConfigurationResponse) SetDelaySeconds(val int) {
 	s.DelaySeconds = val
 }
 
-// Ref: #/components/schemas/AlarmStatusResponse
-type AlarmStatusResponse struct {
-	Status          OptString `json:"status"`
-	DurationSeconds int       `json:"duration_seconds"`
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/AlarmAlreadyRunningProblem
+type AlarmAlreadyRunningProblem struct {
+	Type            AlarmAlreadyRunningProblemType   `json:"type"`
+	Title           AlarmAlreadyRunningProblemTitle  `json:"title"`
+	Status          AlarmAlreadyRunningProblemStatus `json:"status"`
+	Code            AlarmAlreadyRunningProblemCode   `json:"code"`
+	Detail          OptNilString                     `json:"detail"`
+	Instance        OptNilString                     `json:"instance"`
+	AdditionalProps AlarmAlreadyRunningProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *AlarmAlreadyRunningProblem) GetType() AlarmAlreadyRunningProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *AlarmAlreadyRunningProblem) GetTitle() AlarmAlreadyRunningProblemTitle {
+	return s.Title
 }
 
 // GetStatus returns the value of Status.
-func (s *AlarmStatusResponse) GetStatus() OptString {
+func (s *AlarmAlreadyRunningProblem) GetStatus() AlarmAlreadyRunningProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *AlarmAlreadyRunningProblem) GetCode() AlarmAlreadyRunningProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *AlarmAlreadyRunningProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *AlarmAlreadyRunningProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *AlarmAlreadyRunningProblem) GetAdditionalProps() AlarmAlreadyRunningProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *AlarmAlreadyRunningProblem) SetType(val AlarmAlreadyRunningProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AlarmAlreadyRunningProblem) SetTitle(val AlarmAlreadyRunningProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *AlarmAlreadyRunningProblem) SetStatus(val AlarmAlreadyRunningProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *AlarmAlreadyRunningProblem) SetCode(val AlarmAlreadyRunningProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *AlarmAlreadyRunningProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *AlarmAlreadyRunningProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *AlarmAlreadyRunningProblem) SetAdditionalProps(val AlarmAlreadyRunningProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+func (*AlarmAlreadyRunningProblem) startDaylightAlarmRes() {}
+
+type AlarmAlreadyRunningProblemAdditional map[string]jx.Raw
+
+func (s *AlarmAlreadyRunningProblemAdditional) init() AlarmAlreadyRunningProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type AlarmAlreadyRunningProblemCode string
+
+const (
+	AlarmAlreadyRunningProblemCodeAlarmAlreadyRunning AlarmAlreadyRunningProblemCode = "alarm_already_running"
+)
+
+// AllValues returns all AlarmAlreadyRunningProblemCode values.
+func (AlarmAlreadyRunningProblemCode) AllValues() []AlarmAlreadyRunningProblemCode {
+	return []AlarmAlreadyRunningProblemCode{
+		AlarmAlreadyRunningProblemCodeAlarmAlreadyRunning,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AlarmAlreadyRunningProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case AlarmAlreadyRunningProblemCodeAlarmAlreadyRunning:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AlarmAlreadyRunningProblemCode) UnmarshalText(data []byte) error {
+	switch AlarmAlreadyRunningProblemCode(data) {
+	case AlarmAlreadyRunningProblemCodeAlarmAlreadyRunning:
+		*s = AlarmAlreadyRunningProblemCodeAlarmAlreadyRunning
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type AlarmAlreadyRunningProblemStatus int
+
+const (
+	AlarmAlreadyRunningProblemStatus409 AlarmAlreadyRunningProblemStatus = 409
+)
+
+// AllValues returns all AlarmAlreadyRunningProblemStatus values.
+func (AlarmAlreadyRunningProblemStatus) AllValues() []AlarmAlreadyRunningProblemStatus {
+	return []AlarmAlreadyRunningProblemStatus{
+		AlarmAlreadyRunningProblemStatus409,
+	}
+}
+
+type AlarmAlreadyRunningProblemTitle string
+
+const (
+	AlarmAlreadyRunningProblemTitleAlarmAlreadyRunning AlarmAlreadyRunningProblemTitle = "Alarm already running"
+)
+
+// AllValues returns all AlarmAlreadyRunningProblemTitle values.
+func (AlarmAlreadyRunningProblemTitle) AllValues() []AlarmAlreadyRunningProblemTitle {
+	return []AlarmAlreadyRunningProblemTitle{
+		AlarmAlreadyRunningProblemTitleAlarmAlreadyRunning,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AlarmAlreadyRunningProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case AlarmAlreadyRunningProblemTitleAlarmAlreadyRunning:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AlarmAlreadyRunningProblemTitle) UnmarshalText(data []byte) error {
+	switch AlarmAlreadyRunningProblemTitle(data) {
+	case AlarmAlreadyRunningProblemTitleAlarmAlreadyRunning:
+		*s = AlarmAlreadyRunningProblemTitleAlarmAlreadyRunning
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type AlarmAlreadyRunningProblemType string
+
+const (
+	AlarmAlreadyRunningProblemTypeUrnHueriseProblemAlarmAlreadyRunning AlarmAlreadyRunningProblemType = "urn:huerise:problem/alarm_already_running"
+)
+
+// AllValues returns all AlarmAlreadyRunningProblemType values.
+func (AlarmAlreadyRunningProblemType) AllValues() []AlarmAlreadyRunningProblemType {
+	return []AlarmAlreadyRunningProblemType{
+		AlarmAlreadyRunningProblemTypeUrnHueriseProblemAlarmAlreadyRunning,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AlarmAlreadyRunningProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case AlarmAlreadyRunningProblemTypeUrnHueriseProblemAlarmAlreadyRunning:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AlarmAlreadyRunningProblemType) UnmarshalText(data []byte) error {
+	switch AlarmAlreadyRunningProblemType(data) {
+	case AlarmAlreadyRunningProblemTypeUrnHueriseProblemAlarmAlreadyRunning:
+		*s = AlarmAlreadyRunningProblemTypeUrnHueriseProblemAlarmAlreadyRunning
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/AlarmStatusResponse
+type AlarmStatusResponse struct {
+	Status          OptAlarmStatusResponseStatus `json:"status"`
+	DurationSeconds int                          `json:"duration_seconds"`
+}
+
+// GetStatus returns the value of Status.
+func (s *AlarmStatusResponse) GetStatus() OptAlarmStatusResponseStatus {
 	return s.Status
 }
 
@@ -123,7 +334,7 @@ func (s *AlarmStatusResponse) GetDurationSeconds() int {
 }
 
 // SetStatus sets the value of Status.
-func (s *AlarmStatusResponse) SetStatus(val OptString) {
+func (s *AlarmStatusResponse) SetStatus(val OptAlarmStatusResponseStatus) {
 	s.Status = val
 }
 
@@ -133,6 +344,677 @@ func (s *AlarmStatusResponse) SetDurationSeconds(val int) {
 }
 
 func (*AlarmStatusResponse) startDaylightAlarmRes() {}
+
+type AlarmStatusResponseStatus string
+
+const (
+	AlarmStatusResponseStatusStarted AlarmStatusResponseStatus = "started"
+)
+
+// AllValues returns all AlarmStatusResponseStatus values.
+func (AlarmStatusResponseStatus) AllValues() []AlarmStatusResponseStatus {
+	return []AlarmStatusResponseStatus{
+		AlarmStatusResponseStatusStarted,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AlarmStatusResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case AlarmStatusResponseStatusStarted:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AlarmStatusResponseStatus) UnmarshalText(data []byte) error {
+	switch AlarmStatusResponseStatus(data) {
+	case AlarmStatusResponseStatusStarted:
+		*s = AlarmStatusResponseStatusStarted
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/AuthenticationRequiredProblem
+type AuthenticationRequiredProblem struct {
+	Type            AuthenticationRequiredProblemType   `json:"type"`
+	Title           AuthenticationRequiredProblemTitle  `json:"title"`
+	Status          AuthenticationRequiredProblemStatus `json:"status"`
+	Code            AuthenticationRequiredProblemCode   `json:"code"`
+	Detail          OptNilString                        `json:"detail"`
+	Instance        OptNilString                        `json:"instance"`
+	AdditionalProps AuthenticationRequiredProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *AuthenticationRequiredProblem) GetType() AuthenticationRequiredProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *AuthenticationRequiredProblem) GetTitle() AuthenticationRequiredProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *AuthenticationRequiredProblem) GetStatus() AuthenticationRequiredProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *AuthenticationRequiredProblem) GetCode() AuthenticationRequiredProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *AuthenticationRequiredProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *AuthenticationRequiredProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *AuthenticationRequiredProblem) GetAdditionalProps() AuthenticationRequiredProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *AuthenticationRequiredProblem) SetType(val AuthenticationRequiredProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AuthenticationRequiredProblem) SetTitle(val AuthenticationRequiredProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *AuthenticationRequiredProblem) SetStatus(val AuthenticationRequiredProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *AuthenticationRequiredProblem) SetCode(val AuthenticationRequiredProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *AuthenticationRequiredProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *AuthenticationRequiredProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *AuthenticationRequiredProblem) SetAdditionalProps(val AuthenticationRequiredProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+func (*AuthenticationRequiredProblem) doctorRes()                        {}
+func (*AuthenticationRequiredProblem) getDaylightAlarmConfigurationRes() {}
+func (*AuthenticationRequiredProblem) getHueBridgeRes()                  {}
+func (*AuthenticationRequiredProblem) listHueBridgesRes()                {}
+func (*AuthenticationRequiredProblem) listRoomsRes()                     {}
+func (*AuthenticationRequiredProblem) registerHueBridgeRes()             {}
+func (*AuthenticationRequiredProblem) selectHueBridgeRes()               {}
+func (*AuthenticationRequiredProblem) setDaylightAlarmConfigurationRes() {}
+func (*AuthenticationRequiredProblem) startDaylightAlarmRes()            {}
+func (*AuthenticationRequiredProblem) stopDaylightAlarmRes()             {}
+
+type AuthenticationRequiredProblemAdditional map[string]jx.Raw
+
+func (s *AuthenticationRequiredProblemAdditional) init() AuthenticationRequiredProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type AuthenticationRequiredProblemCode string
+
+const (
+	AuthenticationRequiredProblemCodeAuthenticationRequired AuthenticationRequiredProblemCode = "authentication_required"
+)
+
+// AllValues returns all AuthenticationRequiredProblemCode values.
+func (AuthenticationRequiredProblemCode) AllValues() []AuthenticationRequiredProblemCode {
+	return []AuthenticationRequiredProblemCode{
+		AuthenticationRequiredProblemCodeAuthenticationRequired,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AuthenticationRequiredProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case AuthenticationRequiredProblemCodeAuthenticationRequired:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AuthenticationRequiredProblemCode) UnmarshalText(data []byte) error {
+	switch AuthenticationRequiredProblemCode(data) {
+	case AuthenticationRequiredProblemCodeAuthenticationRequired:
+		*s = AuthenticationRequiredProblemCodeAuthenticationRequired
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type AuthenticationRequiredProblemStatus int
+
+const (
+	AuthenticationRequiredProblemStatus401 AuthenticationRequiredProblemStatus = 401
+)
+
+// AllValues returns all AuthenticationRequiredProblemStatus values.
+func (AuthenticationRequiredProblemStatus) AllValues() []AuthenticationRequiredProblemStatus {
+	return []AuthenticationRequiredProblemStatus{
+		AuthenticationRequiredProblemStatus401,
+	}
+}
+
+type AuthenticationRequiredProblemTitle string
+
+const (
+	AuthenticationRequiredProblemTitleAuthenticationRequired AuthenticationRequiredProblemTitle = "Authentication required"
+)
+
+// AllValues returns all AuthenticationRequiredProblemTitle values.
+func (AuthenticationRequiredProblemTitle) AllValues() []AuthenticationRequiredProblemTitle {
+	return []AuthenticationRequiredProblemTitle{
+		AuthenticationRequiredProblemTitleAuthenticationRequired,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AuthenticationRequiredProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case AuthenticationRequiredProblemTitleAuthenticationRequired:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AuthenticationRequiredProblemTitle) UnmarshalText(data []byte) error {
+	switch AuthenticationRequiredProblemTitle(data) {
+	case AuthenticationRequiredProblemTitleAuthenticationRequired:
+		*s = AuthenticationRequiredProblemTitleAuthenticationRequired
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type AuthenticationRequiredProblemType string
+
+const (
+	AuthenticationRequiredProblemTypeUrnHueriseProblemAuthenticationRequired AuthenticationRequiredProblemType = "urn:huerise:problem/authentication_required"
+)
+
+// AllValues returns all AuthenticationRequiredProblemType values.
+func (AuthenticationRequiredProblemType) AllValues() []AuthenticationRequiredProblemType {
+	return []AuthenticationRequiredProblemType{
+		AuthenticationRequiredProblemTypeUrnHueriseProblemAuthenticationRequired,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AuthenticationRequiredProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case AuthenticationRequiredProblemTypeUrnHueriseProblemAuthenticationRequired:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AuthenticationRequiredProblemType) UnmarshalText(data []byte) error {
+	switch AuthenticationRequiredProblemType(data) {
+	case AuthenticationRequiredProblemTypeUrnHueriseProblemAuthenticationRequired:
+		*s = AuthenticationRequiredProblemTypeUrnHueriseProblemAuthenticationRequired
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/BridgeNotFoundProblem
+type BridgeNotFoundProblem struct {
+	Type            BridgeNotFoundProblemType   `json:"type"`
+	Title           BridgeNotFoundProblemTitle  `json:"title"`
+	Status          BridgeNotFoundProblemStatus `json:"status"`
+	Code            BridgeNotFoundProblemCode   `json:"code"`
+	Detail          OptNilString                `json:"detail"`
+	Instance        OptNilString                `json:"instance"`
+	AdditionalProps BridgeNotFoundProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *BridgeNotFoundProblem) GetType() BridgeNotFoundProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *BridgeNotFoundProblem) GetTitle() BridgeNotFoundProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *BridgeNotFoundProblem) GetStatus() BridgeNotFoundProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *BridgeNotFoundProblem) GetCode() BridgeNotFoundProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *BridgeNotFoundProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *BridgeNotFoundProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *BridgeNotFoundProblem) GetAdditionalProps() BridgeNotFoundProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *BridgeNotFoundProblem) SetType(val BridgeNotFoundProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *BridgeNotFoundProblem) SetTitle(val BridgeNotFoundProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *BridgeNotFoundProblem) SetStatus(val BridgeNotFoundProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *BridgeNotFoundProblem) SetCode(val BridgeNotFoundProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *BridgeNotFoundProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *BridgeNotFoundProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *BridgeNotFoundProblem) SetAdditionalProps(val BridgeNotFoundProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+func (*BridgeNotFoundProblem) selectHueBridgeRes() {}
+
+type BridgeNotFoundProblemAdditional map[string]jx.Raw
+
+func (s *BridgeNotFoundProblemAdditional) init() BridgeNotFoundProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type BridgeNotFoundProblemCode string
+
+const (
+	BridgeNotFoundProblemCodeBridgeNotFound BridgeNotFoundProblemCode = "bridge_not_found"
+)
+
+// AllValues returns all BridgeNotFoundProblemCode values.
+func (BridgeNotFoundProblemCode) AllValues() []BridgeNotFoundProblemCode {
+	return []BridgeNotFoundProblemCode{
+		BridgeNotFoundProblemCodeBridgeNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotFoundProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotFoundProblemCodeBridgeNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotFoundProblemCode) UnmarshalText(data []byte) error {
+	switch BridgeNotFoundProblemCode(data) {
+	case BridgeNotFoundProblemCodeBridgeNotFound:
+		*s = BridgeNotFoundProblemCodeBridgeNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type BridgeNotFoundProblemStatus int
+
+const (
+	BridgeNotFoundProblemStatus404 BridgeNotFoundProblemStatus = 404
+)
+
+// AllValues returns all BridgeNotFoundProblemStatus values.
+func (BridgeNotFoundProblemStatus) AllValues() []BridgeNotFoundProblemStatus {
+	return []BridgeNotFoundProblemStatus{
+		BridgeNotFoundProblemStatus404,
+	}
+}
+
+type BridgeNotFoundProblemTitle string
+
+const (
+	BridgeNotFoundProblemTitleBridgeNotFound BridgeNotFoundProblemTitle = "Bridge not found"
+)
+
+// AllValues returns all BridgeNotFoundProblemTitle values.
+func (BridgeNotFoundProblemTitle) AllValues() []BridgeNotFoundProblemTitle {
+	return []BridgeNotFoundProblemTitle{
+		BridgeNotFoundProblemTitleBridgeNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotFoundProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotFoundProblemTitleBridgeNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotFoundProblemTitle) UnmarshalText(data []byte) error {
+	switch BridgeNotFoundProblemTitle(data) {
+	case BridgeNotFoundProblemTitleBridgeNotFound:
+		*s = BridgeNotFoundProblemTitleBridgeNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type BridgeNotFoundProblemType string
+
+const (
+	BridgeNotFoundProblemTypeUrnHueriseProblemBridgeNotFound BridgeNotFoundProblemType = "urn:huerise:problem/bridge_not_found"
+)
+
+// AllValues returns all BridgeNotFoundProblemType values.
+func (BridgeNotFoundProblemType) AllValues() []BridgeNotFoundProblemType {
+	return []BridgeNotFoundProblemType{
+		BridgeNotFoundProblemTypeUrnHueriseProblemBridgeNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotFoundProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotFoundProblemTypeUrnHueriseProblemBridgeNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotFoundProblemType) UnmarshalText(data []byte) error {
+	switch BridgeNotFoundProblemType(data) {
+	case BridgeNotFoundProblemTypeUrnHueriseProblemBridgeNotFound:
+		*s = BridgeNotFoundProblemTypeUrnHueriseProblemBridgeNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/BridgeNotSelectedProblem
+type BridgeNotSelectedProblem struct {
+	Type            BridgeNotSelectedProblemType   `json:"type"`
+	Title           BridgeNotSelectedProblemTitle  `json:"title"`
+	Status          BridgeNotSelectedProblemStatus `json:"status"`
+	Code            BridgeNotSelectedProblemCode   `json:"code"`
+	Detail          OptNilString                   `json:"detail"`
+	Instance        OptNilString                   `json:"instance"`
+	AdditionalProps BridgeNotSelectedProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *BridgeNotSelectedProblem) GetType() BridgeNotSelectedProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *BridgeNotSelectedProblem) GetTitle() BridgeNotSelectedProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *BridgeNotSelectedProblem) GetStatus() BridgeNotSelectedProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *BridgeNotSelectedProblem) GetCode() BridgeNotSelectedProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *BridgeNotSelectedProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *BridgeNotSelectedProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *BridgeNotSelectedProblem) GetAdditionalProps() BridgeNotSelectedProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *BridgeNotSelectedProblem) SetType(val BridgeNotSelectedProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *BridgeNotSelectedProblem) SetTitle(val BridgeNotSelectedProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *BridgeNotSelectedProblem) SetStatus(val BridgeNotSelectedProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *BridgeNotSelectedProblem) SetCode(val BridgeNotSelectedProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *BridgeNotSelectedProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *BridgeNotSelectedProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *BridgeNotSelectedProblem) SetAdditionalProps(val BridgeNotSelectedProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type BridgeNotSelectedProblemAdditional map[string]jx.Raw
+
+func (s *BridgeNotSelectedProblemAdditional) init() BridgeNotSelectedProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type BridgeNotSelectedProblemCode string
+
+const (
+	BridgeNotSelectedProblemCodeBridgeNotSelected BridgeNotSelectedProblemCode = "bridge_not_selected"
+)
+
+// AllValues returns all BridgeNotSelectedProblemCode values.
+func (BridgeNotSelectedProblemCode) AllValues() []BridgeNotSelectedProblemCode {
+	return []BridgeNotSelectedProblemCode{
+		BridgeNotSelectedProblemCodeBridgeNotSelected,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotSelectedProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotSelectedProblemCodeBridgeNotSelected:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotSelectedProblemCode) UnmarshalText(data []byte) error {
+	switch BridgeNotSelectedProblemCode(data) {
+	case BridgeNotSelectedProblemCodeBridgeNotSelected:
+		*s = BridgeNotSelectedProblemCodeBridgeNotSelected
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type BridgeNotSelectedProblemStatus int
+
+const (
+	BridgeNotSelectedProblemStatus409 BridgeNotSelectedProblemStatus = 409
+)
+
+// AllValues returns all BridgeNotSelectedProblemStatus values.
+func (BridgeNotSelectedProblemStatus) AllValues() []BridgeNotSelectedProblemStatus {
+	return []BridgeNotSelectedProblemStatus{
+		BridgeNotSelectedProblemStatus409,
+	}
+}
+
+type BridgeNotSelectedProblemTitle string
+
+const (
+	BridgeNotSelectedProblemTitleBridgeNotSelected BridgeNotSelectedProblemTitle = "Bridge not selected"
+)
+
+// AllValues returns all BridgeNotSelectedProblemTitle values.
+func (BridgeNotSelectedProblemTitle) AllValues() []BridgeNotSelectedProblemTitle {
+	return []BridgeNotSelectedProblemTitle{
+		BridgeNotSelectedProblemTitleBridgeNotSelected,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotSelectedProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotSelectedProblemTitleBridgeNotSelected:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotSelectedProblemTitle) UnmarshalText(data []byte) error {
+	switch BridgeNotSelectedProblemTitle(data) {
+	case BridgeNotSelectedProblemTitleBridgeNotSelected:
+		*s = BridgeNotSelectedProblemTitleBridgeNotSelected
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type BridgeNotSelectedProblemType string
+
+const (
+	BridgeNotSelectedProblemTypeUrnHueriseProblemBridgeNotSelected BridgeNotSelectedProblemType = "urn:huerise:problem/bridge_not_selected"
+)
+
+// AllValues returns all BridgeNotSelectedProblemType values.
+func (BridgeNotSelectedProblemType) AllValues() []BridgeNotSelectedProblemType {
+	return []BridgeNotSelectedProblemType{
+		BridgeNotSelectedProblemTypeUrnHueriseProblemBridgeNotSelected,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BridgeNotSelectedProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case BridgeNotSelectedProblemTypeUrnHueriseProblemBridgeNotSelected:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BridgeNotSelectedProblemType) UnmarshalText(data []byte) error {
+	switch BridgeNotSelectedProblemType(data) {
+	case BridgeNotSelectedProblemTypeUrnHueriseProblemBridgeNotSelected:
+		*s = BridgeNotSelectedProblemTypeUrnHueriseProblemBridgeNotSelected
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // Ref: #/components/schemas/BridgeResponse
 type BridgeResponse struct {
@@ -186,41 +1068,233 @@ func (s *BridgeSelectionRequest) SetBridgeID(val string) {
 	s.BridgeID = val
 }
 
-// Ref: #/components/schemas/ConfigurationErrorResponse
-type ConfigurationErrorResponse struct {
-	Detail string               `json:"detail"`
-	Issues []ConfigurationIssue `json:"issues"`
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/ConfigurationInvalidProblem
+type ConfigurationInvalidProblem struct {
+	Type            ConfigurationInvalidProblemType   `json:"type"`
+	Title           ConfigurationInvalidProblemTitle  `json:"title"`
+	Status          ConfigurationInvalidProblemStatus `json:"status"`
+	Code            ConfigurationInvalidProblemCode   `json:"code"`
+	Detail          OptNilString                      `json:"detail"`
+	Instance        OptNilString                      `json:"instance"`
+	Issues          []ConfigurationIssue              `json:"issues"`
+	AdditionalProps ConfigurationInvalidProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *ConfigurationInvalidProblem) GetType() ConfigurationInvalidProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *ConfigurationInvalidProblem) GetTitle() ConfigurationInvalidProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *ConfigurationInvalidProblem) GetStatus() ConfigurationInvalidProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *ConfigurationInvalidProblem) GetCode() ConfigurationInvalidProblemCode {
+	return s.Code
 }
 
 // GetDetail returns the value of Detail.
-func (s *ConfigurationErrorResponse) GetDetail() string {
+func (s *ConfigurationInvalidProblem) GetDetail() OptNilString {
 	return s.Detail
 }
 
+// GetInstance returns the value of Instance.
+func (s *ConfigurationInvalidProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
 // GetIssues returns the value of Issues.
-func (s *ConfigurationErrorResponse) GetIssues() []ConfigurationIssue {
+func (s *ConfigurationInvalidProblem) GetIssues() []ConfigurationIssue {
 	return s.Issues
 }
 
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *ConfigurationInvalidProblem) GetAdditionalProps() ConfigurationInvalidProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *ConfigurationInvalidProblem) SetType(val ConfigurationInvalidProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *ConfigurationInvalidProblem) SetTitle(val ConfigurationInvalidProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *ConfigurationInvalidProblem) SetStatus(val ConfigurationInvalidProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *ConfigurationInvalidProblem) SetCode(val ConfigurationInvalidProblemCode) {
+	s.Code = val
+}
+
 // SetDetail sets the value of Detail.
-func (s *ConfigurationErrorResponse) SetDetail(val string) {
+func (s *ConfigurationInvalidProblem) SetDetail(val OptNilString) {
 	s.Detail = val
 }
 
+// SetInstance sets the value of Instance.
+func (s *ConfigurationInvalidProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
 // SetIssues sets the value of Issues.
-func (s *ConfigurationErrorResponse) SetIssues(val []ConfigurationIssue) {
+func (s *ConfigurationInvalidProblem) SetIssues(val []ConfigurationIssue) {
 	s.Issues = val
 }
 
-func (*ConfigurationErrorResponse) doctorRes()             {}
-func (*ConfigurationErrorResponse) getHueBridgeRes()       {}
-func (*ConfigurationErrorResponse) listHueBridgesRes()     {}
-func (*ConfigurationErrorResponse) listRoomsRes()          {}
-func (*ConfigurationErrorResponse) registerHueBridgeRes()  {}
-func (*ConfigurationErrorResponse) selectHueBridgeRes()    {}
-func (*ConfigurationErrorResponse) startDaylightAlarmRes() {}
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *ConfigurationInvalidProblem) SetAdditionalProps(val ConfigurationInvalidProblemAdditional) {
+	s.AdditionalProps = val
+}
 
-// Ref: #/components/schemas/ConfigurationIssue
+func (*ConfigurationInvalidProblem) doctorRes()                        {}
+func (*ConfigurationInvalidProblem) getDaylightAlarmConfigurationRes() {}
+func (*ConfigurationInvalidProblem) getHueBridgeRes()                  {}
+func (*ConfigurationInvalidProblem) listHueBridgesRes()                {}
+func (*ConfigurationInvalidProblem) listRoomsRes()                     {}
+func (*ConfigurationInvalidProblem) registerHueBridgeRes()             {}
+
+type ConfigurationInvalidProblemAdditional map[string]jx.Raw
+
+func (s *ConfigurationInvalidProblemAdditional) init() ConfigurationInvalidProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type ConfigurationInvalidProblemCode string
+
+const (
+	ConfigurationInvalidProblemCodeConfigurationInvalid ConfigurationInvalidProblemCode = "configuration_invalid"
+)
+
+// AllValues returns all ConfigurationInvalidProblemCode values.
+func (ConfigurationInvalidProblemCode) AllValues() []ConfigurationInvalidProblemCode {
+	return []ConfigurationInvalidProblemCode{
+		ConfigurationInvalidProblemCodeConfigurationInvalid,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ConfigurationInvalidProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case ConfigurationInvalidProblemCodeConfigurationInvalid:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ConfigurationInvalidProblemCode) UnmarshalText(data []byte) error {
+	switch ConfigurationInvalidProblemCode(data) {
+	case ConfigurationInvalidProblemCodeConfigurationInvalid:
+		*s = ConfigurationInvalidProblemCodeConfigurationInvalid
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type ConfigurationInvalidProblemStatus int
+
+const (
+	ConfigurationInvalidProblemStatus422 ConfigurationInvalidProblemStatus = 422
+)
+
+// AllValues returns all ConfigurationInvalidProblemStatus values.
+func (ConfigurationInvalidProblemStatus) AllValues() []ConfigurationInvalidProblemStatus {
+	return []ConfigurationInvalidProblemStatus{
+		ConfigurationInvalidProblemStatus422,
+	}
+}
+
+type ConfigurationInvalidProblemTitle string
+
+const (
+	ConfigurationInvalidProblemTitleInvalidConfiguration ConfigurationInvalidProblemTitle = "Invalid configuration"
+)
+
+// AllValues returns all ConfigurationInvalidProblemTitle values.
+func (ConfigurationInvalidProblemTitle) AllValues() []ConfigurationInvalidProblemTitle {
+	return []ConfigurationInvalidProblemTitle{
+		ConfigurationInvalidProblemTitleInvalidConfiguration,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ConfigurationInvalidProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case ConfigurationInvalidProblemTitleInvalidConfiguration:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ConfigurationInvalidProblemTitle) UnmarshalText(data []byte) error {
+	switch ConfigurationInvalidProblemTitle(data) {
+	case ConfigurationInvalidProblemTitleInvalidConfiguration:
+		*s = ConfigurationInvalidProblemTitleInvalidConfiguration
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type ConfigurationInvalidProblemType string
+
+const (
+	ConfigurationInvalidProblemTypeUrnHueriseProblemConfigurationInvalid ConfigurationInvalidProblemType = "urn:huerise:problem/configuration_invalid"
+)
+
+// AllValues returns all ConfigurationInvalidProblemType values.
+func (ConfigurationInvalidProblemType) AllValues() []ConfigurationInvalidProblemType {
+	return []ConfigurationInvalidProblemType{
+		ConfigurationInvalidProblemTypeUrnHueriseProblemConfigurationInvalid,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ConfigurationInvalidProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case ConfigurationInvalidProblemTypeUrnHueriseProblemConfigurationInvalid:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ConfigurationInvalidProblemType) UnmarshalText(data []byte) error {
+	switch ConfigurationInvalidProblemType(data) {
+	case ConfigurationInvalidProblemTypeUrnHueriseProblemConfigurationInvalid:
+		*s = ConfigurationInvalidProblemTypeUrnHueriseProblemConfigurationInvalid
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/ConfigurationInvalidProblem/$defs/ConfigurationIssue
 type ConfigurationIssue struct {
 	Location string `json:"location"`
 	Message  string `json:"message"`
@@ -358,8 +1432,8 @@ func (*DaylightAlarmConfigurationResponse) setDaylightAlarmConfigurationRes() {}
 
 // Ref: #/components/schemas/DoctorCheckResponse
 type DoctorCheckResponse struct {
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	Name   string                    `json:"name"`
+	Status DoctorCheckResponseStatus `json:"status"`
 }
 
 // GetName returns the value of Name.
@@ -368,7 +1442,7 @@ func (s *DoctorCheckResponse) GetName() string {
 }
 
 // GetStatus returns the value of Status.
-func (s *DoctorCheckResponse) GetStatus() string {
+func (s *DoctorCheckResponse) GetStatus() DoctorCheckResponseStatus {
 	return s.Status
 }
 
@@ -378,22 +1452,52 @@ func (s *DoctorCheckResponse) SetName(val string) {
 }
 
 // SetStatus sets the value of Status.
-func (s *DoctorCheckResponse) SetStatus(val string) {
+func (s *DoctorCheckResponse) SetStatus(val DoctorCheckResponseStatus) {
 	s.Status = val
 }
 
-type DoctorNotFound ErrorResponse
+type DoctorCheckResponseStatus string
 
-func (*DoctorNotFound) doctorRes() {}
+const (
+	DoctorCheckResponseStatusOk DoctorCheckResponseStatus = "ok"
+)
+
+// AllValues returns all DoctorCheckResponseStatus values.
+func (DoctorCheckResponseStatus) AllValues() []DoctorCheckResponseStatus {
+	return []DoctorCheckResponseStatus{
+		DoctorCheckResponseStatusOk,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DoctorCheckResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case DoctorCheckResponseStatusOk:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DoctorCheckResponseStatus) UnmarshalText(data []byte) error {
+	switch DoctorCheckResponseStatus(data) {
+	case DoctorCheckResponseStatusOk:
+		*s = DoctorCheckResponseStatusOk
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // Ref: #/components/schemas/DoctorResponse
 type DoctorResponse struct {
-	Status string                `json:"status"`
+	Status DoctorResponseStatus  `json:"status"`
 	Checks []DoctorCheckResponse `json:"checks"`
 }
 
 // GetStatus returns the value of Status.
-func (s *DoctorResponse) GetStatus() string {
+func (s *DoctorResponse) GetStatus() DoctorResponseStatus {
 	return s.Status
 }
 
@@ -403,7 +1507,7 @@ func (s *DoctorResponse) GetChecks() []DoctorCheckResponse {
 }
 
 // SetStatus sets the value of Status.
-func (s *DoctorResponse) SetStatus(val string) {
+func (s *DoctorResponse) SetStatus(val DoctorResponseStatus) {
 	s.Status = val
 }
 
@@ -414,39 +1518,463 @@ func (s *DoctorResponse) SetChecks(val []DoctorCheckResponse) {
 
 func (*DoctorResponse) doctorRes() {}
 
-type DoctorServiceUnavailable ErrorResponse
+type DoctorResponseStatus string
 
-func (*DoctorServiceUnavailable) doctorRes() {}
+const (
+	DoctorResponseStatusOk DoctorResponseStatus = "ok"
+)
 
-// Ref: #/components/schemas/ErrorResponse
-type ErrorResponse struct {
-	Detail string `json:"detail"`
+// AllValues returns all DoctorResponseStatus values.
+func (DoctorResponseStatus) AllValues() []DoctorResponseStatus {
+	return []DoctorResponseStatus{
+		DoctorResponseStatusOk,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DoctorResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case DoctorResponseStatusOk:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DoctorResponseStatus) UnmarshalText(data []byte) error {
+	switch DoctorResponseStatus(data) {
+	case DoctorResponseStatusOk:
+		*s = DoctorResponseStatusOk
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/HueUnavailableProblem
+type HueUnavailableProblem struct {
+	Type            HueUnavailableProblemType   `json:"type"`
+	Title           HueUnavailableProblemTitle  `json:"title"`
+	Status          HueUnavailableProblemStatus `json:"status"`
+	Code            HueUnavailableProblemCode   `json:"code"`
+	Detail          OptNilString                `json:"detail"`
+	Instance        OptNilString                `json:"instance"`
+	AdditionalProps HueUnavailableProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *HueUnavailableProblem) GetType() HueUnavailableProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *HueUnavailableProblem) GetTitle() HueUnavailableProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *HueUnavailableProblem) GetStatus() HueUnavailableProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *HueUnavailableProblem) GetCode() HueUnavailableProblemCode {
+	return s.Code
 }
 
 // GetDetail returns the value of Detail.
-func (s *ErrorResponse) GetDetail() string {
+func (s *HueUnavailableProblem) GetDetail() OptNilString {
 	return s.Detail
 }
 
+// GetInstance returns the value of Instance.
+func (s *HueUnavailableProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *HueUnavailableProblem) GetAdditionalProps() HueUnavailableProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *HueUnavailableProblem) SetType(val HueUnavailableProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *HueUnavailableProblem) SetTitle(val HueUnavailableProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *HueUnavailableProblem) SetStatus(val HueUnavailableProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *HueUnavailableProblem) SetCode(val HueUnavailableProblemCode) {
+	s.Code = val
+}
+
 // SetDetail sets the value of Detail.
-func (s *ErrorResponse) SetDetail(val string) {
+func (s *HueUnavailableProblem) SetDetail(val OptNilString) {
 	s.Detail = val
 }
 
-func (*ErrorResponse) listHueBridgesRes() {}
-func (*ErrorResponse) listRoomsRes()      {}
+// SetInstance sets the value of Instance.
+func (s *HueUnavailableProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
 
-type GetDaylightAlarmConfigurationNotFound ErrorResponse
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *HueUnavailableProblem) SetAdditionalProps(val HueUnavailableProblemAdditional) {
+	s.AdditionalProps = val
+}
 
-func (*GetDaylightAlarmConfigurationNotFound) getDaylightAlarmConfigurationRes() {}
+func (*HueUnavailableProblem) doctorRes()                        {}
+func (*HueUnavailableProblem) listHueBridgesRes()                {}
+func (*HueUnavailableProblem) listRoomsRes()                     {}
+func (*HueUnavailableProblem) registerHueBridgeRes()             {}
+func (*HueUnavailableProblem) selectHueBridgeRes()               {}
+func (*HueUnavailableProblem) setDaylightAlarmConfigurationRes() {}
+func (*HueUnavailableProblem) startDaylightAlarmRes()            {}
 
-type GetDaylightAlarmConfigurationServiceUnavailable ErrorResponse
+type HueUnavailableProblemAdditional map[string]jx.Raw
 
-func (*GetDaylightAlarmConfigurationServiceUnavailable) getDaylightAlarmConfigurationRes() {}
+func (s *HueUnavailableProblemAdditional) init() HueUnavailableProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
 
-type GetDaylightAlarmConfigurationUnprocessableEntity ErrorResponse
+type HueUnavailableProblemCode string
 
-func (*GetDaylightAlarmConfigurationUnprocessableEntity) getDaylightAlarmConfigurationRes() {}
+const (
+	HueUnavailableProblemCodeHueUnavailable HueUnavailableProblemCode = "hue_unavailable"
+)
+
+// AllValues returns all HueUnavailableProblemCode values.
+func (HueUnavailableProblemCode) AllValues() []HueUnavailableProblemCode {
+	return []HueUnavailableProblemCode{
+		HueUnavailableProblemCodeHueUnavailable,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HueUnavailableProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case HueUnavailableProblemCodeHueUnavailable:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HueUnavailableProblemCode) UnmarshalText(data []byte) error {
+	switch HueUnavailableProblemCode(data) {
+	case HueUnavailableProblemCodeHueUnavailable:
+		*s = HueUnavailableProblemCodeHueUnavailable
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type HueUnavailableProblemStatus int
+
+const (
+	HueUnavailableProblemStatus503 HueUnavailableProblemStatus = 503
+)
+
+// AllValues returns all HueUnavailableProblemStatus values.
+func (HueUnavailableProblemStatus) AllValues() []HueUnavailableProblemStatus {
+	return []HueUnavailableProblemStatus{
+		HueUnavailableProblemStatus503,
+	}
+}
+
+type HueUnavailableProblemTitle string
+
+const (
+	HueUnavailableProblemTitleHueBridgeUnavailable HueUnavailableProblemTitle = "Hue Bridge unavailable"
+)
+
+// AllValues returns all HueUnavailableProblemTitle values.
+func (HueUnavailableProblemTitle) AllValues() []HueUnavailableProblemTitle {
+	return []HueUnavailableProblemTitle{
+		HueUnavailableProblemTitleHueBridgeUnavailable,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HueUnavailableProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case HueUnavailableProblemTitleHueBridgeUnavailable:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HueUnavailableProblemTitle) UnmarshalText(data []byte) error {
+	switch HueUnavailableProblemTitle(data) {
+	case HueUnavailableProblemTitleHueBridgeUnavailable:
+		*s = HueUnavailableProblemTitleHueBridgeUnavailable
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type HueUnavailableProblemType string
+
+const (
+	HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable HueUnavailableProblemType = "urn:huerise:problem/hue_unavailable"
+)
+
+// AllValues returns all HueUnavailableProblemType values.
+func (HueUnavailableProblemType) AllValues() []HueUnavailableProblemType {
+	return []HueUnavailableProblemType{
+		HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HueUnavailableProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HueUnavailableProblemType) UnmarshalText(data []byte) error {
+	switch HueUnavailableProblemType(data) {
+	case HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable:
+		*s = HueUnavailableProblemTypeUrnHueriseProblemHueUnavailable
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/LinkButtonTimeoutProblem
+type LinkButtonTimeoutProblem struct {
+	Type            LinkButtonTimeoutProblemType   `json:"type"`
+	Title           LinkButtonTimeoutProblemTitle  `json:"title"`
+	Status          LinkButtonTimeoutProblemStatus `json:"status"`
+	Code            LinkButtonTimeoutProblemCode   `json:"code"`
+	Detail          OptNilString                   `json:"detail"`
+	Instance        OptNilString                   `json:"instance"`
+	AdditionalProps LinkButtonTimeoutProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *LinkButtonTimeoutProblem) GetType() LinkButtonTimeoutProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *LinkButtonTimeoutProblem) GetTitle() LinkButtonTimeoutProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *LinkButtonTimeoutProblem) GetStatus() LinkButtonTimeoutProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *LinkButtonTimeoutProblem) GetCode() LinkButtonTimeoutProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *LinkButtonTimeoutProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *LinkButtonTimeoutProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *LinkButtonTimeoutProblem) GetAdditionalProps() LinkButtonTimeoutProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *LinkButtonTimeoutProblem) SetType(val LinkButtonTimeoutProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *LinkButtonTimeoutProblem) SetTitle(val LinkButtonTimeoutProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *LinkButtonTimeoutProblem) SetStatus(val LinkButtonTimeoutProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *LinkButtonTimeoutProblem) SetCode(val LinkButtonTimeoutProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *LinkButtonTimeoutProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *LinkButtonTimeoutProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *LinkButtonTimeoutProblem) SetAdditionalProps(val LinkButtonTimeoutProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type LinkButtonTimeoutProblemAdditional map[string]jx.Raw
+
+func (s *LinkButtonTimeoutProblemAdditional) init() LinkButtonTimeoutProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type LinkButtonTimeoutProblemCode string
+
+const (
+	LinkButtonTimeoutProblemCodeLinkButtonTimeout LinkButtonTimeoutProblemCode = "link_button_timeout"
+)
+
+// AllValues returns all LinkButtonTimeoutProblemCode values.
+func (LinkButtonTimeoutProblemCode) AllValues() []LinkButtonTimeoutProblemCode {
+	return []LinkButtonTimeoutProblemCode{
+		LinkButtonTimeoutProblemCodeLinkButtonTimeout,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LinkButtonTimeoutProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case LinkButtonTimeoutProblemCodeLinkButtonTimeout:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LinkButtonTimeoutProblemCode) UnmarshalText(data []byte) error {
+	switch LinkButtonTimeoutProblemCode(data) {
+	case LinkButtonTimeoutProblemCodeLinkButtonTimeout:
+		*s = LinkButtonTimeoutProblemCodeLinkButtonTimeout
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type LinkButtonTimeoutProblemStatus int
+
+const (
+	LinkButtonTimeoutProblemStatus409 LinkButtonTimeoutProblemStatus = 409
+)
+
+// AllValues returns all LinkButtonTimeoutProblemStatus values.
+func (LinkButtonTimeoutProblemStatus) AllValues() []LinkButtonTimeoutProblemStatus {
+	return []LinkButtonTimeoutProblemStatus{
+		LinkButtonTimeoutProblemStatus409,
+	}
+}
+
+type LinkButtonTimeoutProblemTitle string
+
+const (
+	LinkButtonTimeoutProblemTitleLinkButtonTimeout LinkButtonTimeoutProblemTitle = "Link button timeout"
+)
+
+// AllValues returns all LinkButtonTimeoutProblemTitle values.
+func (LinkButtonTimeoutProblemTitle) AllValues() []LinkButtonTimeoutProblemTitle {
+	return []LinkButtonTimeoutProblemTitle{
+		LinkButtonTimeoutProblemTitleLinkButtonTimeout,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LinkButtonTimeoutProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case LinkButtonTimeoutProblemTitleLinkButtonTimeout:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LinkButtonTimeoutProblemTitle) UnmarshalText(data []byte) error {
+	switch LinkButtonTimeoutProblemTitle(data) {
+	case LinkButtonTimeoutProblemTitleLinkButtonTimeout:
+		*s = LinkButtonTimeoutProblemTitleLinkButtonTimeout
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type LinkButtonTimeoutProblemType string
+
+const (
+	LinkButtonTimeoutProblemTypeUrnHueriseProblemLinkButtonTimeout LinkButtonTimeoutProblemType = "urn:huerise:problem/link_button_timeout"
+)
+
+// AllValues returns all LinkButtonTimeoutProblemType values.
+func (LinkButtonTimeoutProblemType) AllValues() []LinkButtonTimeoutProblemType {
+	return []LinkButtonTimeoutProblemType{
+		LinkButtonTimeoutProblemTypeUrnHueriseProblemLinkButtonTimeout,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LinkButtonTimeoutProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case LinkButtonTimeoutProblemTypeUrnHueriseProblemLinkButtonTimeout:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LinkButtonTimeoutProblemType) UnmarshalText(data []byte) error {
+	switch LinkButtonTimeoutProblemType(data) {
+	case LinkButtonTimeoutProblemTypeUrnHueriseProblemLinkButtonTimeout:
+		*s = LinkButtonTimeoutProblemTypeUrnHueriseProblemLinkButtonTimeout
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 type ListHueBridgesOKApplicationJSON []BridgeResponse
 
@@ -572,6 +2100,216 @@ func (o NilString) Or(d string) string {
 	return d
 }
 
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/OnboardingReadOnlyProblem
+type OnboardingReadOnlyProblem struct {
+	Type            OnboardingReadOnlyProblemType   `json:"type"`
+	Title           OnboardingReadOnlyProblemTitle  `json:"title"`
+	Status          OnboardingReadOnlyProblemStatus `json:"status"`
+	Code            OnboardingReadOnlyProblemCode   `json:"code"`
+	Detail          OptNilString                    `json:"detail"`
+	Instance        OptNilString                    `json:"instance"`
+	AdditionalProps OnboardingReadOnlyProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *OnboardingReadOnlyProblem) GetType() OnboardingReadOnlyProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *OnboardingReadOnlyProblem) GetTitle() OnboardingReadOnlyProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *OnboardingReadOnlyProblem) GetStatus() OnboardingReadOnlyProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *OnboardingReadOnlyProblem) GetCode() OnboardingReadOnlyProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *OnboardingReadOnlyProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *OnboardingReadOnlyProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *OnboardingReadOnlyProblem) GetAdditionalProps() OnboardingReadOnlyProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *OnboardingReadOnlyProblem) SetType(val OnboardingReadOnlyProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OnboardingReadOnlyProblem) SetTitle(val OnboardingReadOnlyProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *OnboardingReadOnlyProblem) SetStatus(val OnboardingReadOnlyProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *OnboardingReadOnlyProblem) SetCode(val OnboardingReadOnlyProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *OnboardingReadOnlyProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *OnboardingReadOnlyProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *OnboardingReadOnlyProblem) SetAdditionalProps(val OnboardingReadOnlyProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+func (*OnboardingReadOnlyProblem) selectHueBridgeRes() {}
+
+type OnboardingReadOnlyProblemAdditional map[string]jx.Raw
+
+func (s *OnboardingReadOnlyProblemAdditional) init() OnboardingReadOnlyProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type OnboardingReadOnlyProblemCode string
+
+const (
+	OnboardingReadOnlyProblemCodeOnboardingReadOnly OnboardingReadOnlyProblemCode = "onboarding_read_only"
+)
+
+// AllValues returns all OnboardingReadOnlyProblemCode values.
+func (OnboardingReadOnlyProblemCode) AllValues() []OnboardingReadOnlyProblemCode {
+	return []OnboardingReadOnlyProblemCode{
+		OnboardingReadOnlyProblemCodeOnboardingReadOnly,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OnboardingReadOnlyProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case OnboardingReadOnlyProblemCodeOnboardingReadOnly:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OnboardingReadOnlyProblemCode) UnmarshalText(data []byte) error {
+	switch OnboardingReadOnlyProblemCode(data) {
+	case OnboardingReadOnlyProblemCodeOnboardingReadOnly:
+		*s = OnboardingReadOnlyProblemCodeOnboardingReadOnly
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type OnboardingReadOnlyProblemStatus int
+
+const (
+	OnboardingReadOnlyProblemStatus409 OnboardingReadOnlyProblemStatus = 409
+)
+
+// AllValues returns all OnboardingReadOnlyProblemStatus values.
+func (OnboardingReadOnlyProblemStatus) AllValues() []OnboardingReadOnlyProblemStatus {
+	return []OnboardingReadOnlyProblemStatus{
+		OnboardingReadOnlyProblemStatus409,
+	}
+}
+
+type OnboardingReadOnlyProblemTitle string
+
+const (
+	OnboardingReadOnlyProblemTitleOnboardingIsReadOnly OnboardingReadOnlyProblemTitle = "Onboarding is read-only"
+)
+
+// AllValues returns all OnboardingReadOnlyProblemTitle values.
+func (OnboardingReadOnlyProblemTitle) AllValues() []OnboardingReadOnlyProblemTitle {
+	return []OnboardingReadOnlyProblemTitle{
+		OnboardingReadOnlyProblemTitleOnboardingIsReadOnly,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OnboardingReadOnlyProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case OnboardingReadOnlyProblemTitleOnboardingIsReadOnly:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OnboardingReadOnlyProblemTitle) UnmarshalText(data []byte) error {
+	switch OnboardingReadOnlyProblemTitle(data) {
+	case OnboardingReadOnlyProblemTitleOnboardingIsReadOnly:
+		*s = OnboardingReadOnlyProblemTitleOnboardingIsReadOnly
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type OnboardingReadOnlyProblemType string
+
+const (
+	OnboardingReadOnlyProblemTypeUrnHueriseProblemOnboardingReadOnly OnboardingReadOnlyProblemType = "urn:huerise:problem/onboarding_read_only"
+)
+
+// AllValues returns all OnboardingReadOnlyProblemType values.
+func (OnboardingReadOnlyProblemType) AllValues() []OnboardingReadOnlyProblemType {
+	return []OnboardingReadOnlyProblemType{
+		OnboardingReadOnlyProblemTypeUrnHueriseProblemOnboardingReadOnly,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OnboardingReadOnlyProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case OnboardingReadOnlyProblemTypeUrnHueriseProblemOnboardingReadOnly:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OnboardingReadOnlyProblemType) UnmarshalText(data []byte) error {
+	switch OnboardingReadOnlyProblemType(data) {
+	case OnboardingReadOnlyProblemTypeUrnHueriseProblemOnboardingReadOnly:
+		*s = OnboardingReadOnlyProblemTypeUrnHueriseProblemOnboardingReadOnly
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // Ref: #/components/schemas/OnboardingState
 type OnboardingState string
 
@@ -672,6 +2410,52 @@ func (s *OnboardingStatusResponse) SetReadOnly(val bool) {
 func (*OnboardingStatusResponse) getHueBridgeRes()      {}
 func (*OnboardingStatusResponse) registerHueBridgeRes() {}
 func (*OnboardingStatusResponse) selectHueBridgeRes()   {}
+
+// NewOptAlarmStatusResponseStatus returns new OptAlarmStatusResponseStatus with value set to v.
+func NewOptAlarmStatusResponseStatus(v AlarmStatusResponseStatus) OptAlarmStatusResponseStatus {
+	return OptAlarmStatusResponseStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptAlarmStatusResponseStatus is optional AlarmStatusResponseStatus.
+type OptAlarmStatusResponseStatus struct {
+	Value AlarmStatusResponseStatus
+	Set   bool
+}
+
+// IsSet returns true if OptAlarmStatusResponseStatus was set.
+func (o OptAlarmStatusResponseStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptAlarmStatusResponseStatus) Reset() {
+	var v AlarmStatusResponseStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptAlarmStatusResponseStatus) SetTo(v AlarmStatusResponseStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptAlarmStatusResponseStatus) Get() (v AlarmStatusResponseStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptAlarmStatusResponseStatus) Or(d AlarmStatusResponseStatus) AlarmStatusResponseStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
 
 // NewOptNilAfterAlarmConfigurationRequest returns new OptNilAfterAlarmConfigurationRequest with value set to v.
 func NewOptNilAfterAlarmConfigurationRequest(v AfterAlarmConfigurationRequest) OptNilAfterAlarmConfigurationRequest {
@@ -862,6 +2646,115 @@ func (o OptNilStartRequest) Or(d StartRequest) StartRequest {
 	return d
 }
 
+// NewOptNilString returns new OptNilString with value set to v.
+func NewOptNilString(v string) OptNilString {
+	return OptNilString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilString is optional nullable string.
+type OptNilString struct {
+	Value string
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilString was set.
+func (o OptNilString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilString) SetTo(v string) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptRequestValidationProblemErrorsItemIn returns new OptRequestValidationProblemErrorsItemIn with value set to v.
+func NewOptRequestValidationProblemErrorsItemIn(v RequestValidationProblemErrorsItemIn) OptRequestValidationProblemErrorsItemIn {
+	return OptRequestValidationProblemErrorsItemIn{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRequestValidationProblemErrorsItemIn is optional RequestValidationProblemErrorsItemIn.
+type OptRequestValidationProblemErrorsItemIn struct {
+	Value RequestValidationProblemErrorsItemIn
+	Set   bool
+}
+
+// IsSet returns true if OptRequestValidationProblemErrorsItemIn was set.
+func (o OptRequestValidationProblemErrorsItemIn) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRequestValidationProblemErrorsItemIn) Reset() {
+	var v RequestValidationProblemErrorsItemIn
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRequestValidationProblemErrorsItemIn) SetTo(v RequestValidationProblemErrorsItemIn) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRequestValidationProblemErrorsItemIn) Get() (v RequestValidationProblemErrorsItemIn, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRequestValidationProblemErrorsItemIn) Or(d RequestValidationProblemErrorsItemIn) RequestValidationProblemErrorsItemIn {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -908,13 +2801,435 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-type RegisterHueBridgeConflict ErrorResponse
+// RegisterHueBridgeConflict represents sum type.
+type RegisterHueBridgeConflict struct {
+	Type                      RegisterHueBridgeConflictType // switch on this field
+	BridgeNotSelectedProblem  BridgeNotSelectedProblem
+	LinkButtonTimeoutProblem  LinkButtonTimeoutProblem
+	OnboardingReadOnlyProblem OnboardingReadOnlyProblem
+}
+
+// RegisterHueBridgeConflictType is oneOf type of RegisterHueBridgeConflict.
+type RegisterHueBridgeConflictType string
+
+// Possible values for RegisterHueBridgeConflictType.
+const (
+	BridgeNotSelectedProblemRegisterHueBridgeConflict  RegisterHueBridgeConflictType = "bridge_not_selected"
+	LinkButtonTimeoutProblemRegisterHueBridgeConflict  RegisterHueBridgeConflictType = "link_button_timeout"
+	OnboardingReadOnlyProblemRegisterHueBridgeConflict RegisterHueBridgeConflictType = "onboarding_read_only"
+)
+
+// IsBridgeNotSelectedProblem reports whether RegisterHueBridgeConflict is BridgeNotSelectedProblem.
+func (s RegisterHueBridgeConflict) IsBridgeNotSelectedProblem() bool {
+	return s.Type == BridgeNotSelectedProblemRegisterHueBridgeConflict
+}
+
+// IsLinkButtonTimeoutProblem reports whether RegisterHueBridgeConflict is LinkButtonTimeoutProblem.
+func (s RegisterHueBridgeConflict) IsLinkButtonTimeoutProblem() bool {
+	return s.Type == LinkButtonTimeoutProblemRegisterHueBridgeConflict
+}
+
+// IsOnboardingReadOnlyProblem reports whether RegisterHueBridgeConflict is OnboardingReadOnlyProblem.
+func (s RegisterHueBridgeConflict) IsOnboardingReadOnlyProblem() bool {
+	return s.Type == OnboardingReadOnlyProblemRegisterHueBridgeConflict
+}
+
+// SetBridgeNotSelectedProblem sets RegisterHueBridgeConflict to BridgeNotSelectedProblem.
+func (s *RegisterHueBridgeConflict) SetBridgeNotSelectedProblem(v BridgeNotSelectedProblem) {
+	s.Type = BridgeNotSelectedProblemRegisterHueBridgeConflict
+	s.BridgeNotSelectedProblem = v
+}
+
+// GetBridgeNotSelectedProblem returns BridgeNotSelectedProblem and true boolean if RegisterHueBridgeConflict is BridgeNotSelectedProblem.
+func (s RegisterHueBridgeConflict) GetBridgeNotSelectedProblem() (v BridgeNotSelectedProblem, ok bool) {
+	if !s.IsBridgeNotSelectedProblem() {
+		return v, false
+	}
+	return s.BridgeNotSelectedProblem, true
+}
+
+// NewBridgeNotSelectedProblemRegisterHueBridgeConflict returns new RegisterHueBridgeConflict from BridgeNotSelectedProblem.
+func NewBridgeNotSelectedProblemRegisterHueBridgeConflict(v BridgeNotSelectedProblem) RegisterHueBridgeConflict {
+	var s RegisterHueBridgeConflict
+	s.SetBridgeNotSelectedProblem(v)
+	return s
+}
+
+// SetLinkButtonTimeoutProblem sets RegisterHueBridgeConflict to LinkButtonTimeoutProblem.
+func (s *RegisterHueBridgeConflict) SetLinkButtonTimeoutProblem(v LinkButtonTimeoutProblem) {
+	s.Type = LinkButtonTimeoutProblemRegisterHueBridgeConflict
+	s.LinkButtonTimeoutProblem = v
+}
+
+// GetLinkButtonTimeoutProblem returns LinkButtonTimeoutProblem and true boolean if RegisterHueBridgeConflict is LinkButtonTimeoutProblem.
+func (s RegisterHueBridgeConflict) GetLinkButtonTimeoutProblem() (v LinkButtonTimeoutProblem, ok bool) {
+	if !s.IsLinkButtonTimeoutProblem() {
+		return v, false
+	}
+	return s.LinkButtonTimeoutProblem, true
+}
+
+// NewLinkButtonTimeoutProblemRegisterHueBridgeConflict returns new RegisterHueBridgeConflict from LinkButtonTimeoutProblem.
+func NewLinkButtonTimeoutProblemRegisterHueBridgeConflict(v LinkButtonTimeoutProblem) RegisterHueBridgeConflict {
+	var s RegisterHueBridgeConflict
+	s.SetLinkButtonTimeoutProblem(v)
+	return s
+}
+
+// SetOnboardingReadOnlyProblem sets RegisterHueBridgeConflict to OnboardingReadOnlyProblem.
+func (s *RegisterHueBridgeConflict) SetOnboardingReadOnlyProblem(v OnboardingReadOnlyProblem) {
+	s.Type = OnboardingReadOnlyProblemRegisterHueBridgeConflict
+	s.OnboardingReadOnlyProblem = v
+}
+
+// GetOnboardingReadOnlyProblem returns OnboardingReadOnlyProblem and true boolean if RegisterHueBridgeConflict is OnboardingReadOnlyProblem.
+func (s RegisterHueBridgeConflict) GetOnboardingReadOnlyProblem() (v OnboardingReadOnlyProblem, ok bool) {
+	if !s.IsOnboardingReadOnlyProblem() {
+		return v, false
+	}
+	return s.OnboardingReadOnlyProblem, true
+}
+
+// NewOnboardingReadOnlyProblemRegisterHueBridgeConflict returns new RegisterHueBridgeConflict from OnboardingReadOnlyProblem.
+func NewOnboardingReadOnlyProblemRegisterHueBridgeConflict(v OnboardingReadOnlyProblem) RegisterHueBridgeConflict {
+	var s RegisterHueBridgeConflict
+	s.SetOnboardingReadOnlyProblem(v)
+	return s
+}
 
 func (*RegisterHueBridgeConflict) registerHueBridgeRes() {}
 
-type RegisterHueBridgeServiceUnavailable ErrorResponse
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/RequestValidationProblem
+type RequestValidationProblem struct {
+	Type            RequestValidationProblemType         `json:"type"`
+	Title           RequestValidationProblemTitle        `json:"title"`
+	Status          RequestValidationProblemStatus       `json:"status"`
+	Code            RequestValidationProblemCode         `json:"code"`
+	Detail          OptNilString                         `json:"detail"`
+	Instance        OptNilString                         `json:"instance"`
+	Errors          []RequestValidationProblemErrorsItem `json:"errors"`
+	AdditionalProps RequestValidationProblemAdditional
+}
 
-func (*RegisterHueBridgeServiceUnavailable) registerHueBridgeRes() {}
+// GetType returns the value of Type.
+func (s *RequestValidationProblem) GetType() RequestValidationProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *RequestValidationProblem) GetTitle() RequestValidationProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *RequestValidationProblem) GetStatus() RequestValidationProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *RequestValidationProblem) GetCode() RequestValidationProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *RequestValidationProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *RequestValidationProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetErrors returns the value of Errors.
+func (s *RequestValidationProblem) GetErrors() []RequestValidationProblemErrorsItem {
+	return s.Errors
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *RequestValidationProblem) GetAdditionalProps() RequestValidationProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *RequestValidationProblem) SetType(val RequestValidationProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *RequestValidationProblem) SetTitle(val RequestValidationProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *RequestValidationProblem) SetStatus(val RequestValidationProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *RequestValidationProblem) SetCode(val RequestValidationProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *RequestValidationProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *RequestValidationProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetErrors sets the value of Errors.
+func (s *RequestValidationProblem) SetErrors(val []RequestValidationProblemErrorsItem) {
+	s.Errors = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *RequestValidationProblem) SetAdditionalProps(val RequestValidationProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type RequestValidationProblemAdditional map[string]jx.Raw
+
+func (s *RequestValidationProblemAdditional) init() RequestValidationProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type RequestValidationProblemCode string
+
+const (
+	RequestValidationProblemCodeRequestValidationError RequestValidationProblemCode = "request_validation_error"
+)
+
+// AllValues returns all RequestValidationProblemCode values.
+func (RequestValidationProblemCode) AllValues() []RequestValidationProblemCode {
+	return []RequestValidationProblemCode{
+		RequestValidationProblemCodeRequestValidationError,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RequestValidationProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case RequestValidationProblemCodeRequestValidationError:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RequestValidationProblemCode) UnmarshalText(data []byte) error {
+	switch RequestValidationProblemCode(data) {
+	case RequestValidationProblemCodeRequestValidationError:
+		*s = RequestValidationProblemCodeRequestValidationError
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type RequestValidationProblemErrorsItem struct {
+	Code      string                                  `json:"code"`
+	Detail    string                                  `json:"detail"`
+	Pointer   OptString                               `json:"pointer"`
+	Parameter OptString                               `json:"parameter"`
+	In        OptRequestValidationProblemErrorsItemIn `json:"in"`
+}
+
+// GetCode returns the value of Code.
+func (s *RequestValidationProblemErrorsItem) GetCode() string {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *RequestValidationProblemErrorsItem) GetDetail() string {
+	return s.Detail
+}
+
+// GetPointer returns the value of Pointer.
+func (s *RequestValidationProblemErrorsItem) GetPointer() OptString {
+	return s.Pointer
+}
+
+// GetParameter returns the value of Parameter.
+func (s *RequestValidationProblemErrorsItem) GetParameter() OptString {
+	return s.Parameter
+}
+
+// GetIn returns the value of In.
+func (s *RequestValidationProblemErrorsItem) GetIn() OptRequestValidationProblemErrorsItemIn {
+	return s.In
+}
+
+// SetCode sets the value of Code.
+func (s *RequestValidationProblemErrorsItem) SetCode(val string) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *RequestValidationProblemErrorsItem) SetDetail(val string) {
+	s.Detail = val
+}
+
+// SetPointer sets the value of Pointer.
+func (s *RequestValidationProblemErrorsItem) SetPointer(val OptString) {
+	s.Pointer = val
+}
+
+// SetParameter sets the value of Parameter.
+func (s *RequestValidationProblemErrorsItem) SetParameter(val OptString) {
+	s.Parameter = val
+}
+
+// SetIn sets the value of In.
+func (s *RequestValidationProblemErrorsItem) SetIn(val OptRequestValidationProblemErrorsItemIn) {
+	s.In = val
+}
+
+type RequestValidationProblemErrorsItemIn string
+
+const (
+	RequestValidationProblemErrorsItemInPath   RequestValidationProblemErrorsItemIn = "path"
+	RequestValidationProblemErrorsItemInQuery  RequestValidationProblemErrorsItemIn = "query"
+	RequestValidationProblemErrorsItemInHeader RequestValidationProblemErrorsItemIn = "header"
+	RequestValidationProblemErrorsItemInCookie RequestValidationProblemErrorsItemIn = "cookie"
+)
+
+// AllValues returns all RequestValidationProblemErrorsItemIn values.
+func (RequestValidationProblemErrorsItemIn) AllValues() []RequestValidationProblemErrorsItemIn {
+	return []RequestValidationProblemErrorsItemIn{
+		RequestValidationProblemErrorsItemInPath,
+		RequestValidationProblemErrorsItemInQuery,
+		RequestValidationProblemErrorsItemInHeader,
+		RequestValidationProblemErrorsItemInCookie,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RequestValidationProblemErrorsItemIn) MarshalText() ([]byte, error) {
+	switch s {
+	case RequestValidationProblemErrorsItemInPath:
+		return []byte(s), nil
+	case RequestValidationProblemErrorsItemInQuery:
+		return []byte(s), nil
+	case RequestValidationProblemErrorsItemInHeader:
+		return []byte(s), nil
+	case RequestValidationProblemErrorsItemInCookie:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RequestValidationProblemErrorsItemIn) UnmarshalText(data []byte) error {
+	switch RequestValidationProblemErrorsItemIn(data) {
+	case RequestValidationProblemErrorsItemInPath:
+		*s = RequestValidationProblemErrorsItemInPath
+		return nil
+	case RequestValidationProblemErrorsItemInQuery:
+		*s = RequestValidationProblemErrorsItemInQuery
+		return nil
+	case RequestValidationProblemErrorsItemInHeader:
+		*s = RequestValidationProblemErrorsItemInHeader
+		return nil
+	case RequestValidationProblemErrorsItemInCookie:
+		*s = RequestValidationProblemErrorsItemInCookie
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type RequestValidationProblemStatus int
+
+const (
+	RequestValidationProblemStatus422 RequestValidationProblemStatus = 422
+)
+
+// AllValues returns all RequestValidationProblemStatus values.
+func (RequestValidationProblemStatus) AllValues() []RequestValidationProblemStatus {
+	return []RequestValidationProblemStatus{
+		RequestValidationProblemStatus422,
+	}
+}
+
+type RequestValidationProblemTitle string
+
+const (
+	RequestValidationProblemTitleRequestValidationFailed RequestValidationProblemTitle = "Request validation failed"
+)
+
+// AllValues returns all RequestValidationProblemTitle values.
+func (RequestValidationProblemTitle) AllValues() []RequestValidationProblemTitle {
+	return []RequestValidationProblemTitle{
+		RequestValidationProblemTitleRequestValidationFailed,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RequestValidationProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case RequestValidationProblemTitleRequestValidationFailed:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RequestValidationProblemTitle) UnmarshalText(data []byte) error {
+	switch RequestValidationProblemTitle(data) {
+	case RequestValidationProblemTitleRequestValidationFailed:
+		*s = RequestValidationProblemTitleRequestValidationFailed
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type RequestValidationProblemType string
+
+const (
+	RequestValidationProblemTypeUrnHueriseProblemRequestValidationError RequestValidationProblemType = "urn:huerise:problem/request_validation_error"
+)
+
+// AllValues returns all RequestValidationProblemType values.
+func (RequestValidationProblemType) AllValues() []RequestValidationProblemType {
+	return []RequestValidationProblemType{
+		RequestValidationProblemTypeUrnHueriseProblemRequestValidationError,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RequestValidationProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case RequestValidationProblemTypeUrnHueriseProblemRequestValidationError:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RequestValidationProblemType) UnmarshalText(data []byte) error {
+	switch RequestValidationProblemType(data) {
+	case RequestValidationProblemTypeUrnHueriseProblemRequestValidationError:
+		*s = RequestValidationProblemTypeUrnHueriseProblemRequestValidationError
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // Ref: #/components/schemas/RoomResponse
 type RoomResponse struct {
@@ -951,6 +3266,218 @@ func (s *RoomResponse) SetName(val string) {
 // SetScenes sets the value of Scenes.
 func (s *RoomResponse) SetScenes(val []SceneResponse) {
 	s.Scenes = val
+}
+
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/SceneNotFoundProblem
+type SceneNotFoundProblem struct {
+	Type            SceneNotFoundProblemType   `json:"type"`
+	Title           SceneNotFoundProblemTitle  `json:"title"`
+	Status          SceneNotFoundProblemStatus `json:"status"`
+	Code            SceneNotFoundProblemCode   `json:"code"`
+	Detail          OptNilString               `json:"detail"`
+	Instance        OptNilString               `json:"instance"`
+	AdditionalProps SceneNotFoundProblemAdditional
+}
+
+// GetType returns the value of Type.
+func (s *SceneNotFoundProblem) GetType() SceneNotFoundProblemType {
+	return s.Type
+}
+
+// GetTitle returns the value of Title.
+func (s *SceneNotFoundProblem) GetTitle() SceneNotFoundProblemTitle {
+	return s.Title
+}
+
+// GetStatus returns the value of Status.
+func (s *SceneNotFoundProblem) GetStatus() SceneNotFoundProblemStatus {
+	return s.Status
+}
+
+// GetCode returns the value of Code.
+func (s *SceneNotFoundProblem) GetCode() SceneNotFoundProblemCode {
+	return s.Code
+}
+
+// GetDetail returns the value of Detail.
+func (s *SceneNotFoundProblem) GetDetail() OptNilString {
+	return s.Detail
+}
+
+// GetInstance returns the value of Instance.
+func (s *SceneNotFoundProblem) GetInstance() OptNilString {
+	return s.Instance
+}
+
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *SceneNotFoundProblem) GetAdditionalProps() SceneNotFoundProblemAdditional {
+	return s.AdditionalProps
+}
+
+// SetType sets the value of Type.
+func (s *SceneNotFoundProblem) SetType(val SceneNotFoundProblemType) {
+	s.Type = val
+}
+
+// SetTitle sets the value of Title.
+func (s *SceneNotFoundProblem) SetTitle(val SceneNotFoundProblemTitle) {
+	s.Title = val
+}
+
+// SetStatus sets the value of Status.
+func (s *SceneNotFoundProblem) SetStatus(val SceneNotFoundProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *SceneNotFoundProblem) SetCode(val SceneNotFoundProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *SceneNotFoundProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *SceneNotFoundProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *SceneNotFoundProblem) SetAdditionalProps(val SceneNotFoundProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+func (*SceneNotFoundProblem) doctorRes()                        {}
+func (*SceneNotFoundProblem) setDaylightAlarmConfigurationRes() {}
+func (*SceneNotFoundProblem) startDaylightAlarmRes()            {}
+
+type SceneNotFoundProblemAdditional map[string]jx.Raw
+
+func (s *SceneNotFoundProblemAdditional) init() SceneNotFoundProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type SceneNotFoundProblemCode string
+
+const (
+	SceneNotFoundProblemCodeSceneNotFound SceneNotFoundProblemCode = "scene_not_found"
+)
+
+// AllValues returns all SceneNotFoundProblemCode values.
+func (SceneNotFoundProblemCode) AllValues() []SceneNotFoundProblemCode {
+	return []SceneNotFoundProblemCode{
+		SceneNotFoundProblemCodeSceneNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneNotFoundProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneNotFoundProblemCodeSceneNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneNotFoundProblemCode) UnmarshalText(data []byte) error {
+	switch SceneNotFoundProblemCode(data) {
+	case SceneNotFoundProblemCodeSceneNotFound:
+		*s = SceneNotFoundProblemCodeSceneNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SceneNotFoundProblemStatus int
+
+const (
+	SceneNotFoundProblemStatus404 SceneNotFoundProblemStatus = 404
+)
+
+// AllValues returns all SceneNotFoundProblemStatus values.
+func (SceneNotFoundProblemStatus) AllValues() []SceneNotFoundProblemStatus {
+	return []SceneNotFoundProblemStatus{
+		SceneNotFoundProblemStatus404,
+	}
+}
+
+type SceneNotFoundProblemTitle string
+
+const (
+	SceneNotFoundProblemTitleSceneNotFound SceneNotFoundProblemTitle = "Scene not found"
+)
+
+// AllValues returns all SceneNotFoundProblemTitle values.
+func (SceneNotFoundProblemTitle) AllValues() []SceneNotFoundProblemTitle {
+	return []SceneNotFoundProblemTitle{
+		SceneNotFoundProblemTitleSceneNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneNotFoundProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneNotFoundProblemTitleSceneNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneNotFoundProblemTitle) UnmarshalText(data []byte) error {
+	switch SceneNotFoundProblemTitle(data) {
+	case SceneNotFoundProblemTitleSceneNotFound:
+		*s = SceneNotFoundProblemTitleSceneNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SceneNotFoundProblemType string
+
+const (
+	SceneNotFoundProblemTypeUrnHueriseProblemSceneNotFound SceneNotFoundProblemType = "urn:huerise:problem/scene_not_found"
+)
+
+// AllValues returns all SceneNotFoundProblemType values.
+func (SceneNotFoundProblemType) AllValues() []SceneNotFoundProblemType {
+	return []SceneNotFoundProblemType{
+		SceneNotFoundProblemTypeUrnHueriseProblemSceneNotFound,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneNotFoundProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneNotFoundProblemTypeUrnHueriseProblemSceneNotFound:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneNotFoundProblemType) UnmarshalText(data []byte) error {
+	switch SceneNotFoundProblemType(data) {
+	case SceneNotFoundProblemTypeUrnHueriseProblemSceneNotFound:
+		*s = SceneNotFoundProblemTypeUrnHueriseProblemSceneNotFound
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Ref: #/components/schemas/SceneResponse
@@ -990,41 +3517,451 @@ func (s *SceneResponse) SetBrightness(val NilFloat64) {
 	s.Brightness = val
 }
 
-type SelectHueBridgeConflict ErrorResponse
+// RFC 9457 Problem Details with a stable application code.
+// Ref: #/components/schemas/SceneRoomMismatchProblem
+type SceneRoomMismatchProblem struct {
+	Type            SceneRoomMismatchProblemType   `json:"type"`
+	Title           SceneRoomMismatchProblemTitle  `json:"title"`
+	Status          SceneRoomMismatchProblemStatus `json:"status"`
+	Code            SceneRoomMismatchProblemCode   `json:"code"`
+	Detail          OptNilString                   `json:"detail"`
+	Instance        OptNilString                   `json:"instance"`
+	AdditionalProps SceneRoomMismatchProblemAdditional
+}
 
-func (*SelectHueBridgeConflict) selectHueBridgeRes() {}
+// GetType returns the value of Type.
+func (s *SceneRoomMismatchProblem) GetType() SceneRoomMismatchProblemType {
+	return s.Type
+}
 
-type SelectHueBridgeNotFound ErrorResponse
+// GetTitle returns the value of Title.
+func (s *SceneRoomMismatchProblem) GetTitle() SceneRoomMismatchProblemTitle {
+	return s.Title
+}
 
-func (*SelectHueBridgeNotFound) selectHueBridgeRes() {}
+// GetStatus returns the value of Status.
+func (s *SceneRoomMismatchProblem) GetStatus() SceneRoomMismatchProblemStatus {
+	return s.Status
+}
 
-type SelectHueBridgeServiceUnavailable ErrorResponse
+// GetCode returns the value of Code.
+func (s *SceneRoomMismatchProblem) GetCode() SceneRoomMismatchProblemCode {
+	return s.Code
+}
 
-func (*SelectHueBridgeServiceUnavailable) selectHueBridgeRes() {}
+// GetDetail returns the value of Detail.
+func (s *SceneRoomMismatchProblem) GetDetail() OptNilString {
+	return s.Detail
+}
 
-type SetDaylightAlarmConfigurationNotFound ErrorResponse
+// GetInstance returns the value of Instance.
+func (s *SceneRoomMismatchProblem) GetInstance() OptNilString {
+	return s.Instance
+}
 
-func (*SetDaylightAlarmConfigurationNotFound) setDaylightAlarmConfigurationRes() {}
+// GetAdditionalProps returns the value of AdditionalProps.
+func (s *SceneRoomMismatchProblem) GetAdditionalProps() SceneRoomMismatchProblemAdditional {
+	return s.AdditionalProps
+}
 
-type SetDaylightAlarmConfigurationServiceUnavailable ErrorResponse
+// SetType sets the value of Type.
+func (s *SceneRoomMismatchProblem) SetType(val SceneRoomMismatchProblemType) {
+	s.Type = val
+}
 
-func (*SetDaylightAlarmConfigurationServiceUnavailable) setDaylightAlarmConfigurationRes() {}
+// SetTitle sets the value of Title.
+func (s *SceneRoomMismatchProblem) SetTitle(val SceneRoomMismatchProblemTitle) {
+	s.Title = val
+}
 
-type SetDaylightAlarmConfigurationUnprocessableEntity ErrorResponse
+// SetStatus sets the value of Status.
+func (s *SceneRoomMismatchProblem) SetStatus(val SceneRoomMismatchProblemStatus) {
+	s.Status = val
+}
+
+// SetCode sets the value of Code.
+func (s *SceneRoomMismatchProblem) SetCode(val SceneRoomMismatchProblemCode) {
+	s.Code = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *SceneRoomMismatchProblem) SetDetail(val OptNilString) {
+	s.Detail = val
+}
+
+// SetInstance sets the value of Instance.
+func (s *SceneRoomMismatchProblem) SetInstance(val OptNilString) {
+	s.Instance = val
+}
+
+// SetAdditionalProps sets the value of AdditionalProps.
+func (s *SceneRoomMismatchProblem) SetAdditionalProps(val SceneRoomMismatchProblemAdditional) {
+	s.AdditionalProps = val
+}
+
+type SceneRoomMismatchProblemAdditional map[string]jx.Raw
+
+func (s *SceneRoomMismatchProblemAdditional) init() SceneRoomMismatchProblemAdditional {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type SceneRoomMismatchProblemCode string
+
+const (
+	SceneRoomMismatchProblemCodeSceneRoomMismatch SceneRoomMismatchProblemCode = "scene_room_mismatch"
+)
+
+// AllValues returns all SceneRoomMismatchProblemCode values.
+func (SceneRoomMismatchProblemCode) AllValues() []SceneRoomMismatchProblemCode {
+	return []SceneRoomMismatchProblemCode{
+		SceneRoomMismatchProblemCodeSceneRoomMismatch,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneRoomMismatchProblemCode) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneRoomMismatchProblemCodeSceneRoomMismatch:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneRoomMismatchProblemCode) UnmarshalText(data []byte) error {
+	switch SceneRoomMismatchProblemCode(data) {
+	case SceneRoomMismatchProblemCodeSceneRoomMismatch:
+		*s = SceneRoomMismatchProblemCodeSceneRoomMismatch
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SceneRoomMismatchProblemStatus int
+
+const (
+	SceneRoomMismatchProblemStatus422 SceneRoomMismatchProblemStatus = 422
+)
+
+// AllValues returns all SceneRoomMismatchProblemStatus values.
+func (SceneRoomMismatchProblemStatus) AllValues() []SceneRoomMismatchProblemStatus {
+	return []SceneRoomMismatchProblemStatus{
+		SceneRoomMismatchProblemStatus422,
+	}
+}
+
+type SceneRoomMismatchProblemTitle string
+
+const (
+	SceneRoomMismatchProblemTitleSceneDoesNotBelongToRoom SceneRoomMismatchProblemTitle = "Scene does not belong to room"
+)
+
+// AllValues returns all SceneRoomMismatchProblemTitle values.
+func (SceneRoomMismatchProblemTitle) AllValues() []SceneRoomMismatchProblemTitle {
+	return []SceneRoomMismatchProblemTitle{
+		SceneRoomMismatchProblemTitleSceneDoesNotBelongToRoom,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneRoomMismatchProblemTitle) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneRoomMismatchProblemTitleSceneDoesNotBelongToRoom:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneRoomMismatchProblemTitle) UnmarshalText(data []byte) error {
+	switch SceneRoomMismatchProblemTitle(data) {
+	case SceneRoomMismatchProblemTitleSceneDoesNotBelongToRoom:
+		*s = SceneRoomMismatchProblemTitleSceneDoesNotBelongToRoom
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SceneRoomMismatchProblemType string
+
+const (
+	SceneRoomMismatchProblemTypeUrnHueriseProblemSceneRoomMismatch SceneRoomMismatchProblemType = "urn:huerise:problem/scene_room_mismatch"
+)
+
+// AllValues returns all SceneRoomMismatchProblemType values.
+func (SceneRoomMismatchProblemType) AllValues() []SceneRoomMismatchProblemType {
+	return []SceneRoomMismatchProblemType{
+		SceneRoomMismatchProblemTypeUrnHueriseProblemSceneRoomMismatch,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SceneRoomMismatchProblemType) MarshalText() ([]byte, error) {
+	switch s {
+	case SceneRoomMismatchProblemTypeUrnHueriseProblemSceneRoomMismatch:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SceneRoomMismatchProblemType) UnmarshalText(data []byte) error {
+	switch SceneRoomMismatchProblemType(data) {
+	case SceneRoomMismatchProblemTypeUrnHueriseProblemSceneRoomMismatch:
+		*s = SceneRoomMismatchProblemTypeUrnHueriseProblemSceneRoomMismatch
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// SelectHueBridgeUnprocessableEntity represents sum type.
+type SelectHueBridgeUnprocessableEntity struct {
+	Type                        SelectHueBridgeUnprocessableEntityType // switch on this field
+	ConfigurationInvalidProblem ConfigurationInvalidProblem
+	RequestValidationProblem    RequestValidationProblem
+}
+
+// SelectHueBridgeUnprocessableEntityType is oneOf type of SelectHueBridgeUnprocessableEntity.
+type SelectHueBridgeUnprocessableEntityType string
+
+// Possible values for SelectHueBridgeUnprocessableEntityType.
+const (
+	ConfigurationInvalidProblemSelectHueBridgeUnprocessableEntity SelectHueBridgeUnprocessableEntityType = "configuration_invalid"
+	RequestValidationProblemSelectHueBridgeUnprocessableEntity    SelectHueBridgeUnprocessableEntityType = "request_validation_error"
+)
+
+// IsConfigurationInvalidProblem reports whether SelectHueBridgeUnprocessableEntity is ConfigurationInvalidProblem.
+func (s SelectHueBridgeUnprocessableEntity) IsConfigurationInvalidProblem() bool {
+	return s.Type == ConfigurationInvalidProblemSelectHueBridgeUnprocessableEntity
+}
+
+// IsRequestValidationProblem reports whether SelectHueBridgeUnprocessableEntity is RequestValidationProblem.
+func (s SelectHueBridgeUnprocessableEntity) IsRequestValidationProblem() bool {
+	return s.Type == RequestValidationProblemSelectHueBridgeUnprocessableEntity
+}
+
+// SetConfigurationInvalidProblem sets SelectHueBridgeUnprocessableEntity to ConfigurationInvalidProblem.
+func (s *SelectHueBridgeUnprocessableEntity) SetConfigurationInvalidProblem(v ConfigurationInvalidProblem) {
+	s.Type = ConfigurationInvalidProblemSelectHueBridgeUnprocessableEntity
+	s.ConfigurationInvalidProblem = v
+}
+
+// GetConfigurationInvalidProblem returns ConfigurationInvalidProblem and true boolean if SelectHueBridgeUnprocessableEntity is ConfigurationInvalidProblem.
+func (s SelectHueBridgeUnprocessableEntity) GetConfigurationInvalidProblem() (v ConfigurationInvalidProblem, ok bool) {
+	if !s.IsConfigurationInvalidProblem() {
+		return v, false
+	}
+	return s.ConfigurationInvalidProblem, true
+}
+
+// NewConfigurationInvalidProblemSelectHueBridgeUnprocessableEntity returns new SelectHueBridgeUnprocessableEntity from ConfigurationInvalidProblem.
+func NewConfigurationInvalidProblemSelectHueBridgeUnprocessableEntity(v ConfigurationInvalidProblem) SelectHueBridgeUnprocessableEntity {
+	var s SelectHueBridgeUnprocessableEntity
+	s.SetConfigurationInvalidProblem(v)
+	return s
+}
+
+// SetRequestValidationProblem sets SelectHueBridgeUnprocessableEntity to RequestValidationProblem.
+func (s *SelectHueBridgeUnprocessableEntity) SetRequestValidationProblem(v RequestValidationProblem) {
+	s.Type = RequestValidationProblemSelectHueBridgeUnprocessableEntity
+	s.RequestValidationProblem = v
+}
+
+// GetRequestValidationProblem returns RequestValidationProblem and true boolean if SelectHueBridgeUnprocessableEntity is RequestValidationProblem.
+func (s SelectHueBridgeUnprocessableEntity) GetRequestValidationProblem() (v RequestValidationProblem, ok bool) {
+	if !s.IsRequestValidationProblem() {
+		return v, false
+	}
+	return s.RequestValidationProblem, true
+}
+
+// NewRequestValidationProblemSelectHueBridgeUnprocessableEntity returns new SelectHueBridgeUnprocessableEntity from RequestValidationProblem.
+func NewRequestValidationProblemSelectHueBridgeUnprocessableEntity(v RequestValidationProblem) SelectHueBridgeUnprocessableEntity {
+	var s SelectHueBridgeUnprocessableEntity
+	s.SetRequestValidationProblem(v)
+	return s
+}
+
+func (*SelectHueBridgeUnprocessableEntity) selectHueBridgeRes() {}
+
+// SetDaylightAlarmConfigurationUnprocessableEntity represents sum type.
+type SetDaylightAlarmConfigurationUnprocessableEntity struct {
+	Type                        SetDaylightAlarmConfigurationUnprocessableEntityType // switch on this field
+	SceneRoomMismatchProblem    SceneRoomMismatchProblem
+	ConfigurationInvalidProblem ConfigurationInvalidProblem
+	RequestValidationProblem    RequestValidationProblem
+}
+
+// SetDaylightAlarmConfigurationUnprocessableEntityType is oneOf type of SetDaylightAlarmConfigurationUnprocessableEntity.
+type SetDaylightAlarmConfigurationUnprocessableEntityType string
+
+// Possible values for SetDaylightAlarmConfigurationUnprocessableEntityType.
+const (
+	SceneRoomMismatchProblemSetDaylightAlarmConfigurationUnprocessableEntity    SetDaylightAlarmConfigurationUnprocessableEntityType = "scene_room_mismatch"
+	ConfigurationInvalidProblemSetDaylightAlarmConfigurationUnprocessableEntity SetDaylightAlarmConfigurationUnprocessableEntityType = "configuration_invalid"
+	RequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity    SetDaylightAlarmConfigurationUnprocessableEntityType = "request_validation_error"
+)
+
+// IsSceneRoomMismatchProblem reports whether SetDaylightAlarmConfigurationUnprocessableEntity is SceneRoomMismatchProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) IsSceneRoomMismatchProblem() bool {
+	return s.Type == SceneRoomMismatchProblemSetDaylightAlarmConfigurationUnprocessableEntity
+}
+
+// IsConfigurationInvalidProblem reports whether SetDaylightAlarmConfigurationUnprocessableEntity is ConfigurationInvalidProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) IsConfigurationInvalidProblem() bool {
+	return s.Type == ConfigurationInvalidProblemSetDaylightAlarmConfigurationUnprocessableEntity
+}
+
+// IsRequestValidationProblem reports whether SetDaylightAlarmConfigurationUnprocessableEntity is RequestValidationProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) IsRequestValidationProblem() bool {
+	return s.Type == RequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity
+}
+
+// SetSceneRoomMismatchProblem sets SetDaylightAlarmConfigurationUnprocessableEntity to SceneRoomMismatchProblem.
+func (s *SetDaylightAlarmConfigurationUnprocessableEntity) SetSceneRoomMismatchProblem(v SceneRoomMismatchProblem) {
+	s.Type = SceneRoomMismatchProblemSetDaylightAlarmConfigurationUnprocessableEntity
+	s.SceneRoomMismatchProblem = v
+}
+
+// GetSceneRoomMismatchProblem returns SceneRoomMismatchProblem and true boolean if SetDaylightAlarmConfigurationUnprocessableEntity is SceneRoomMismatchProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) GetSceneRoomMismatchProblem() (v SceneRoomMismatchProblem, ok bool) {
+	if !s.IsSceneRoomMismatchProblem() {
+		return v, false
+	}
+	return s.SceneRoomMismatchProblem, true
+}
+
+// NewSceneRoomMismatchProblemSetDaylightAlarmConfigurationUnprocessableEntity returns new SetDaylightAlarmConfigurationUnprocessableEntity from SceneRoomMismatchProblem.
+func NewSceneRoomMismatchProblemSetDaylightAlarmConfigurationUnprocessableEntity(v SceneRoomMismatchProblem) SetDaylightAlarmConfigurationUnprocessableEntity {
+	var s SetDaylightAlarmConfigurationUnprocessableEntity
+	s.SetSceneRoomMismatchProblem(v)
+	return s
+}
+
+// SetConfigurationInvalidProblem sets SetDaylightAlarmConfigurationUnprocessableEntity to ConfigurationInvalidProblem.
+func (s *SetDaylightAlarmConfigurationUnprocessableEntity) SetConfigurationInvalidProblem(v ConfigurationInvalidProblem) {
+	s.Type = ConfigurationInvalidProblemSetDaylightAlarmConfigurationUnprocessableEntity
+	s.ConfigurationInvalidProblem = v
+}
+
+// GetConfigurationInvalidProblem returns ConfigurationInvalidProblem and true boolean if SetDaylightAlarmConfigurationUnprocessableEntity is ConfigurationInvalidProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) GetConfigurationInvalidProblem() (v ConfigurationInvalidProblem, ok bool) {
+	if !s.IsConfigurationInvalidProblem() {
+		return v, false
+	}
+	return s.ConfigurationInvalidProblem, true
+}
+
+// NewConfigurationInvalidProblemSetDaylightAlarmConfigurationUnprocessableEntity returns new SetDaylightAlarmConfigurationUnprocessableEntity from ConfigurationInvalidProblem.
+func NewConfigurationInvalidProblemSetDaylightAlarmConfigurationUnprocessableEntity(v ConfigurationInvalidProblem) SetDaylightAlarmConfigurationUnprocessableEntity {
+	var s SetDaylightAlarmConfigurationUnprocessableEntity
+	s.SetConfigurationInvalidProblem(v)
+	return s
+}
+
+// SetRequestValidationProblem sets SetDaylightAlarmConfigurationUnprocessableEntity to RequestValidationProblem.
+func (s *SetDaylightAlarmConfigurationUnprocessableEntity) SetRequestValidationProblem(v RequestValidationProblem) {
+	s.Type = RequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity
+	s.RequestValidationProblem = v
+}
+
+// GetRequestValidationProblem returns RequestValidationProblem and true boolean if SetDaylightAlarmConfigurationUnprocessableEntity is RequestValidationProblem.
+func (s SetDaylightAlarmConfigurationUnprocessableEntity) GetRequestValidationProblem() (v RequestValidationProblem, ok bool) {
+	if !s.IsRequestValidationProblem() {
+		return v, false
+	}
+	return s.RequestValidationProblem, true
+}
+
+// NewRequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity returns new SetDaylightAlarmConfigurationUnprocessableEntity from RequestValidationProblem.
+func NewRequestValidationProblemSetDaylightAlarmConfigurationUnprocessableEntity(v RequestValidationProblem) SetDaylightAlarmConfigurationUnprocessableEntity {
+	var s SetDaylightAlarmConfigurationUnprocessableEntity
+	s.SetRequestValidationProblem(v)
+	return s
+}
 
 func (*SetDaylightAlarmConfigurationUnprocessableEntity) setDaylightAlarmConfigurationRes() {}
 
-type StartDaylightAlarmConflict ErrorResponse
+// StartDaylightAlarmUnprocessableEntity represents sum type.
+type StartDaylightAlarmUnprocessableEntity struct {
+	Type                        StartDaylightAlarmUnprocessableEntityType // switch on this field
+	ConfigurationInvalidProblem ConfigurationInvalidProblem
+	RequestValidationProblem    RequestValidationProblem
+}
 
-func (*StartDaylightAlarmConflict) startDaylightAlarmRes() {}
+// StartDaylightAlarmUnprocessableEntityType is oneOf type of StartDaylightAlarmUnprocessableEntity.
+type StartDaylightAlarmUnprocessableEntityType string
 
-type StartDaylightAlarmNotFound ErrorResponse
+// Possible values for StartDaylightAlarmUnprocessableEntityType.
+const (
+	ConfigurationInvalidProblemStartDaylightAlarmUnprocessableEntity StartDaylightAlarmUnprocessableEntityType = "configuration_invalid"
+	RequestValidationProblemStartDaylightAlarmUnprocessableEntity    StartDaylightAlarmUnprocessableEntityType = "request_validation_error"
+)
 
-func (*StartDaylightAlarmNotFound) startDaylightAlarmRes() {}
+// IsConfigurationInvalidProblem reports whether StartDaylightAlarmUnprocessableEntity is ConfigurationInvalidProblem.
+func (s StartDaylightAlarmUnprocessableEntity) IsConfigurationInvalidProblem() bool {
+	return s.Type == ConfigurationInvalidProblemStartDaylightAlarmUnprocessableEntity
+}
 
-type StartDaylightAlarmServiceUnavailable ErrorResponse
+// IsRequestValidationProblem reports whether StartDaylightAlarmUnprocessableEntity is RequestValidationProblem.
+func (s StartDaylightAlarmUnprocessableEntity) IsRequestValidationProblem() bool {
+	return s.Type == RequestValidationProblemStartDaylightAlarmUnprocessableEntity
+}
 
-func (*StartDaylightAlarmServiceUnavailable) startDaylightAlarmRes() {}
+// SetConfigurationInvalidProblem sets StartDaylightAlarmUnprocessableEntity to ConfigurationInvalidProblem.
+func (s *StartDaylightAlarmUnprocessableEntity) SetConfigurationInvalidProblem(v ConfigurationInvalidProblem) {
+	s.Type = ConfigurationInvalidProblemStartDaylightAlarmUnprocessableEntity
+	s.ConfigurationInvalidProblem = v
+}
+
+// GetConfigurationInvalidProblem returns ConfigurationInvalidProblem and true boolean if StartDaylightAlarmUnprocessableEntity is ConfigurationInvalidProblem.
+func (s StartDaylightAlarmUnprocessableEntity) GetConfigurationInvalidProblem() (v ConfigurationInvalidProblem, ok bool) {
+	if !s.IsConfigurationInvalidProblem() {
+		return v, false
+	}
+	return s.ConfigurationInvalidProblem, true
+}
+
+// NewConfigurationInvalidProblemStartDaylightAlarmUnprocessableEntity returns new StartDaylightAlarmUnprocessableEntity from ConfigurationInvalidProblem.
+func NewConfigurationInvalidProblemStartDaylightAlarmUnprocessableEntity(v ConfigurationInvalidProblem) StartDaylightAlarmUnprocessableEntity {
+	var s StartDaylightAlarmUnprocessableEntity
+	s.SetConfigurationInvalidProblem(v)
+	return s
+}
+
+// SetRequestValidationProblem sets StartDaylightAlarmUnprocessableEntity to RequestValidationProblem.
+func (s *StartDaylightAlarmUnprocessableEntity) SetRequestValidationProblem(v RequestValidationProblem) {
+	s.Type = RequestValidationProblemStartDaylightAlarmUnprocessableEntity
+	s.RequestValidationProblem = v
+}
+
+// GetRequestValidationProblem returns RequestValidationProblem and true boolean if StartDaylightAlarmUnprocessableEntity is RequestValidationProblem.
+func (s StartDaylightAlarmUnprocessableEntity) GetRequestValidationProblem() (v RequestValidationProblem, ok bool) {
+	if !s.IsRequestValidationProblem() {
+		return v, false
+	}
+	return s.RequestValidationProblem, true
+}
+
+// NewRequestValidationProblemStartDaylightAlarmUnprocessableEntity returns new StartDaylightAlarmUnprocessableEntity from RequestValidationProblem.
+func NewRequestValidationProblemStartDaylightAlarmUnprocessableEntity(v RequestValidationProblem) StartDaylightAlarmUnprocessableEntity {
+	var s StartDaylightAlarmUnprocessableEntity
+	s.SetRequestValidationProblem(v)
+	return s
+}
+
+func (*StartDaylightAlarmUnprocessableEntity) startDaylightAlarmRes() {}
 
 // Ref: #/components/schemas/StartRequest
 type StartRequest struct {
@@ -1043,3 +3980,5 @@ func (s *StartRequest) SetDurationSeconds(val int) {
 
 // StopDaylightAlarmNoContent is response for StopDaylightAlarm operation.
 type StopDaylightAlarmNoContent struct{}
+
+func (*StopDaylightAlarmNoContent) stopDaylightAlarmRes() {}

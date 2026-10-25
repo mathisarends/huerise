@@ -24,12 +24,22 @@
               }
             }
           },
-          "404": {
-            "description": "The configured Hue scene does not exist.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The selected Hue scene does not exist.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SceneNotFoundProblem"
                 }
               }
             }
@@ -37,9 +47,9 @@
           "422": {
             "description": "The YAML configuration is missing or invalid.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
@@ -47,9 +57,9 @@
           "503": {
             "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -84,22 +94,32 @@
               }
             }
           },
-          "422": {
-            "description": "The stored Hue configuration is invalid.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The YAML configuration is missing or invalid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
           },
           "503": {
-            "description": "Hue Bridge discovery is unavailable.",
+            "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -130,12 +150,22 @@
               }
             }
           },
-          "422": {
-            "description": "The stored Hue configuration is invalid.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The YAML configuration is missing or invalid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
@@ -174,12 +204,22 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The selected Hue Bridge was not discovered.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/BridgeNotFoundProblem"
                 }
               }
             }
@@ -187,29 +227,43 @@
           "409": {
             "description": "Environment overrides make Hue onboarding read-only.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/OnboardingReadOnlyProblem"
                 }
               }
             }
           },
           "422": {
-            "description": "The stored Hue configuration is invalid.",
+            "description": "The YAML configuration is missing or invalid. Request validation failed.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigurationInvalidProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestValidationProblem"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "code",
+                    "mapping": {
+                      "configuration_invalid": "#/components/schemas/ConfigurationInvalidProblem",
+                      "request_validation_error": "#/components/schemas/RequestValidationProblem"
+                    }
+                  }
                 }
               }
             }
           },
           "503": {
-            "description": "Hue Bridge discovery is unavailable.",
+            "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -240,32 +294,60 @@
               }
             }
           },
-          "409": {
-            "description": "A Hue Bridge must be selected before registration.\n\nThe Hue Bridge link button was not pressed in time.\n\nEnvironment overrides make Hue onboarding read-only.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Possible problems: Bridge not selected, Link button timeout, Onboarding is read-only",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BridgeNotSelectedProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LinkButtonTimeoutProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OnboardingReadOnlyProblem"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "code",
+                    "mapping": {
+                      "bridge_not_selected": "#/components/schemas/BridgeNotSelectedProblem",
+                      "link_button_timeout": "#/components/schemas/LinkButtonTimeoutProblem",
+                      "onboarding_read_only": "#/components/schemas/OnboardingReadOnlyProblem"
+                    }
+                  }
                 }
               }
             }
           },
           "422": {
-            "description": "The stored Hue configuration is invalid.",
+            "description": "The YAML configuration is missing or invalid.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
           },
           "503": {
-            "description": "Hue Bridge registration is unavailable.",
+            "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -300,12 +382,22 @@
               }
             }
           },
-          "422": {
-            "description": "The YAML configuration is invalid.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The YAML configuration is missing or invalid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
@@ -313,9 +405,9 @@
           "503": {
             "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -346,32 +438,22 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
           "422": {
-            "description": "The selected scene does not belong to the selected room.\n\nThe YAML configuration is missing or invalid.",
+            "description": "The YAML configuration is missing or invalid.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The selected Hue scene does not exist.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "The Hue Bridge is not configured, reachable, or authenticated.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ConfigurationInvalidProblem"
                 }
               }
             }
@@ -410,12 +492,40 @@
               }
             }
           },
-          "422": {
-            "description": "The selected scene does not belong to the selected room.\n\nThe YAML configuration is missing or invalid.",
+          "401": {
+            "description": "Authentication required",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Possible problems: Scene does not belong to room, Invalid configuration Request validation failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SceneRoomMismatchProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ConfigurationInvalidProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestValidationProblem"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "code",
+                    "mapping": {
+                      "scene_room_mismatch": "#/components/schemas/SceneRoomMismatchProblem",
+                      "configuration_invalid": "#/components/schemas/ConfigurationInvalidProblem",
+                      "request_validation_error": "#/components/schemas/RequestValidationProblem"
+                    }
+                  }
                 }
               }
             }
@@ -423,9 +533,9 @@
           "404": {
             "description": "The selected Hue scene does not exist.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/SceneNotFoundProblem"
                 }
               }
             }
@@ -433,9 +543,9 @@
           "503": {
             "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -483,32 +593,56 @@
               }
             }
           },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
+          },
           "409": {
             "description": "A daylight alarm is already running.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/AlarmAlreadyRunningProblem"
                 }
               }
             }
           },
           "404": {
-            "description": "The configured Hue scene does not exist.",
+            "description": "The selected Hue scene does not exist.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/SceneNotFoundProblem"
                 }
               }
             }
           },
           "422": {
-            "description": "The YAML configuration is missing or invalid.",
+            "description": "The YAML configuration is missing or invalid. Request validation failed.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConfigurationErrorResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigurationInvalidProblem"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestValidationProblem"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "code",
+                    "mapping": {
+                      "configuration_invalid": "#/components/schemas/ConfigurationInvalidProblem",
+                      "request_validation_error": "#/components/schemas/RequestValidationProblem"
+                    }
+                  }
                 }
               }
             }
@@ -516,9 +650,9 @@
           "503": {
             "description": "The Hue Bridge is not configured, reachable, or authenticated.",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/HueUnavailableProblem"
                 }
               }
             }
@@ -540,7 +674,17 @@
         "operationId": "stopDaylightAlarm",
         "responses": {
           "204": {
-            "description": "Successful Response"
+            "description": "No content"
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationRequiredProblem"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -604,9 +748,11 @@
         "properties": {
           "status": {
             "type": "string",
-            "const": "started",
             "title": "Status",
-            "default": "started"
+            "default": "started",
+            "enum": [
+              "started"
+            ]
           },
           "duration_seconds": {
             "type": "integer",
@@ -655,50 +801,6 @@
           "bridge_id"
         ],
         "title": "BridgeSelectionRequest"
-      },
-      "ConfigurationErrorResponse": {
-        "properties": {
-          "detail": {
-            "type": "string",
-            "title": "Detail"
-          },
-          "issues": {
-            "items": {
-              "$ref": "#/components/schemas/ConfigurationIssue"
-            },
-            "type": "array",
-            "title": "Issues"
-          }
-        },
-        "type": "object",
-        "required": [
-          "detail",
-          "issues"
-        ],
-        "title": "ConfigurationErrorResponse"
-      },
-      "ConfigurationIssue": {
-        "properties": {
-          "location": {
-            "type": "string",
-            "title": "Location"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "location",
-          "message",
-          "type"
-        ],
-        "title": "ConfigurationIssue"
       },
       "DaylightAlarmConfigurationRequest": {
         "properties": {
@@ -775,8 +877,10 @@
           },
           "status": {
             "type": "string",
-            "const": "ok",
-            "title": "Status"
+            "title": "Status",
+            "enum": [
+              "ok"
+            ]
           }
         },
         "type": "object",
@@ -790,8 +894,10 @@
         "properties": {
           "status": {
             "type": "string",
-            "const": "ok",
-            "title": "Status"
+            "title": "Status",
+            "enum": [
+              "ok"
+            ]
           },
           "checks": {
             "items": {
@@ -807,19 +913,6 @@
           "checks"
         ],
         "title": "DoctorResponse"
-      },
-      "ErrorResponse": {
-        "properties": {
-          "detail": {
-            "type": "string",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "required": [
-          "detail"
-        ],
-        "title": "ErrorResponse"
       },
       "NamedResourceResponse": {
         "properties": {
@@ -961,6 +1054,785 @@
           "duration_seconds"
         ],
         "title": "StartRequest"
+      },
+      "Problem": {
+        "type": "object",
+        "title": "Problem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{2,}$"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "AuthenticationRequiredProblem": {
+        "type": "object",
+        "title": "AuthenticationRequiredProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/authentication_required"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Authentication required"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              401
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "authentication_required"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "ConfigurationInvalidProblem": {
+        "type": "object",
+        "title": "ConfigurationInvalidProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/configuration_invalid"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Invalid configuration"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "configuration_invalid"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/ConfigurationInvalidProblem/$defs/ConfigurationIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "issues"
+        ],
+        "additionalProperties": true,
+        "$defs": {
+          "ConfigurationIssue": {
+            "properties": {
+              "location": {
+                "title": "Location",
+                "type": "string"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "type": {
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "location",
+              "message",
+              "type"
+            ],
+            "title": "ConfigurationIssue",
+            "type": "object"
+          }
+        }
+      },
+      "SceneNotFoundProblem": {
+        "type": "object",
+        "title": "SceneNotFoundProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/scene_not_found"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Scene not found"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "scene_not_found"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "HueUnavailableProblem": {
+        "type": "object",
+        "title": "HueUnavailableProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/hue_unavailable"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Hue Bridge unavailable"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              503
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "hue_unavailable"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "BridgeNotFoundProblem": {
+        "type": "object",
+        "title": "BridgeNotFoundProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/bridge_not_found"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Bridge not found"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              404
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "bridge_not_found"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "BridgeNotSelectedProblem": {
+        "type": "object",
+        "title": "BridgeNotSelectedProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/bridge_not_selected"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Bridge not selected"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "bridge_not_selected"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "LinkButtonTimeoutProblem": {
+        "type": "object",
+        "title": "LinkButtonTimeoutProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/link_button_timeout"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Link button timeout"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "link_button_timeout"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "OnboardingReadOnlyProblem": {
+        "type": "object",
+        "title": "OnboardingReadOnlyProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/onboarding_read_only"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Onboarding is read-only"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "onboarding_read_only"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "AlarmAlreadyRunningProblem": {
+        "type": "object",
+        "title": "AlarmAlreadyRunningProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/alarm_already_running"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Alarm already running"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              409
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "alarm_already_running"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "SceneRoomMismatchProblem": {
+        "type": "object",
+        "title": "SceneRoomMismatchProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/scene_room_mismatch"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Scene does not belong to room"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "scene_room_mismatch"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code"
+        ],
+        "additionalProperties": true
+      },
+      "RequestValidationProblem": {
+        "type": "object",
+        "title": "RequestValidationProblem",
+        "description": "RFC 9457 Problem Details with a stable application code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "enum": [
+              "urn:huerise:problem/request_validation_error"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "Request validation failed"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              422
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "request_validation_error"
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instance": {
+            "format": "uri-reference",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "pointer": {
+                  "type": "string"
+                },
+                "parameter": {
+                  "type": "string"
+                },
+                "in": {
+                  "type": "string",
+                  "enum": [
+                    "path",
+                    "query",
+                    "header",
+                    "cookie"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "detail"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "errors"
+        ],
+        "additionalProperties": true
       }
     },
     "securitySchemes": {

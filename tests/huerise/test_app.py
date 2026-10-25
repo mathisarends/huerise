@@ -167,13 +167,13 @@ def test_errors_are_documented_on_their_routes(client: TestClient) -> None:
         "responses"
     ]
 
-    assert responses["404"]["description"] == (
-        "The configured Hue scene does not exist."
-    )
+    assert responses["404"]["description"] == ("The selected Hue scene does not exist.")
     assert responses["409"]["description"] == ("A daylight alarm is already running.")
-    assert responses["422"]["description"] == (
-        "The YAML configuration is missing or invalid."
-    )
+    schema = responses["422"]["content"]["application/problem+json"]["schema"]
+    assert schema["discriminator"]["mapping"] == {
+        "configuration_invalid": "#/components/schemas/ConfigurationInvalidProblem",
+        "request_validation_error": "#/components/schemas/RequestValidationProblem",
+    }
     assert responses["503"]["description"] == (
         "The Hue Bridge is not configured, reachable, or authenticated."
     )
@@ -190,6 +190,10 @@ def test_protected_routes_require_api_key(
         client.get("/daylight-alarm/configuration", headers=headers).status_code == 401
     )
     assert client.get("/hue/bridge", headers=headers).status_code == 401
+    response = client.get("/doctor", headers=headers)
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.headers["www-authenticate"] == 'ApiKey realm="huerise"'
+    assert response.json()["code"] == "authentication_required"
 
 
 def test_exposes_doctor_rooms_and_configuration(client: TestClient) -> None:
@@ -262,9 +266,10 @@ def test_rejects_a_scene_from_another_room(two_room_client: TestClient) -> None:
     )
 
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": f"Hue scene {OTHER_SCENE_ID} does not belong to room {ROOM_ID}"
-    }
+    assert response.json()["code"] == "scene_room_mismatch"
+    assert response.json()["detail"] == (
+        f"Hue scene {OTHER_SCENE_ID} does not belong to room {ROOM_ID}"
+    )
 
 
 def test_rejects_an_after_alarm_scene_from_another_room(
@@ -286,9 +291,10 @@ def test_rejects_an_after_alarm_scene_from_another_room(
     )
 
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": f"Hue scene {OTHER_SCENE_ID} does not belong to room {ROOM_ID}"
-    }
+    assert response.json()["code"] == "scene_room_mismatch"
+    assert response.json()["detail"] == (
+        f"Hue scene {OTHER_SCENE_ID} does not belong to room {ROOM_ID}"
+    )
 
 
 def test_rejects_an_unknown_scene(two_room_client: TestClient) -> None:
@@ -304,7 +310,8 @@ def test_rejects_an_unknown_scene(two_room_client: TestClient) -> None:
     )
 
     assert response.status_code == 404
-    assert response.json() == {"detail": f"Hue scene not found: {unknown_scene_id}"}
+    assert response.json()["code"] == "scene_not_found"
+    assert response.json()["detail"] == f"Hue scene not found: {unknown_scene_id}"
 
 
 def test_starts_and_stops_daylight_alarm(
@@ -339,7 +346,14 @@ def test_rejects_a_second_alarm_with_the_documented_error(client: TestClient) ->
 
     assert first.status_code == 202
     assert second.status_code == 409
-    assert second.json() == {"detail": "Daylight alarm is already running"}
+    assert second.headers["content-type"] == "application/problem+json"
+    assert second.json() == {
+        "type": "urn:huerise:problem/alarm_already_running",
+        "title": "Alarm already running",
+        "status": 409,
+        "code": "alarm_already_running",
+        "detail": "Daylight alarm is already running",
+    }
 
 
 def test_request_validation_matches_documented_error(client: TestClient) -> None:
@@ -351,12 +365,15 @@ def test_request_validation_matches_documented_error(client: TestClient) -> None
 
     assert response.status_code == 422
     assert response.json() == {
-        "detail": "Request validation failed",
-        "issues": [
+        "type": "urn:huerise:problem/request_validation_error",
+        "title": "Request validation failed",
+        "status": 422,
+        "code": "request_validation_error",
+        "errors": [
             {
-                "location": "body.duration_seconds",
-                "message": "Input should be greater than or equal to 1",
-                "type": "greater_than_equal",
+                "pointer": "#/duration_seconds",
+                "detail": "Input should be greater than or equal to 1",
+                "code": "greater_than_equal",
             }
         ],
     }

@@ -5,7 +5,7 @@ package client
 // setDefaults set default value of fields.
 func (s *AlarmStatusResponse) setDefaults() {
 	{
-		val := string("started")
+		val := AlarmStatusResponseStatus("started")
 		s.Status.SetTo(val)
 	}
 }

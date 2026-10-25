@@ -1,11 +1,13 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import status
+from fastapi_canon import CanonResponse, CanonRouter
 
 from huerise.features.daylight_alarm.application import (
     DaylightAlarm,
     DaylightAlarmConfiguration,
 )
 from huerise.features.daylight_alarm.presentation.errors import (
+    alarm_errors,
     configuration_errors,
     start_alarm_errors,
 )
@@ -18,20 +20,23 @@ from huerise.features.daylight_alarm.presentation.schemas import (
     DaylightAlarmConfigurationResponse,
     StartRequest,
 )
-from huerise.platform.api.errors import ExceptionRouter
+from huerise.platform.api.errors import AUTHENTICATION_REQUIRED, CONFIGURATION_INVALID
 
-router = ExceptionRouter(
+router = CanonRouter(
     prefix="/daylight-alarm",
     tags=["daylight-alarm"],
     route_class=DishkaRoute,
+    error_registry=alarm_errors,
+    raises=[AUTHENTICATION_REQUIRED],
 )
 
 
 @router.get(
     "/configuration",
+    status_code=200,
     response_model=DaylightAlarmConfigurationResponse,
     operation_id="getDaylightAlarmConfiguration",
-    errors=configuration_errors,
+    raises=[CONFIGURATION_INVALID],
 )
 async def get_configuration(
     configuration: FromDishka[DaylightAlarmConfiguration],
@@ -42,9 +47,10 @@ async def get_configuration(
 
 @router.put(
     "/configuration",
+    status_code=200,
     response_model=DaylightAlarmConfigurationResponse,
     operation_id="setDaylightAlarmConfiguration",
-    errors=configuration_errors,
+    raises=configuration_errors,
 )
 async def set_configuration(
     body: DaylightAlarmConfigurationRequest,
@@ -69,7 +75,7 @@ async def set_configuration(
     status_code=status.HTTP_202_ACCEPTED,
     response_model=AlarmStatusResponse,
     operation_id="startDaylightAlarm",
-    errors=start_alarm_errors,
+    raises=start_alarm_errors,
 )
 async def start(
     alarm: FromDishka[DaylightAlarm],
@@ -83,7 +89,7 @@ async def start(
 
 @router.post(
     "/stop",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response=CanonResponse.empty(),
     response_model=None,
     operation_id="stopDaylightAlarm",
 )

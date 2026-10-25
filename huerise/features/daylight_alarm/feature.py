@@ -3,7 +3,7 @@ from fastapi_canon import Feature
 from huerise.features.daylight_alarm.infrastructure.provider import (
     DaylightAlarmProvider,
 )
-from huerise.features.daylight_alarm.presentation import router
+from huerise.features.daylight_alarm.presentation.router import router
 
 feature = Feature(
     name="daylight_alarm",

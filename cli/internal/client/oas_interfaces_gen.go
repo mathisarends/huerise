@@ -36,3 +36,7 @@ type SetDaylightAlarmConfigurationRes interface {
 type StartDaylightAlarmRes interface {
 	startDaylightAlarmRes()
 }
+
+type StopDaylightAlarmRes interface {
+	stopDaylightAlarmRes()
+}

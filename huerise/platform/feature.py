@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi_canon import Feature
 
+from huerise.platform.api.errors import api_errors
 from huerise.platform.provider import PlatformProvider
 from huerise.platform.settings import AppSettings
 
@@ -22,5 +23,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 platform_feature = Feature(
     name="platform",
     providers=[PlatformProvider],
+    errors=api_errors,
     lifespan=lifespan,
 )
