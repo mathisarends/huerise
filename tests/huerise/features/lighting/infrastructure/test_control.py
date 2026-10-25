@@ -130,7 +130,11 @@ class Bridge:
         return self.group
 
     async def scenes_for_room(self, room_id: UUID) -> list[Scene]:
-        return [item for item in self.scenes_data if item.group.rid == room_id]
+        return [
+            item.model_copy(deep=True)
+            for item in self.scenes_data
+            if item.group.rid == room_id
+        ]
 
     async def entertainment_areas(self) -> SimpleNamespace:
         return SimpleNamespace(data=self.areas)
@@ -471,6 +475,50 @@ async def test_scene_temperature_is_an_own_command(bridge: Bridge) -> None:
     bridge.clipped_color = {"x": 0.4, "y": 0.4}
     client = await monitored(bridge)
     await client.set_brightness(ROOM, 20)
+    await client.close()
+
+
+async def test_changes_during_stream_connect_prevent_scene_activation() -> None:
+    class SwitchingBridge(Bridge):
+        async def start_stream(self, timeout: float | None = None) -> None:
+            assert self.light.dimming is not None
+            self.light = self.light.model_copy(
+                update={
+                    "dimming": self.light.dimming.model_copy(update={"brightness": 80})
+                }
+            )
+            await super().start_stream(timeout)
+
+    bridge = SwitchingBridge()
+    client = HueifyClient(cast(Hueify, bridge))
+    with pytest.raises(LightingOverrideError):
+        await client.watch_room(ROOM)
+
+    assert bridge.commands == []
+    await client.close()
+
+
+async def test_an_existing_scene_is_allowed_before_start(bridge: Bridge) -> None:
+    bridge.scenes_data[1].status = SceneStatus(active="static", last_recall="old")
+    client = await monitored(bridge)
+    await client.close()
+
+    assert bridge.commands == [("activate", SCENE, 1)]
+
+
+async def test_a_scene_recall_during_connect_takes_priority() -> None:
+    class SwitchingBridge(Bridge):
+        async def start_stream(self, timeout: float | None = None) -> None:
+            self.scenes_data[1].status = SceneStatus(active="static", last_recall="new")
+            await super().start_stream(timeout)
+
+    bridge = SwitchingBridge()
+    bridge.scenes_data[1].status = SceneStatus(active="static", last_recall="old")
+    client = HueifyClient(cast(Hueify, bridge))
+    with pytest.raises(LightingOverrideError):
+        await client.watch_room(ROOM)
+
+    assert bridge.commands == []
     await client.close()
 
 

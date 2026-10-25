@@ -96,6 +96,8 @@ class RoomControlMonitor:
         self._client.on_connection_change(self._on_connection)
         await self._client.start_stream(timeout=self._connection_timeout)
         await self.wait_ready()
+        await self._resync(initial=True)
+        self.ensure_control()
 
     async def wait_ready(self) -> None:
         try:
@@ -191,7 +193,7 @@ class RoomControlMonitor:
             self._ready.clear()
             self._signals.put_nowait("disconnected")
 
-    async def _resync(self) -> None:
+    async def _resync(self, *, initial: bool = False) -> None:
         for room_id in self._room_lights:
             resources = [
                 *await self._client.rooms.lights(room_id),
@@ -202,6 +204,10 @@ class RoomControlMonitor:
                     HueEvent.model_validate(resource.model_dump()), resync=True
                 )
             for scene in await self._client.rooms.scenes(room_id):
+                previous = self._scenes.get(scene.id)
+                if initial and previous is not None and previous.status == scene.status:
+                    continue
+                self._scenes.setdefault(scene.id, scene)
                 await self._on_event(SceneEvent(id=scene.id, status=scene.status))
         for area in (await self._client.entertainment.list()).data:
             if area.id in self._areas and area.is_streaming:
