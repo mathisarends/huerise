@@ -7,6 +7,7 @@ from uuid import UUID
 
 import pytest
 from hueify import Hueify
+from hueify.onboarding import RegisteredApp
 from pydantic import SecretStr
 
 from huerise.features.lighting.domain import HueCredentials, HueUnavailableError
@@ -164,9 +165,9 @@ async def test_onboarding_adapts_hueify_functions(
     async def fake_discover() -> list[SimpleNamespace]:
         return [SimpleNamespace(id="bridge-1", internalipaddress="192.0.2.10")]
 
-    async def fake_register(bridge_ip: str, *, device_type: str) -> str:
+    async def fake_register(bridge_ip: str, *, device_type: str) -> RegisteredApp:
         registrations.append((bridge_ip, device_type))
-        return "registered-hue-key-123"
+        return RegisteredApp(app_key="registered-hue-key-123", client_key="unused-key")
 
     monkeypatch.setattr(hue_module, "discover_bridges", fake_discover)
     monkeypatch.setattr(hue_module, "register_app_key", fake_register)

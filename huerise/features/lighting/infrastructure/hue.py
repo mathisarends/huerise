@@ -99,4 +99,5 @@ class HueifyOnboarding(OnboardingGateway):
         )
 
     async def register(self, bridge_ip: str) -> str:
-        return await register_app_key(bridge_ip, device_type="huerise#backend")
+        registration = await register_app_key(bridge_ip, device_type="huerise#backend")
+        return registration.app_key
