@@ -3,7 +3,7 @@
   "info": {
     "title": "Huerise Daylight Alarm API",
     "description": "Run one YAML-configured Philips Hue daylight alarm.",
-    "version": "0.1.1"
+    "version": "0.2.0"
   },
   "paths": {
     "/doctor": {

@@ -1,5 +1,6 @@
 from collections.abc import Generator, Iterator
 from contextlib import contextmanager
+from importlib.metadata import version
 from pathlib import Path
 from uuid import UUID
 
@@ -162,7 +163,7 @@ def test_operation_ids_are_explicit_and_stable(client: TestClient) -> None:
 
 def test_api_uses_package_version(client: TestClient) -> None:
     assert isinstance(client.app, FastAPI)
-    assert client.app.version == __version__
+    assert client.app.version == __version__ == version("huerise")
 
 
 def test_errors_are_documented_on_their_routes(client: TestClient) -> None:

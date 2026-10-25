@@ -27,6 +27,9 @@ dev = [
     "ty>=0.0.81",
 ]
 
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "huerise/version.py" }]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
