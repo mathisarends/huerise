@@ -224,7 +224,8 @@ uv run --locked poe ci
 Releases are built from semantic-version Git tags. See
 [`docs/release.md`](docs/release.md) for the complete release process.
 
-Canon composes the `daylight_alarm`, `lighting`, and shared `platform` features.
+Canon composes the `health`, `daylight_alarm`, `lighting`, and shared `platform`
+features.
 Application services depend on owned ports, and Dishka owns their lifetimes.
 See [Architecture](docs/architecture.md) for the layout, HTTP contracts, and
 enforced dependency boundaries.

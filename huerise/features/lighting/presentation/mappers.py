@@ -1,25 +1,12 @@
 from collections.abc import Sequence
 
-from huerise.features.lighting.application import DoctorReport
 from huerise.features.lighting.domain import DiscoveredBridge, OnboardingStatus, Room
 from huerise.features.lighting.presentation.schemas import (
     BridgeResponse,
-    DoctorCheckResponse,
-    DoctorResponse,
     OnboardingStatusResponse,
     RoomResponse,
     SceneResponse,
 )
-
-
-def to_doctor_response(report: DoctorReport) -> DoctorResponse:
-    return DoctorResponse(
-        status=report.status,
-        checks=[
-            DoctorCheckResponse(name=check.name, status=check.status)
-            for check in report.checks
-        ],
-    )
 
 
 def to_room_response(room: Room) -> RoomResponse:

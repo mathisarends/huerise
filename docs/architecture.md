@@ -17,9 +17,14 @@ huerise/
     provider.py          Shared Dishka bindings
     feature.py           Platform assembly and logging lifespan
   features/
+    health/
+      application/       Doctor diagnostics
+      infrastructure/    Dishka provider
+      presentation/      Diagnostic router, schemas, mappers, errors
+      feature.py         Feature descriptor
     lighting/
       domain/            Hue values, errors, and abstract gateway contracts
-      application/       Onboarding, scenes, and Doctor workflows
+      application/       Onboarding and scene workflows
       infrastructure/    Hueify adapters and Dishka provider
       presentation/      Canon routers, response schemas, mappers, errors
       feature.py         Feature descriptor

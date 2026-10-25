@@ -1,6 +1,6 @@
 from dishka import Provider, Scope, provide
 
-from huerise.features.lighting.application import Doctor, HueOnboarding, SceneService
+from huerise.features.lighting.application import HueOnboarding, SceneService
 from huerise.features.lighting.domain import (
     HueClientFactory,
     HueCredentialsSource,
@@ -11,7 +11,7 @@ from huerise.features.lighting.infrastructure.hue import (
     HueifyClientFactory,
     HueifyOnboarding,
 )
-from huerise.platform.configuration import ConfigurationSource, ConfigurationStore
+from huerise.platform.configuration import ConfigurationStore
 from huerise.platform.settings import HueEnvironment
 
 
@@ -42,15 +42,6 @@ class LightingProvider(Provider):
         gateway: OnboardingGateway,
     ) -> HueOnboarding:
         return HueOnboarding(configuration, environment, gateway)
-
-    @provide
-    def doctor(
-        self,
-        configuration: ConfigurationSource,
-        credentials: HueCredentialsSource,
-        clients: HueClientFactory,
-    ) -> Doctor:
-        return Doctor(configuration, credentials, clients)
 
     @provide
     def scenes(

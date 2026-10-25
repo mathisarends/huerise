@@ -1,16 +1,16 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi_canon import CanonRouter
 
-from huerise.features.lighting.application import Doctor
-from huerise.features.lighting.presentation.errors import doctor_errors, lighting_errors
-from huerise.features.lighting.presentation.mappers import to_doctor_response
-from huerise.features.lighting.presentation.schemas import DoctorResponse
+from huerise.features.health.application import Doctor
+from huerise.features.health.presentation.errors import doctor_errors, health_errors
+from huerise.features.health.presentation.mappers import to_doctor_response
+from huerise.features.health.presentation.schemas import DoctorResponse
 from huerise.platform.api.errors import AUTHENTICATION_REQUIRED
 
 doctor_router = CanonRouter(
     tags=["doctor"],
     route_class=DishkaRoute,
-    error_registry=lighting_errors,
+    error_registry=health_errors,
     raises=[AUTHENTICATION_REQUIRED],
 )
 

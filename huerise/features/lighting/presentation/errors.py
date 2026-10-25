@@ -75,7 +75,6 @@ lighting_errors = ErrorRegistry.merge(
     name="lighting",
 )
 
-doctor_errors = [SCENE_NOT_FOUND, CONFIGURATION_INVALID, HUE_UNAVAILABLE]
 scene_errors = [CONFIGURATION_INVALID, HUE_UNAVAILABLE]
 discover_bridges_errors = [CONFIGURATION_INVALID, HUE_UNAVAILABLE]
 bridge_status_errors = [CONFIGURATION_INVALID]

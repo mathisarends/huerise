@@ -96,7 +96,11 @@ include_external_packages = true
 [[tool.importlinter.contracts]]
 name = "Feature layers depend inward"
 type = "layers"
-containers = ["huerise.features.lighting", "huerise.features.daylight_alarm"]
+containers = [
+    "huerise.features.health",
+    "huerise.features.lighting",
+    "huerise.features.daylight_alarm",
+]
 layers = ["presentation | infrastructure", "application", "(domain)"]
 
 [[tool.importlinter.contracts]]
