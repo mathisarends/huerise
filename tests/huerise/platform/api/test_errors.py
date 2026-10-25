@@ -1,8 +1,8 @@
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 
-from huerise.configuration import ConfigurationError, ConfigurationIssue
-from huerise.exception_handlers import ExceptionRouter, error
+from huerise.platform.api.errors import ExceptionRouter, error
+from huerise.platform.configuration import ConfigurationError, ConfigurationIssue
 
 
 def test_preserves_configuration_issues_in_route_error_response() -> None:

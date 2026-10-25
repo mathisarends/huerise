@@ -2,8 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from huerise.configuration import YamlConfiguration
-from huerise.env import HueEnvironment
 from huerise.features.lighting.application import (
     BridgeNotFoundError,
     BridgeNotSelectedError,
@@ -14,6 +12,8 @@ from huerise.features.lighting.application import (
     OnboardingReadOnlyError,
     OnboardingState,
 )
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.settings import HueEnvironment
 from tests.huerise.features.lighting.fakes import FakeOnboardingGateway
 
 BRIDGES = (

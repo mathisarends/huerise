@@ -4,8 +4,12 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from huerise.configuration import ConfigurationError, HueConfig, YamlConfiguration
-from huerise.env import AppSettings, HueEnvironment, LogLevel
+from huerise.platform.configuration import (
+    ConfigurationError,
+    HueConfig,
+    YamlConfiguration,
+)
+from huerise.platform.settings import AppSettings, HueEnvironment, LogLevel
 
 VALID_CONFIG = """\
 daylight_alarm:
@@ -111,7 +115,7 @@ def test_removes_temporary_file_when_atomic_replace_fails(
     def fail_replace(_: Path, __: Path) -> None:
         raise OSError("disk unavailable")
 
-    monkeypatch.setattr("huerise.configuration.os.replace", fail_replace)
+    monkeypatch.setattr("huerise.platform.configuration.os.replace", fail_replace)
 
     with pytest.raises(OSError, match="disk unavailable"):
         repository.save_hue(HueConfig(bridge_ip="192.0.2.10"))

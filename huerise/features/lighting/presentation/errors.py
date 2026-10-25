@@ -1,7 +1,5 @@
 from fastapi import status
 
-from huerise.configuration import ConfigurationError
-from huerise.exception_handlers import error
 from huerise.features.lighting.application import (
     BridgeNotFoundError,
     BridgeNotSelectedError,
@@ -10,6 +8,8 @@ from huerise.features.lighting.application import (
     OnboardingReadOnlyError,
     SceneNotFoundError,
 )
+from huerise.platform.api.errors import error
+from huerise.platform.configuration import ConfigurationError
 
 doctor_errors = {
     SceneNotFoundError: error(

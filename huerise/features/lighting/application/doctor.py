@@ -2,7 +2,6 @@ from contextlib import suppress
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
-from huerise.configuration import HueriseConfig
 from huerise.features.lighting.application.models import (
     HueClientFactory,
     HueCredentialsSource,
@@ -10,6 +9,7 @@ from huerise.features.lighting.application.models import (
     SceneNotFoundError,
     room_for_scene,
 )
+from huerise.platform.configuration import HueriseConfig
 
 
 class ConfigurationSource(Protocol):

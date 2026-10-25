@@ -1,16 +1,16 @@
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from uuid import UUID
 
 import pytest
-from dishka import Provider, Scope, make_async_container, provide
+from dishka import Provider, Scope, provide
 from fastapi.testclient import TestClient
+from fastapi_canon import Feature
 from pydantic import SecretStr
 
 from huerise import __version__
-from huerise.configuration import YamlConfiguration
-from huerise.env import AppSettings, HueEnvironment
-from huerise.features.daylight_alarm.infrastructure import DaylightAlarmProvider
+from huerise.app import create_app
 from huerise.features.lighting.application import (
     HueBridge,
     HueClientFactory,
@@ -18,8 +18,8 @@ from huerise.features.lighting.application import (
     Room,
     Scene,
 )
-from huerise.features.lighting.infrastructure import LightingProvider
-from huerise.main import create_app
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.settings import AppSettings, HueEnvironment
 from tests.huerise.features.lighting.fakes import (
     FakeHueClient,
     FakeHueClientFactory,
@@ -42,25 +42,25 @@ class AppTestProvider(Provider):
         self._path = path
         self._client = client
 
-    @provide
+    @provide(override=True)
     def settings(self) -> AppSettings:
         return AppSettings(
             api_key=SecretStr(API_KEY), config_path=self._path, _env_file=None
         )
 
-    @provide
+    @provide(override=True)
     def environment(self) -> HueEnvironment:
         return HueEnvironment(_env_file=None)
 
-    @provide
+    @provide(override=True)
     def configuration(self) -> YamlConfiguration:
         return YamlConfiguration(self._path)
 
-    @provide
+    @provide(override=True)
     def clients(self) -> HueClientFactory:
         return FakeHueClientFactory(self._client)
 
-    @provide
+    @provide(override=True)
     def onboarding_gateway(self) -> OnboardingGateway:
         return FakeOnboardingGateway((HueBridge("bridge-1", "192.0.2.10"),))
 
@@ -70,6 +70,7 @@ def hue_client() -> FakeHueClient:
     return FakeHueClient([Room(ROOM_ID, "Bedroom", (Scene(SCENE_ID, "Sunrise", 80),))])
 
 
+@contextmanager
 def _client(tmp_path: Path, hue_client: FakeHueClient) -> Iterator[TestClient]:
     path = tmp_path / "huerise.yml"
     path.write_text(
@@ -89,18 +90,18 @@ daylight_alarm:
 """,
         encoding="utf-8",
     )
-    container = make_async_container(
-        LightingProvider(),
-        DaylightAlarmProvider(),
-        AppTestProvider(path, hue_client),
+    overrides = Feature(
+        name="test_overrides",
+        providers=[AppTestProvider(path, hue_client)],
     )
-    with TestClient(create_app(container)) as test_client:
+    with TestClient(create_app(overrides)) as test_client:
         yield test_client
 
 
 @pytest.fixture
 def client(tmp_path: Path, hue_client: FakeHueClient) -> Iterator[TestClient]:
-    yield from _client(tmp_path, hue_client)
+    with _client(tmp_path, hue_client) as test_client:
+        yield test_client
 
 
 @pytest.fixture
@@ -111,7 +112,29 @@ def two_room_client(tmp_path: Path) -> Iterator[TestClient]:
             Room(OTHER_ROOM_ID, "Kitchen", (Scene(OTHER_SCENE_ID, "Bright", 100),)),
         ]
     )
-    yield from _client(tmp_path, hue_client)
+    with _client(tmp_path, hue_client) as test_client:
+        yield test_client
+
+
+def test_shutdown_stops_the_alarm_and_closes_the_hue_client(
+    tmp_path: Path, hue_client: FakeHueClient
+) -> None:
+    with _client(tmp_path, hue_client) as client:
+        response = client.post("/daylight-alarm/start", headers=AUTH)
+        assert response.status_code == 202
+        assert not hue_client.closed
+
+    assert hue_client.closed
+
+
+def test_unused_alarm_does_not_connect_to_hue_on_shutdown(
+    tmp_path: Path, hue_client: FakeHueClient
+) -> None:
+    with _client(tmp_path, hue_client):
+        pass
+
+    assert not hue_client.closed
+    assert hue_client.commands == []
 
 
 def test_operation_ids_are_explicit_and_stable(client: TestClient) -> None:

@@ -1,7 +1,5 @@
 from dishka import Provider, Scope, provide
 
-from huerise.configuration import YamlConfiguration
-from huerise.env import HueEnvironment
 from huerise.features.lighting.application import (
     Doctor,
     HueClientFactory,
@@ -14,6 +12,8 @@ from huerise.features.lighting.infrastructure.hue import (
     HueifyClientFactory,
     HueifyOnboarding,
 )
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.settings import HueEnvironment
 
 
 class LightingProvider(Provider):

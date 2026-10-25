@@ -1,16 +1,16 @@
 from uuid import UUID
 
-from huerise.configuration import (
-    AfterAlarmConfig,
-    DaylightAlarmConfig,
-    NamedResourceConfig,
-    YamlConfiguration,
-)
 from huerise.features.lighting.application import (
     Room,
     Scene,
     SceneService,
     room_for_scene,
+)
+from huerise.platform.configuration import (
+    AfterAlarmConfig,
+    DaylightAlarmConfig,
+    NamedResourceConfig,
+    YamlConfiguration,
 )
 
 

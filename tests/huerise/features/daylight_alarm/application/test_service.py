@@ -4,12 +4,6 @@ from uuid import UUID
 
 import pytest
 
-from huerise.configuration import (
-    AfterAlarmConfig,
-    DaylightAlarmConfig,
-    HueriseConfig,
-    NamedResourceConfig,
-)
 from huerise.features.daylight_alarm.application import (
     AlarmAlreadyRunningError,
     DaylightAlarm,
@@ -19,6 +13,12 @@ from huerise.features.lighting.application import (
     Room,
     Scene,
     SceneNotFoundError,
+)
+from huerise.platform.configuration import (
+    AfterAlarmConfig,
+    DaylightAlarmConfig,
+    HueriseConfig,
+    NamedResourceConfig,
 )
 from tests.huerise.fakes import FakeConfiguration
 from tests.huerise.features.lighting.fakes import (

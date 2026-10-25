@@ -4,8 +4,6 @@ from uuid import UUID
 from hueify import Hueify
 from hueify.onboarding import discover_bridges, register_app_key
 
-from huerise.configuration import YamlConfiguration
-from huerise.env import HueEnvironment
 from huerise.features.lighting.application.models import (
     HueClient,
     HueCredentials,
@@ -17,6 +15,8 @@ from huerise.features.lighting.application.onboarding import (
     HueBridge,
     OnboardingGateway,
 )
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.settings import HueEnvironment
 
 
 class HueCredentialsProvider:

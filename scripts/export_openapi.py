@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from huerise.main import app
+from huerise.app import app
 
 OUTPUT = Path(__file__).resolve().parent.parent / "specs" / "openapi.json"
 

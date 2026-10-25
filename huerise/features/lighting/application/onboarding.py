@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Protocol
 
-from huerise.configuration import HueConfig, YamlConfiguration
-from huerise.env import HueEnvironment
 from huerise.features.lighting.application.models import HueUnavailableError
+from huerise.platform.configuration import HueConfig, YamlConfiguration
+from huerise.platform.settings import HueEnvironment
 
 
 class OnboardingState(StrEnum):

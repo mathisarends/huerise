@@ -1,10 +1,10 @@
 from dishka import Provider, Scope, provide
 
-from huerise.configuration import YamlConfiguration
-from huerise.env import AppSettings, HueEnvironment
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.settings import AppSettings, HueEnvironment
 
 
-class CoreProvider(Provider):
+class PlatformProvider(Provider):
     scope = Scope.APP
 
     @provide

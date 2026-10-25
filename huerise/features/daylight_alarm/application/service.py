@@ -5,7 +5,6 @@ from contextlib import suppress
 from typing import Protocol
 from uuid import UUID
 
-from huerise.configuration import DaylightAlarmConfig, HueriseConfig
 from huerise.features.lighting.application import (
     HueClient,
     HueClientFactory,
@@ -14,6 +13,7 @@ from huerise.features.lighting.application import (
     SceneNotFoundError,
     room_for_scene,
 )
+from huerise.platform.configuration import DaylightAlarmConfig, HueriseConfig
 
 logger = logging.getLogger(__name__)
 START_BRIGHTNESS = 1.0

@@ -1,7 +1,5 @@
 from fastapi import status
 
-from huerise.configuration import ConfigurationError
-from huerise.exception_handlers import error
 from huerise.features.daylight_alarm.application import (
     AlarmAlreadyRunningError,
     SceneDoesNotBelongToRoomError,
@@ -10,6 +8,8 @@ from huerise.features.lighting.application import (
     HueUnavailableError,
     SceneNotFoundError,
 )
+from huerise.platform.api.errors import error
+from huerise.platform.configuration import ConfigurationError
 
 start_alarm_errors = {
     AlarmAlreadyRunningError: error(

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from huerise.configuration import HueriseConfig
+from huerise.platform.configuration import HueriseConfig
 
 
 @dataclass

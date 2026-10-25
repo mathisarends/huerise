@@ -2,17 +2,17 @@ from uuid import UUID
 
 import pytest
 
-from huerise.configuration import (
-    DaylightAlarmConfig,
-    HueriseConfig,
-    NamedResourceConfig,
-)
 from huerise.features.lighting.application import (
     Doctor,
     HueUnavailableError,
     Room,
     Scene,
     SceneNotFoundError,
+)
+from huerise.platform.configuration import (
+    DaylightAlarmConfig,
+    HueriseConfig,
+    NamedResourceConfig,
 )
 from tests.huerise.fakes import FakeConfiguration
 from tests.huerise.features.lighting.fakes import (

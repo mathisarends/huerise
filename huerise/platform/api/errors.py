@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from huerise.configuration import ConfigurationError, ConfigurationIssue
+from huerise.platform.configuration import ConfigurationError, ConfigurationIssue
 
 
 class ErrorResponse(BaseModel):

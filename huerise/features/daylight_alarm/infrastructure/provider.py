@@ -1,25 +1,31 @@
+from collections.abc import AsyncIterator
+
 from dishka import Provider, Scope, provide
 
-from huerise.configuration import YamlConfiguration
 from huerise.features.daylight_alarm.application import (
     DaylightAlarm,
     DaylightAlarmConfiguration,
 )
 from huerise.features.lighting.application import HueClientFactory, SceneService
 from huerise.features.lighting.infrastructure import HueCredentialsProvider
+from huerise.platform.configuration import YamlConfiguration
 
 
 class DaylightAlarmProvider(Provider):
     scope = Scope.APP
 
     @provide
-    def daylight_alarm(
+    async def daylight_alarm(
         self,
         configuration: YamlConfiguration,
         credentials: HueCredentialsProvider,
         clients: HueClientFactory,
-    ) -> DaylightAlarm:
-        return DaylightAlarm(configuration, credentials, clients)
+    ) -> AsyncIterator[DaylightAlarm]:
+        alarm = DaylightAlarm(configuration, credentials, clients)
+        try:
+            yield alarm
+        finally:
+            await alarm.stop()
 
     @provide
     def configuration(

@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from huerise.configuration import YamlConfiguration
-from huerise.env import AppSettings, HueEnvironment
-from huerise.shared import CoreProvider
+from huerise.platform.configuration import YamlConfiguration
+from huerise.platform.provider import PlatformProvider
+from huerise.platform.settings import AppSettings, HueEnvironment
 
 
 def test_core_provider_builds_environment_backed_dependencies(
@@ -15,7 +15,7 @@ def test_core_provider_builds_environment_backed_dependencies(
     monkeypatch.setenv("HUERISE_CONFIG_PATH", "custom.yml")
     monkeypatch.delenv("HUE_BRIDGE_IP", raising=False)
     monkeypatch.delenv("HUE_APP_KEY", raising=False)
-    provider = CoreProvider()
+    provider = PlatformProvider()
 
     settings = provider.app_settings()
     environment = provider.hue_environment()

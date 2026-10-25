@@ -1,8 +1,5 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import Depends
 
-from huerise.authentication import require_api_key
-from huerise.exception_handlers import ExceptionRouter
 from huerise.features.lighting.application import HueOnboarding, SceneService
 from huerise.features.lighting.presentation.errors import (
     bridge_status_errors,
@@ -22,12 +19,12 @@ from huerise.features.lighting.presentation.schemas import (
     OnboardingStatusResponse,
     RoomResponse,
 )
+from huerise.platform.api.errors import ExceptionRouter
 
 hue_router = ExceptionRouter(
     prefix="/hue",
     tags=["hue"],
     route_class=DishkaRoute,
-    dependencies=[Depends(require_api_key)],
 )
 
 

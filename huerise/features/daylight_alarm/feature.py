@@ -1,4 +1,4 @@
-from huerise.shared import Feature
+from fastapi_canon import Feature
 
 from .infrastructure import DaylightAlarmProvider
 from .presentation import router

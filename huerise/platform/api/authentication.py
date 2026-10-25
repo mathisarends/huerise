@@ -4,7 +4,7 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 
-from huerise.env import AppSettings
+from huerise.platform.settings import AppSettings
 
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 

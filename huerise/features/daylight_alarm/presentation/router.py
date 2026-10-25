@@ -1,8 +1,6 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import Depends, status
+from fastapi import status
 
-from huerise.authentication import require_api_key
-from huerise.exception_handlers import ExceptionRouter
 from huerise.features.daylight_alarm.application import (
     DaylightAlarm,
     DaylightAlarmConfiguration,
@@ -17,12 +15,12 @@ from huerise.features.daylight_alarm.presentation.schemas import (
     DaylightAlarmConfigurationResponse,
     StartRequest,
 )
+from huerise.platform.api.errors import ExceptionRouter
 
 router = ExceptionRouter(
     prefix="/daylight-alarm",
     tags=["daylight-alarm"],
     route_class=DishkaRoute,
-    dependencies=[Depends(require_api_key)],
 )
 
 
