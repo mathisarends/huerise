@@ -1,8 +1,7 @@
 from fastapi_canon import Feature
 
 from huerise.features.health.infrastructure.provider import HealthProvider
-from huerise.features.health.presentation.doctor_router import doctor_router
-from huerise.features.health.presentation.probe_router import probe_router
+from huerise.features.health.presentation.routers import doctor_router, probe_router
 
 feature = Feature(
     name="health",
