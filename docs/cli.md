@@ -95,8 +95,8 @@ mode the same failure is a single object:
 ```json
 {
   "error": {
-    "code": "auth",
-    "message": "Invalid API key",
+    "code": "authentication_required",
+    "message": "Invalid or missing API key",
     "hint": "Check HUERISE_API_KEY, or pass --api-key.",
     "status": 401
   }
@@ -107,11 +107,13 @@ mode the same failure is a single object:
 | ---: | --- |
 | `0` | Success |
 | `1` | Transport, API, or local I/O failure |
-| `2` | Invalid arguments, missing configuration, or invalid server YAML |
+| `2` | Invalid arguments, missing configuration, or HTTP 422 validation failure |
 | `3` | Authentication or authorization failure |
 
-A `configuration` error means the server rejected the request because its YAML
-is missing or invalid; `hint` then lists the offending locations.
+API failures preserve the server's stable Problem Details `code`, including
+`configuration_invalid`, `request_validation_error`, `alarm_already_running`,
+and `hue_unavailable`. Configuration issues and request-validation pointers
+appear in `hint`. Local argument and connection errors retain their CLI codes.
 
 ## Configuration precedence
 

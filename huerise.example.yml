@@ -1,0 +1,8 @@
+daylight_alarm:
+  room:
+    id: "00000000-0000-0000-0000-000000000000"
+    name: Bedroom
+  scene:
+    id: "00000000-0000-0000-0000-000000000000"
+    name: Sunrise
+  duration_seconds: 1800

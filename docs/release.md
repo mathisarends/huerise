@@ -46,25 +46,27 @@ semantic versioning:
 - increment MINOR for backward-compatible features;
 - increment MAJOR for incompatible API, CLI, or configuration changes.
 
+During the initial `0.x` series, increment MINOR for incompatible changes and
+describe the migration in the release notes. Version `0.2.0` introduces the
+Canon Problem Details error contract.
+
 Update `huerise/version.py` without the `v` prefix:
 
 ```python
 __version__ = "2.1.0"
 ```
 
-Run the same checks used by CI:
+Regenerate contracts after changing the version, then run the same checks used
+by CI:
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run pytest
-uv run python scripts/export_openapi.py
-cd cli
-go generate ./...
-go test ./...
-go vet ./...
-cd ..
-git diff --exit-code -- specs/openapi.json cli/internal/client
+uv lock
+uv run --locked poe codegen
+uv run --locked poe check
+uv run --locked poe test
+uv run --locked poe go-test
+uv run --locked poe go-vet
+uv build
 ```
 
 Optionally validate the CLI packaging locally with GoReleaser:
@@ -77,12 +79,13 @@ goreleaser release --snapshot --clean --skip=publish
 Commit and push the version change:
 
 ```bash
-git add huerise/version.py
+git add huerise/version.py uv.lock specs/openapi.json cli/internal/client
 git commit -m "Release 2.1.0"
 git push origin main
 ```
 
-Wait for the `CI` workflow on `main` to succeed before creating the tag.
+Run `uv run --locked poe ci` on the committed tree and wait for the Linux and
+Windows `CI` jobs on `main` to succeed before creating the tag.
 
 ## Publish a release
 

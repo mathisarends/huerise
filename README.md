@@ -18,6 +18,7 @@ shortcut — which calls `POST /daylight-alarm/start`.
 - [API](#api)
 - [CLI](#cli)
 - [Local development](#local-development)
+- [Architecture](docs/architecture.md)
 
 ## How it works
 
@@ -142,6 +143,12 @@ storage.
 
 Send the configured key as `X-API-Key` on every route.
 
+API failures use RFC 9457 `application/problem+json`, including `type`, `title`,
+`status`, a stable `code`, and optional `detail`. YAML failures add sanitized
+`issues`; invalid requests add `errors` with JSON pointers. For example, a
+second alarm returns `409` with `code: "alarm_already_running"`. Server and
+CLI should be upgraded together from `0.1.x`; see [the changelog](CHANGELOG.md).
+
 | Method | Route | Purpose |
 | --- | --- | --- |
 | `GET` | `/doctor` | Validate YAML, credentials, Bridge access, and configured scene |
@@ -198,11 +205,11 @@ HUERISE_API_URL=http://huerise.local:8080
 
 ## Local development
 
-Huerise requires Python 3.14 and
+Huerise requires Python 3.14, Go 1.25 or newer, and
 [`uv`](https://docs.astral.sh/uv/).
 
 ```bash
-uv sync
+uv sync --locked
 $env:HUERISE_API_KEY = "development-key"  # PowerShell
 uv run python -m huerise.main
 ```
@@ -210,14 +217,14 @@ uv run python -m huerise.main
 Quality checks:
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run pytest
+uv run --locked poe check
+uv run --locked poe ci
 ```
 
 Releases are built from semantic-version Git tags. See
-[`docs/relase.md`](docs/relase.md) for the complete release process.
+[`docs/release.md`](docs/release.md) for the complete release process.
 
-The implementation is split into the `daylight_alarm` and `lighting` features,
-each layered into `application`, `infrastructure`, and `presentation`. Dishka
-owns their app-scoped services and Hue adapters.
+Canon composes the `daylight_alarm`, `lighting`, and shared `platform` features.
+Application services depend on owned ports, and Dishka owns their lifetimes.
+See [Architecture](docs/architecture.md) for the layout, HTTP contracts, and
+enforced dependency boundaries.
