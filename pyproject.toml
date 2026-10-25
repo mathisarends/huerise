@@ -3,10 +3,10 @@ name = "huerise"
 dynamic = ["version"]
 description = "Minimal API for a YAML-configured Philips Hue daylight alarm"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<3.15"
 dependencies = [
     "hueify>=0.8.0",
-    "dishka>=1.9.1",
+    "dishka>=1.10,<2",
     "pydantic-settings>=2.13.1",
     "pydantic>=2.12.5",
     "fastapi>=0.124.0",
@@ -17,11 +17,14 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "import-linter>=2.4",
+    "poethepoet>=0.48.0",
     "pre-commit>=4.5.0",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.9",
+    "ty>=0.0.81",
 ]
 
 [tool.pytest.ini_options]
@@ -32,9 +35,15 @@ addopts = "--import-mode=importlib --cov=huerise --cov-report=term-missing"
 
 [tool.coverage.run]
 source = ["huerise"]
+branch = true
 omit = [
     "huerise/main.py",
 ]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_covered = true
 
 [tool.ruff]
 line-length = 88
@@ -76,3 +85,103 @@ packages = ["huerise"]
 
 [tool.hatch.version]
 path = "huerise/version.py"
+
+[tool.importlinter]
+root_package = "huerise"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Feature layers depend inward"
+type = "layers"
+containers = ["huerise.features.lighting", "huerise.features.daylight_alarm"]
+layers = ["presentation | infrastructure", "application", "(domain)"]
+
+[[tool.importlinter.contracts]]
+name = "Domain stays independent of frameworks and adapters"
+type = "forbidden"
+source_modules = ["huerise.features.*.domain"]
+forbidden_modules = [
+    "huerise.platform",
+    "fastapi",
+    "fastapi_canon",
+    "dishka",
+    "pydantic",
+    "pydantic_settings",
+    "hueify",
+    "yaml",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application uses ports instead of HTTP and concrete adapters"
+type = "forbidden"
+source_modules = ["huerise.features.*.application"]
+forbidden_modules = [
+    "huerise.features.*.infrastructure",
+    "huerise.features.*.presentation",
+    "huerise.platform.api",
+    "huerise.platform.configuration.yaml",
+    "fastapi",
+    "fastapi_canon",
+    "dishka",
+    "hueify",
+]
+
+[[tool.importlinter.contracts]]
+name = "Platform does not depend on business features"
+type = "forbidden"
+source_modules = ["huerise.platform"]
+forbidden_modules = ["huerise.features"]
+
+[tool.poe.tasks.sync]
+cmd = "uv sync --locked"
+
+[tool.poe.tasks.format]
+cmd = "ruff format ."
+
+[tool.poe.tasks.format-check]
+cmd = "ruff format --check ."
+
+[tool.poe.tasks.lint]
+cmd = "ruff check ."
+
+[tool.poe.tasks.typecheck]
+cmd = "ty check"
+
+[tool.poe.tasks.architecture]
+cmd = "lint-imports"
+
+[tool.poe.tasks.test]
+cmd = "pytest"
+
+[tool.poe.tasks.lock-check]
+cmd = "uv lock --check"
+
+[tool.poe.tasks.openapi]
+cmd = "python scripts/export_openapi.py"
+
+[tool.poe.tasks.client-generate]
+cmd = "go generate ./..."
+cwd = "cli"
+
+[tool.poe.tasks.go-test]
+cmd = "go test ./..."
+cwd = "cli"
+
+[tool.poe.tasks.go-vet]
+cmd = "go vet ./..."
+cwd = "cli"
+
+[tool.poe.tasks.codegen-clean]
+cmd = "git diff --exit-code -- specs/openapi.json cli/internal/client"
+
+[tool.poe.tasks.codegen]
+sequence = ["openapi", "client-generate"]
+
+[tool.poe.tasks.codegen-check]
+sequence = ["codegen", "codegen-clean"]
+
+[tool.poe.tasks.check]
+sequence = ["format-check", "lint", "typecheck", "architecture"]
+
+[tool.poe.tasks.ci]
+sequence = ["check", "lock-check", "test", "go-test", "go-vet", "codegen-check"]

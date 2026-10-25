@@ -130,6 +130,7 @@ def test_updates_only_hue_section_atomically(tmp_path: Path) -> None:
     )
 
     config = repository.load()
+    assert config.hue is not None
     assert str(config.hue.bridge_ip) == "192.0.2.10"
     assert config.hue.app_key == "a-valid-hue-app-key-123"
     assert config.daylight_alarm.scene.id == UUID(int=1)

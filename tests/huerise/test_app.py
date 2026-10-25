@@ -1,10 +1,11 @@
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from uuid import UUID
 
 import pytest
 from dishka import Provider, Scope, provide
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi_canon import Feature
 from pydantic import SecretStr
@@ -71,7 +72,7 @@ def hue_client() -> FakeHueClient:
 
 
 @contextmanager
-def _client(tmp_path: Path, hue_client: FakeHueClient) -> Iterator[TestClient]:
+def _client(tmp_path: Path, hue_client: FakeHueClient) -> Generator[TestClient]:
     path = tmp_path / "huerise.yml"
     path.write_text(
         f"""\
@@ -138,6 +139,7 @@ def test_unused_alarm_does_not_connect_to_hue_on_shutdown(
 
 
 def test_operation_ids_are_explicit_and_stable(client: TestClient) -> None:
+    assert isinstance(client.app, FastAPI)
     operations = {
         operation["operationId"]
         for path in client.app.openapi()["paths"].values()
@@ -159,10 +161,12 @@ def test_operation_ids_are_explicit_and_stable(client: TestClient) -> None:
 
 
 def test_api_uses_package_version(client: TestClient) -> None:
+    assert isinstance(client.app, FastAPI)
     assert client.app.version == __version__
 
 
 def test_errors_are_documented_on_their_routes(client: TestClient) -> None:
+    assert isinstance(client.app, FastAPI)
     responses = client.app.openapi()["paths"]["/daylight-alarm/start"]["post"][
         "responses"
     ]

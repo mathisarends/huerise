@@ -1,9 +1,12 @@
+import builtins
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 from uuid import UUID
 
 import pytest
+from hueify import Hueify
 from pydantic import SecretStr
 
 from huerise.features.lighting.domain import HueCredentials, HueUnavailableError
@@ -24,12 +27,12 @@ ROOM_ID = UUID(int=2)
 
 @dataclass
 class FakeRoomsApi:
-    brightness: list[tuple[UUID, float]] = field(default_factory=list)
+    brightness: builtins.list[tuple[UUID, float]] = field(default_factory=list)
 
     async def list(self) -> SimpleNamespace:
         return SimpleNamespace(data=[SimpleNamespace(id=ROOM_ID, name="Bedroom")])
 
-    async def scenes(self, room_id: UUID) -> list[SimpleNamespace]:
+    async def scenes(self, room_id: UUID) -> builtins.list[SimpleNamespace]:
         assert room_id == ROOM_ID
         return [
             SimpleNamespace(
@@ -136,7 +139,7 @@ def test_factory_builds_adapter_with_credentials(
 
 async def test_client_adapts_hueify_operations() -> None:
     external = FakeHueify()
-    client = HueifyClient(external)
+    client = HueifyClient(cast(Hueify, external))
 
     rooms = await client.list_rooms()
     await client.activate_scene(SCENE_ID, brightness=12.5)

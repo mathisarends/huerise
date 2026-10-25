@@ -92,6 +92,7 @@ desktop.ini
 docs/node_modules/
 
 .ruff_cache/
+.import_linter_cache/
 bandit-report.json
 
 # --- SQLLite temp files ---

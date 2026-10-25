@@ -18,3 +18,18 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: typecheck
+        name: Check Python types
+        entry: uv run --locked poe typecheck
+        language: system
+        pass_filenames: false
+        types_or: [python, toml]
+      - id: architecture
+        name: Check architecture boundaries
+        entry: uv run --locked poe architecture
+        language: system
+        pass_filenames: false
+        types_or: [python, toml]

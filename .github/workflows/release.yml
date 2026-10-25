@@ -32,24 +32,12 @@ jobs:
             echo "Release tag must match vMAJOR.MINOR.PATCH" >&2
             exit 1
           fi
-          package_version="$(uv run python -c 'from huerise import __version__; print(__version__)')"
+          package_version="$(uv run --locked python -c 'from huerise import __version__; print(__version__)')"
           if [[ "v${package_version}" != "${GITHUB_REF_NAME}" ]]; then
             echo "Tag ${GITHUB_REF_NAME} does not match package version ${package_version}" >&2
             exit 1
           fi
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      - run: uv run pytest
-      - run: uv run python scripts/export_openapi.py
-        env:
-          HUERISE_API_KEY: schema-export-placeholder
-      - run: go generate ./...
-        working-directory: cli
-      - run: go test ./...
-        working-directory: cli
-      - run: go vet ./...
-        working-directory: cli
-      - run: git diff --exit-code -- specs/openapi.json cli/internal/client
+      - run: uv run --locked poe ci
 
   cli:
     name: Build CLI
